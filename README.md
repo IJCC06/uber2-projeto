@@ -396,7 +396,7 @@ uber-2/
 ├── der/
 │   └── der.png
 │
-├── src/
+├── python/
 │   ├── main.py
 │   ├── usuarios.py
 │   ├── motoristas.py
@@ -405,8 +405,6 @@ uber-2/
 │   ├── pagamentos.py
 │   ├── avaliacoes.py
 │   └── enderecos.py
-│
-└── requirements.txt
 ```
 
 ---
@@ -429,61 +427,13 @@ O sistema terá funcionalidades relacionadas ao gerenciamento da plataforma, com
 
 ---
 
-# ▶️ Como Executar
-
-### 1. Clone o repositório
-
-```bash
-git clone <URL_DO_REPOSITORIO>
-```
-
-### 2. Acesse a pasta
-
-```bash
-cd uber-2
-```
-
-### 3. Configure o banco de dados
-
-Crie o banco de dados PostgreSQL e execute os scripts presentes na pasta:
-
-```text
-database/
-```
-
-Primeiro:
-
-```text
-create_tables.sql
-```
-
-Depois:
-
-```text
-insert_data.sql
-```
-
-Por fim:
-
-```text
-queries.sql
-```
-
-### 4. Execute o projeto Python
-
-```bash
-python src/main.py
-```
-
----
-
 # 👥 Equipe
 
 | Integrante           | Função          |
 | -------------------- | --------------- |
-| Nome do integrante 1 | Desenvolvimento |
-| Nome do integrante 2 | Desenvolvimento |
-| Nome do integrante 3 | Desenvolvimento |
+| Gabriel M. Cassano   | Desenvolvimento |
+| João Vitor Tezzaro   | Desenvolvimento |
+| Ana L. do Nascimento | Desenvolvimento |
 
 ---
 
