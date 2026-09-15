@@ -433,7 +433,7 @@ O sistema terá funcionalidades relacionadas ao gerenciamento da plataforma, com
 | -------------------- | --------------- |
 | Gabriel M. Cassano   | Desenvolvimento |
 | João Vitor Tezzaro   | Desenvolvimento |
-| Ana L. do Nascimento | Desenvolvimento |
+| Ana L. do Nascimento | Documentação    |
 
 ---
 
