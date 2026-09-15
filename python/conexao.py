@@ -5,5 +5,8 @@ CAMINHO_BANCO = "../database/uber2.db"
 
 def conectar():
     conexao = sqlite3.connect(CAMINHO_BANCO)
-    conexao.row_factory = sqlite3.Row
+
+    # Permite utilizar as chaves estrangeiras no SQLite
+    conexao.execute("PRAGMA foreign_keys = ON")
+
     return conexao

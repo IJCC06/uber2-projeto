@@ -423,7 +423,7 @@ uber-2/
 ├── README.md
 │
 ├── database/
-|   ├── uber2.db
+|   └── uber2.db
 |
 ├── sql/
 │   ├── create_tables.sql
@@ -443,7 +443,8 @@ uber-2/
 │   ├── pagamentos.py
 │   ├── avaliacoes.py
 │   ├── enderecos.py
-│   └── historico_corridas.py
+│   ├── historico_corridas.py
+|   └── criar_tabelas.py
 ```
 
 ---
