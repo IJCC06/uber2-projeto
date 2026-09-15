@@ -182,27 +182,4 @@ def criar_tabelas():
     print("Tabelas criadas com sucesso!")
 
 
-#criar_tabelas()
-
-def listar_tabelas():
-    conexao = conectar()
-    cursor = conexao.cursor()
-
-    cursor.execute("""
-        SELECT name
-        FROM sqlite_master
-        WHERE type = 'table'
-        ORDER BY name;
-    """)
-
-    tabelas = cursor.fetchall()
-
-    print("Tabelas do banco:")
-
-    for tabela in tabelas:
-        print("-", tabela[0])
-
-    conexao.close()
-
-
-listar_tabelas()
+criar_tabelas()
