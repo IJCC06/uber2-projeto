@@ -15,6 +15,5 @@ def cadastrar_motorista():
     """, (nome, cpf, telefone, cnh))
 
     conexao.commit()
+    print("Motorista cadastrado com sucesso!")
     conexao.close()
-
-cadastrar_motorista()
