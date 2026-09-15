@@ -121,7 +121,7 @@ CREATE TABLE pagamentos (
 CREATE TABLE historico_corridas (
     id SERIAL PRIMARY KEY,
     id_corrida INTEGER NOT NULL,
-    status_anterior status_corrida NOT NULL,
+    status_anterior status_corrida,
     novo_status status_corrida NOT NULL,
     data_alteracao TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -129,3 +129,6 @@ CREATE TABLE historico_corridas (
         FOREIGN KEY (id_corrida)
         REFERENCES corridas(id)
 );
+
+ALTER TABLE corridas
+ALTER COLUMN id_motorista DROP NOT NULL;
