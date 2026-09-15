@@ -4,7 +4,7 @@
 
 Sistema de transporte desenvolvido como **Atividade Integrada de Banco de Dados com Python**, com o objetivo de aplicar, na prática, conhecimentos de **Banco de Dados** e **Programação Web Backend**.
 
-O projeto simula uma plataforma de transporte por aplicativo, permitindo o gerenciamento de usuários, motoristas, veículos, corridas, pagamentos, avaliações e endereços.
+O projeto simula uma plataforma de transporte por aplicativo, permitindo o gerenciamento de usuários, motoristas, veículos, corridas, pagamentos, avaliações, endereços e histórico de corridas.
 
 ---
 
@@ -14,7 +14,7 @@ O **Uber 2** foi desenvolvido para atender aos requisitos propostos na atividade
 
 A proposta é desenvolver um sistema de gerenciamento de corridas que permita cadastrar e consultar informações relacionadas aos passageiros, motoristas e viagens.
 
-O banco de dados será composto por **7 tabelas**, conforme o requisito para equipes formadas por três integrantes.
+O banco de dados será composto por **8 tabelas**, sendo 7 tabelas principais e uma tabela destinada ao histórico das corridas.
 
 ---
 
@@ -22,7 +22,7 @@ O banco de dados será composto por **7 tabelas**, conforme o requisito para equ
 
 * Desenvolver um banco de dados relacional utilizando PostgreSQL;
 * Construir um **Diagrama Entidade-Relacionamento (DER)**;
-* Criar as 7 tabelas do sistema;
+* Criar as 8 tabelas do sistema;
 * Criar scripts para criação e população do banco;
 * Realizar consultas SQL que entreguem informações relevantes;
 * Aplicar comandos `INSERT`, `UPDATE`, `DELETE` e `WHERE`;
@@ -67,21 +67,22 @@ O banco de dados será composto por **7 tabelas**, conforme o requisito para equ
 
 # 🗄️ Banco de Dados
 
-O banco de dados do **Uber 2** será desenvolvido utilizando **PostgreSQL** e contará com **7 tabelas relacionadas entre si**.
+O banco de dados do **Uber 2** será desenvolvido utilizando **PostgreSQL** e contará com **8 tabelas relacionadas entre si**.
 
 As tabelas representam os principais elementos necessários para o funcionamento de uma plataforma de transporte.
 
 ## 📊 Tabelas
 
-| Tabela       | Descrição                                          |
-| ------------ | -------------------------------------------------- |
-| `usuarios`   | Armazena os dados dos passageiros cadastrados      |
-| `motoristas` | Armazena os dados dos motoristas                   |
-| `veiculos`   | Contém informações dos veículos utilizados         |
-| `corridas`   | Registra as corridas realizadas                    |
-| `pagamentos` | Armazena os pagamentos das corridas                |
-| `avaliacoes` | Registra as avaliações realizadas após as corridas |
-| `enderecos`  | Armazena os endereços utilizados nas corridas      |
+| Tabela               | Descrição                                          |
+| -------------------- | -------------------------------------------------- |
+| `usuarios`           | Armazena os dados dos passageiros cadastrados      |
+| `motoristas`         | Armazena os dados dos motoristas                   |
+| `veiculos`           | Contém informações dos veículos utilizados         |
+| `corridas`           | Registra as corridas realizadas                    |
+| `pagamentos`         | Armazena os pagamentos das corridas                |
+| `avaliacoes`         | Registra as avaliações realizadas após as corridas |
+| `enderecos`          | Armazena os endereços utilizados nas corridas      |
+| `historico_corridas` | Registra as alterações de status das corridas      |
 
 ---
 
@@ -226,6 +227,33 @@ Uma corrida possuirá um endereço de **origem** e um endereço de **destino**.
 
 ---
 
+## 🕐 8. Histórico de Corridas
+
+A tabela `historico_corridas` armazenará as alterações de status das corridas, permitindo acompanhar todas as etapas pelas quais uma corrida passou.
+
+```text
+historico_corridas
+├── id_historico
+├── id_corrida
+├── status_anterior
+├── novo_status
+└── data_alteracao
+```
+
+Essa tabela permitirá registrar, por exemplo, a mudança de uma corrida de:
+
+```text
+Solicitada → Aceita
+Aceita → Em andamento
+Em andamento → Finalizada
+```
+
+Também será possível registrar quando uma corrida for cancelada.
+
+O campo `id_corrida` será utilizado para relacionar cada registro do histórico à corrida correspondente.
+
+---
+
 # 🔗 Relacionamentos
 
 As principais relações entre as tabelas serão:
@@ -252,7 +280,7 @@ CORRIDAS
    │                  ├── Origem
    │                  └── Destino
    │
-   └────────────────────────
+   └──────────────► HISTORICO_CORRIDAS
 ```
 
 O **DER completo** será disponibilizado na pasta de documentação do projeto.
@@ -271,7 +299,7 @@ Será utilizado:
 CREATE TABLE
 ```
 
-para criar as sete tabelas e definir suas respectivas chaves primárias e estrangeiras.
+para criar as oito tabelas e definir suas respectivas chaves primárias e estrangeiras.
 
 ### População
 
@@ -323,6 +351,9 @@ Alguns exemplos:
 * Quanto foi arrecadado em determinado período?
 * Quais motoristas estão disponíveis?
 * Qual veículo realizou determinada corrida?
+* Qual foi o histórico de status de determinada corrida?
+* Quantas vezes as corridas foram canceladas?
+* Quais corridas passaram por mais alterações de status?
 
 Essas consultas têm como objetivo demonstrar a utilização prática dos dados armazenados.
 
@@ -352,6 +383,9 @@ def listar_corridas():
     pass
 
 def realizar_pagamento():
+    pass
+
+def consultar_historico_corrida():
     pass
 ```
 
@@ -404,7 +438,8 @@ uber-2/
 │   ├── corridas.py
 │   ├── pagamentos.py
 │   ├── avaliacoes.py
-│   └── enderecos.py
+│   ├── enderecos.py
+│   └── historico_corridas.py
 ```
 
 ---
@@ -423,6 +458,8 @@ O sistema terá funcionalidades relacionadas ao gerenciamento da plataforma, com
 * Exclusão de registros;
 * Registro de pagamentos;
 * Registro de avaliações;
+* Registro do histórico das corridas;
+* Consulta do histórico de uma corrida;
 * Consulta de informações utilizando filtros.
 
 ---
