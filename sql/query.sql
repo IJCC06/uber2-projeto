@@ -1,6 +1,5 @@
 -- Exibir todos os Dados
 SELECT * FROM usuarios;
-SELECT * FROM enderecos;
 SELECT * FROM motoristas;
 SELECT * FROM veiculos;
 SELECT * FROM corridas;
@@ -32,7 +31,8 @@ FROM motoristas m
 JOIN corridas c
     ON c.id_motorista = m.id
 GROUP BY m.id, m.nome
-ORDER BY quantidade_corridas DESC;
+ORDER BY quantidade_corridas DESC
+LIMIT 5;
 
 -- 3. Qual forma de pagamento foi mais utilizada?
 SELECT
@@ -58,14 +58,14 @@ SELECT
     h.novo_status,
     h.data_alteracao
 FROM historico_corridas h
-WHERE h.id_corrida = 1
+WHERE h.id_corrida = 20
 ORDER BY h.data_alteracao;
 
 -- 6. Quanto foi arrecadado em determinado período?
 SELECT
     sum(valor) AS total_arrecadado
 FROM pagamentos
-WHERE status = 'Pago' AND data_pagamento BETWEEN '2026-01-01' AND '2026-12-31';
+WHERE status = 'Pago' AND data_pagamento BETWEEN '2026-01-01' AND '2026-03-01';
 
 -- 7. Qual foi a média de avaliação de cada motorista?
 SELECT

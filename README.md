@@ -1,515 +1,605 @@
-# 🚗 Uber 2 — O inimigo agora é outro
+# 🚗 Uber 2
 
-> **Uber 2: O inimigo agora é outro.**
+Sistema de gerenciamento de corridas desenvolvido em **Python** utilizando **SQLite**.
 
-Sistema de transporte desenvolvido como **Atividade Integrada de Banco de Dados com Python**, com o objetivo de aplicar, na prática, conhecimentos de **Banco de Dados** e **Programação Web Backend**.
-
-O projeto simula uma plataforma de transporte por aplicativo, permitindo o gerenciamento de usuários, motoristas, veículos, corridas, pagamentos, avaliações, endereços e histórico de corridas.
+O projeto simula o funcionamento básico de uma plataforma de transporte, permitindo o gerenciamento de usuários, motoristas, veículos, corridas, pagamentos e avaliações.
 
 ---
 
-## 📌 Sobre o Projeto
+## 📌 Sobre o projeto
 
-O **Uber 2** foi desenvolvido para atender aos requisitos propostos na atividade integrada, utilizando **PostgreSQL** para a estrutura do banco de dados e **Python** para a implementação da aplicação.
+O **Uber 2** foi desenvolvido como um projeto acadêmico com o objetivo de aplicar conceitos de:
 
-A proposta é desenvolver um sistema de gerenciamento de corridas que permita cadastrar e consultar informações relacionadas aos passageiros, motoristas e viagens.
+* Python;
+* Programação modular;
+* Banco de dados relacional;
+* SQLite;
+* CRUD;
+* Chaves primárias e estrangeiras;
+* Validações;
+* Consultas SQL;
+* Relacionamentos entre tabelas;
+* Menus interativos no terminal.
 
-O banco de dados será composto por **8 tabelas**, sendo 7 tabelas principais e uma tabela destinada ao histórico das corridas.
+O sistema possui três tipos de acesso:
 
----
-
-## 🎯 Objetivos
-
-* Desenvolver um banco de dados relacional utilizando PostgreSQL;
-* Construir um **Diagrama Entidade-Relacionamento (DER)**;
-* Criar as 8 tabelas do sistema;
-* Criar scripts para criação e população do banco;
-* Realizar consultas SQL que entreguem informações relevantes;
-* Aplicar comandos `INSERT`, `UPDATE`, `DELETE` e `WHERE`;
-* Desenvolver a aplicação utilizando Python;
-* Utilizar funções, listas e dicionários;
-* Organizar o projeto utilizando módulos;
-* Trabalhar com SQLite utilizando Python, conforme solicitado na atividade.
+* 👤 Usuário;
+* 🚗 Motorista;
+* 🔐 Administrador.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Tecnologias utilizadas
 
-### Banco de Dados
-
-* **PostgreSQL**
+* **Python 3**
 * **SQLite**
+* Biblioteca `sqlite3`
+* Programação modular
 * SQL
 
-### Backend
-
-* **Python**
-
-### Conceitos Aplicados
-
-* DER — Diagrama Entidade-Relacionamento;
-* Chaves primárias e estrangeiras;
-* Relacionamentos entre tabelas;
-* `CREATE TABLE`;
-* `INSERT`;
-* `UPDATE`;
-* `DELETE`;
-* `SELECT`;
-* `WHERE`;
-* Funções;
-* Listas;
-* Dicionários;
-* Módulos;
-* Estruturas de decisão;
-* Estruturas de repetição.
+Não são necessárias bibliotecas externas para executar o projeto.
 
 ---
 
-# 🗄️ Banco de Dados
-
-O banco de dados do **Uber 2** será desenvolvido utilizando **PostgreSQL** e contará com **8 tabelas relacionadas entre si**.
-
-As tabelas representam os principais elementos necessários para o funcionamento de uma plataforma de transporte.
-
-## 📊 Tabelas
-
-| Tabela               | Descrição                                          |
-| -------------------- | -------------------------------------------------- |
-| `usuarios`           | Armazena os dados dos passageiros cadastrados      |
-| `motoristas`         | Armazena os dados dos motoristas                   |
-| `veiculos`           | Contém informações dos veículos utilizados         |
-| `corridas`           | Registra as corridas realizadas                    |
-| `pagamentos`         | Armazena os pagamentos das corridas                |
-| `avaliacoes`         | Registra as avaliações realizadas após as corridas |
-| `enderecos`          | Armazena os endereços utilizados nas corridas      |
-| `historico_corridas` | Registra as alterações de status das corridas      |
-
----
-
-## 👤 1. Usuários
-
-A tabela `usuarios` armazenará as informações dos passageiros que utilizam o sistema.
+## 📁 Estrutura do projeto
 
 ```text
-usuarios
-├── id_usuario
-├── nome
-├── email
-├── telefone
-├── senha
-└── data_cadastro
+Uber2/
+│
+├── principal.py
+│
+├── banco/
+│   ├── __init__.py
+│   ├── conexao.py
+│   └── criar_banco.py
+│
+├── usuarios/
+│   ├── __init__.py
+│   └── usuarios.py
+│
+├── motoristas/
+│   ├── __init__.py
+│   └── motoristas.py
+│
+├── veiculos/
+│   ├── __init__.py
+│   └── veiculos.py
+│
+├── corridas/
+│   ├── __init__.py
+│   └── corridas.py
+│
+├── pagamentos/
+│   ├── __init__.py
+│   └── pagamentos.py
+│
+├── avaliacoes/
+│   ├── __init__.py
+│   └── avaliacoes.py
+│
+├── historico/
+│   ├── __init__.py
+│   └── historico.py
+│
+└── consultas/
+    ├── __init__.py
+    └── consultas.py
 ```
+
+O banco de dados `uber2.db` é criado na pasta principal do projeto.
 
 ---
 
-## 🚗 2. Motoristas
+## 🗄️ Banco de dados
 
-A tabela `motoristas` armazenará os dados dos motoristas cadastrados na plataforma.
+O sistema utiliza **7 tabelas**:
+
+### `usuarios`
+
+Armazena os dados dos usuários.
+
+Principais informações:
+
+* ID;
+* Nome;
+* E-mail;
+* Telefone;
+* Senha;
+* Data de cadastro.
+
+### `motoristas`
+
+Armazena os dados dos motoristas.
+
+Principais informações:
+
+* ID;
+* Nome;
+* CPF;
+* Telefone;
+* CNH;
+* Status.
+
+O status pode ser:
+
+* `Ativo`
+* `Inativo`
+
+### `veiculos`
+
+Armazena os veículos associados aos motoristas.
+
+Informações:
+
+* ID;
+* Motorista;
+* Modelo;
+* Marca;
+* Placa;
+* Ano;
+* Cor.
+
+### `corridas`
+
+Armazena as corridas realizadas no sistema.
+
+Informações:
+
+* ID;
+* Usuário;
+* Motorista;
+* Origem;
+* Destino;
+* Data e hora;
+* Valor;
+* Status.
+
+Os status possíveis são:
+
+* `Solicitada`
+* `Aceita`
+* `Em andamento`
+* `Finalizada`
+* `Cancelada`
+
+### `pagamentos`
+
+Armazena os pagamentos das corridas.
+
+Formas de pagamento:
+
+* `Pix`
+* `Dinheiro`
+* `Cartão`
+
+Status:
+
+* `Pendente`
+* `Pago`
+* `Cancelado`
+
+No fluxo atual do sistema, quando o usuário cadastra um pagamento, ele é registrado automaticamente como **Pago**.
+
+### `avaliacoes`
+
+Armazena as avaliações das corridas.
+
+Cada avaliação possui:
+
+* ID;
+* Corrida;
+* Nota;
+* Comentário;
+* Data da avaliação.
+
+A nota deve estar entre **1 e 5**.
+
+### `historico_corridas`
+
+Registra as alterações de status das corridas.
+
+São armazenados:
+
+* ID do registro;
+* ID da corrida;
+* Status anterior;
+* Novo status;
+* Data da alteração.
+
+---
+
+## 👤 Funcionalidades do usuário
+
+O usuário pode:
+
+### Cadastro
+
+* Criar uma conta;
+* Informar nome, e-mail, telefone e senha.
+
+### Login
+
+O acesso é realizado utilizando:
+
+* E-mail;
+* Senha.
+
+### Corridas
+
+O usuário pode:
+
+* Solicitar uma corrida;
+* Informar origem e destino;
+* Visualizar suas próprias corridas.
+
+O sistema não permite que origem e destino sejam iguais.
+
+### Pagamentos
+
+O usuário pode:
+
+* Cadastrar pagamento de uma corrida finalizada;
+* Escolher entre Pix, dinheiro ou cartão;
+* Consultar seus pagamentos.
+
+O sistema impede o cadastro de mais de um pagamento para a mesma corrida.
+
+### Avaliações
+
+Após uma corrida ser finalizada, o usuário pode:
+
+* Avaliar a corrida;
+* Informar uma nota de 1 a 5;
+* Adicionar um comentário.
+
+Uma corrida não pode receber mais de uma avaliação do mesmo sistema.
+
+### Dados da conta
+
+O usuário pode:
+
+* Editar seus dados;
+* Excluir sua própria conta.
+
+---
+
+## 🚗 Funcionalidades do motorista
+
+O motorista realiza login utilizando seu **CPF**.
+
+Para entrar no sistema, o motorista precisa estar com status `Ativo`.
+
+### Corridas
+
+O motorista pode:
+
+* Visualizar corridas disponíveis;
+* Aceitar uma corrida;
+* Atualizar o status de uma corrida.
+
+O fluxo de status é:
 
 ```text
-motoristas
-├── id_motorista
-├── nome
-├── cpf
-├── telefone
-├── cnh
-└── status
+Solicitada
+     ↓
+Aceita
+     ↓
+Em andamento
+     ↓
+Finalizada
 ```
 
-O campo `status` poderá representar, por exemplo:
+Também é possível cancelar uma corrida em determinadas etapas do fluxo.
 
-* Disponível;
-* Indisponível;
-* Em corrida.
+### Veículos
+
+O motorista pode:
+
+* Cadastrar veículo;
+* Listar seus veículos;
+* Editar seus veículos;
+* Excluir seus veículos.
+
+### Histórico
+
+O motorista pode consultar o histórico das alterações de status das corridas associadas a ele.
+
+### Dados pessoais
+
+O motorista pode editar seus próprios dados.
 
 ---
 
-## 🚘 3. Veículos
+## 🔐 Funcionalidades do administrador
 
-A tabela `veiculos` armazenará os veículos utilizados pelos motoristas.
+O administrador possui acesso às áreas de gerenciamento do sistema.
+
+### Gerenciamento de usuários
+
+Pode:
+
+* Listar usuários;
+* Editar usuários;
+* Excluir usuários.
+
+### Gerenciamento de motoristas
+
+Pode:
+
+* Cadastrar motoristas;
+* Listar motoristas;
+* Editar motoristas;
+* Alterar status;
+* Excluir motoristas.
+
+### Gerenciamento de veículos
+
+Pode:
+
+* Listar todos os veículos;
+* Editar veículos;
+* Excluir veículos.
+
+### Gerenciamento de corridas
+
+Pode:
+
+* Listar todas as corridas;
+* Editar corridas;
+* Excluir corridas;
+* Consultar o histórico de uma corrida.
+
+### Gerenciamento de pagamentos
+
+Pode:
+
+* Listar pagamentos;
+* Editar pagamentos;
+* Excluir pagamentos.
+
+### Gerenciamento de avaliações
+
+Pode:
+
+* Listar avaliações;
+* Editar avaliações;
+* Excluir avaliações.
+
+---
+
+## 📊 Consultas e relatórios
+
+O sistema possui **9 consultas SQL**:
+
+### 1. Cinco corridas mais caras
+
+Exibe as cinco corridas com maior valor.
+
+### 2. Motorista com mais corridas
+
+Identifica os motoristas com maior quantidade de corridas.
+
+### 3. Forma de pagamento mais utilizada
+
+Mostra a forma de pagamento mais utilizada pelos usuários.
+
+### 4. Usuários com mais corridas
+
+Exibe os usuários que possuem maior quantidade de corridas.
+
+### 5. Motoristas disponíveis
+
+Lista os motoristas que estão com status `Ativo`.
+
+### 6. Histórico de determinada corrida
+
+Permite consultar todas as alterações de status de uma corrida específica.
+
+### 7. Arrecadação por período
+
+Permite informar uma data inicial e uma data final para consultar:
+
+* Quantidade de pagamentos;
+* Valor total arrecadado.
+
+São considerados os pagamentos com status `Pago`.
+
+### 8. Média de avaliação dos motoristas
+
+Apresenta a quantidade de avaliações e a média de notas recebidas por cada motorista.
+
+### 9. Média geral dos motoristas
+
+Apresenta a média geral das avaliações dos motoristas.
+
+---
+
+## 🔄 Fluxo principal do sistema
+
+Um exemplo de utilização do sistema:
 
 ```text
-veiculos
-├── id_veiculo
-├── id_motorista
-├── modelo
-├── marca
-├── placa
-├── ano
-└── cor
-```
-
-O campo `id_motorista` será utilizado para relacionar o veículo ao seu motorista.
-
----
-
-## 🏁 4. Corridas
-
-A tabela `corridas` será uma das principais tabelas do sistema e registrará as viagens solicitadas pelos usuários.
-
-```text
-corridas
-├── id_corrida
-├── id_usuario
-├── id_motorista
-├── id_origem
-├── id_destino
-├── data_hora
-├── valor
-└── status
-```
-
-O campo `status` poderá assumir valores como:
-
-* Solicitada;
-* Aceita;
-* Em andamento;
-* Finalizada;
-* Cancelada.
-
----
-
-## 💳 5. Pagamentos
-
-A tabela `pagamentos` armazenará as informações referentes ao pagamento de cada corrida.
-
-```text
-pagamentos
-├── id_pagamento
-├── id_corrida
-├── forma_pagamento
-├── valor
-├── status
-└── data_pagamento
-```
-
-As formas de pagamento poderão incluir:
-
-* Pix;
-* Cartão;
-* Dinheiro.
-
----
-
-## ⭐ 6. Avaliações
-
-A tabela `avaliacoes` armazenará a avaliação realizada após uma corrida.
-
-```text
-avaliacoes
-├── id_avaliacao
-├── id_corrida
-├── nota
-├── comentario
-└── data_avaliacao
-```
-
-A nota poderá variar de **1 a 5**.
-
----
-
-## 📍 7. Endereços
-
-A tabela `enderecos` armazenará os locais utilizados como origem e destino das corridas.
-
-```text
-enderecos
-├── id_endereco
-├── rua
-├── numero
-├── bairro
-├── cidade
-├── estado
-└── cep
-```
-
-Uma corrida possuirá um endereço de **origem** e um endereço de **destino**.
-
----
-
-## 🕐 8. Histórico de Corridas
-
-A tabela `historico_corridas` armazenará as alterações de status das corridas, permitindo acompanhar todas as etapas pelas quais uma corrida passou.
-
-```text
-historico_corridas
-├── id_historico
-├── id_corrida
-├── status_anterior
-├── novo_status
-└── data_alteracao
-```
-
-Essa tabela permitirá registrar, por exemplo, a mudança de uma corrida de:
-
-```text
-Solicitada → Aceita
-Aceita → Em andamento
-Em andamento → Finalizada
-```
-
-Também será possível registrar quando uma corrida for cancelada.
-
-O campo `id_corrida` será utilizado para relacionar cada registro do histórico à corrida correspondente.
-
----
-
-# 🔗 Relacionamentos
-
-As principais relações entre as tabelas serão:
-
-```text
-USUARIOS
-   │
-   │ 1:N
-   ▼
-CORRIDAS
-   │
-   ├──────────────► MOTORISTAS
-   │                    │
-   │                    │ 1:N
-   │                    ▼
-   │                 VEICULOS
-   │
-   ├──────────────► PAGAMENTOS
-   │
-   ├──────────────► AVALIACOES
-   │
-   ├──────────────► ENDERECOS
-   │                  │
-   │                  ├── Origem
-   │                  └── Destino
-   │
-   └──────────────► HISTORICO_CORRIDAS
-```
-
-O **DER completo** será disponibilizado na pasta de documentação do projeto.
-
----
-
-# 📝 Scripts SQL
-
-Os scripts SQL serão separados de acordo com suas funções.
-
-### Criação das tabelas
-
-Será utilizado:
-
-```sql
-CREATE TABLE
-```
-
-para criar as oito tabelas e definir suas respectivas chaves primárias e estrangeiras.
-
-### População
-
-Os dados iniciais serão inseridos utilizando:
-
-```sql
-INSERT INTO
-```
-
-### Atualização
-
-Para alterar informações:
-
-```sql
-UPDATE
-```
-
-### Exclusão
-
-Para remover registros:
-
-```sql
-DELETE
-```
-
-### Consultas
-
-As informações serão consultadas utilizando:
-
-```sql
-SELECT
-WHERE
+Cadastro do usuário
+        ↓
+Login
+        ↓
+Solicitação de corrida
+        ↓
+Motorista visualiza corrida
+        ↓
+Motorista aceita
+        ↓
+Corrida em andamento
+        ↓
+Corrida finalizada
+        ↓
+Pagamento
+        ↓
+Avaliação
+        ↓
+Histórico e consultas
 ```
 
 ---
 
-# 🔎 Consultas que Entregam Valor
+## 📝 Regras importantes
 
-O sistema contará com consultas que permitam extrair informações relevantes do banco de dados.
+O sistema possui diversas validações para manter a integridade dos dados.
 
-Alguns exemplos:
+Entre elas:
 
-* Quais foram as 5 corridas mais caras?
-* Qual motorista realizou mais corridas?
-* Qual foi a média de avaliação de cada motorista?
-* Qual forma de pagamento foi mais utilizada?
-* Quais corridas foram canceladas?
-* Quais usuários realizaram mais corridas?
-* Quanto foi arrecadado em determinado período?
-* Quais motoristas estão disponíveis?
-* Qual veículo realizou determinada corrida?
-* Qual foi o histórico de status de determinada corrida?
-* Quantas vezes as corridas foram canceladas?
-* Quais corridas passaram por mais alterações de status?
-
-Essas consultas têm como objetivo demonstrar a utilização prática dos dados armazenados.
+* E-mail de usuário não pode ser duplicado;
+* CPF de motorista não pode ser duplicado;
+* CNH não pode ser duplicada;
+* Placa de veículo não pode ser duplicada;
+* Origem e destino de uma corrida não podem ser iguais;
+* Valor da corrida não pode ser negativo;
+* Nota de avaliação deve estar entre 1 e 5;
+* Uma corrida não pode possuir mais de um pagamento;
+* Uma corrida não pode possuir mais de uma avaliação;
+* Pagamento só pode ser cadastrado para corrida finalizada;
+* Avaliação só pode ser realizada para corrida finalizada;
+* Motorista precisa estar ativo para realizar login;
+* O motorista só pode gerenciar seus próprios veículos;
+* O motorista só pode atualizar corridas associadas a ele;
+* O usuário só pode visualizar suas próprias corridas e pagamentos.
 
 ---
 
-# 🐍 Projeto Python
+## ▶️ Como executar
 
-A aplicação será desenvolvida utilizando Python e deverá aplicar os conceitos trabalhados em sala de aula.
+### 1. Clone ou baixe o projeto
 
-## Funções
+Coloque o projeto em uma pasta de sua preferência.
 
-As funcionalidades serão organizadas em funções.
+### 2. Abra o terminal na pasta do projeto
 
 Exemplo:
 
-```python
-def cadastrar_usuario():
-    pass
-
-def cadastrar_motorista():
-    pass
-
-def solicitar_corrida():
-    pass
-
-def listar_corridas():
-    pass
-
-def realizar_pagamento():
-    pass
-
-def consultar_historico_corrida():
-    pass
+```bash
+cd Uber2
 ```
 
-## Listas
+### 3. Crie o banco de dados
 
-Listas serão utilizadas para armazenar e manipular conjuntos de informações.
+Execute:
 
-```python
-corridas = []
+```bash
+python banco/criar_banco.py
 ```
 
-## Dicionários
-
-Dicionários poderão representar os dados de cada registro.
-
-```python
-usuario = {
-    "nome": "João",
-    "email": "joao@email.com",
-    "telefone": "99999-9999"
-}
-```
-
-## Módulos
-
-O projeto será dividido em módulos para facilitar a organização, manutenção e reutilização do código.
-
----
-
-# 📁 Estrutura do Projeto
+Isso criará o arquivo:
 
 ```text
-uber-2/
-│
-├── README.md
-│
-├── database/
-|   └── uber2.db
-|
-├── sql/
-│   ├── create_tables.sql
-│   ├── insert_data.sql
-│   └── queries.sql
-│
-├── der/
-│   └── der.png
-│
-├── python/
-│   ├── principal.py
-|   ├── conexao.py
-│   ├── usuarios.py
-│   ├── motoristas.py
-│   ├── veiculos.py
-│   ├── corridas.py
-│   ├── pagamentos.py
-│   ├── avaliacoes.py
-│   ├── enderecos.py
-│   ├── historico_corridas.py
-|   └── criar_tabelas.py
-|   └── listar_dados.py
+uber2.db
+```
+
+### 4. Execute o sistema
+
+```bash
+python principal.py
+```
+
+O menu principal será exibido:
+
+```text
+===================================
+             UBER 2
+===================================
+1 - Login
+2 - Cadastrar usuário
+0 - Sair
 ```
 
 ---
 
-# 🚕 Funcionalidades
+## 🔑 Acessos
 
-O sistema terá funcionalidades relacionadas ao gerenciamento da plataforma, como:
+### Usuário
 
-* Cadastro de usuários;
-* Cadastro de motoristas;
-* Cadastro de veículos;
-* Cadastro de endereços;
-* Solicitação de corridas;
-* Consulta de corridas;
-* Atualização de informações;
-* Exclusão de registros;
-* Registro de pagamentos;
-* Registro de avaliações;
-* Registro do histórico das corridas;
-* Consulta do histórico de uma corrida;
-* Consulta de informações utilizando filtros.
+O usuário deve primeiro realizar o cadastro e depois entrar utilizando:
+
+```text
+E-mail
+Senha
+```
+
+### Motorista
+
+O motorista é cadastrado pelo administrador e realiza login utilizando:
+
+```text
+CPF
+```
+
+O motorista precisa estar com status `Ativo`.
+
+### Administrador
+
+O acesso administrativo utiliza uma senha definida no arquivo `principal.py`.
+
+```python
+SENHA_ADMIN = "OInimigoEoTransito"
+```
+
+> Para um sistema real, a senha administrativa não deveria ficar diretamente no código. Neste projeto, ela é utilizada dessa forma para fins acadêmicos.
 
 ---
 
-# 👥 Equipe
+## 🧪 Testes realizados
 
-| Integrante           | Função          |
-| -------------------- | --------------- |
-| Gabriel M. Cassano   | Desenvolvimento |
-| João Vitor Tezzaro   | Desenvolvimento |
-| Ana L. do Nascimento | Documentação    |
+Durante o desenvolvimento, foram testados os principais fluxos do sistema:
+
+* Cadastro de usuário;
+* Login de usuário;
+* Login de administrador;
+* Cadastro de motorista;
+* Login de motorista;
+* Cadastro de veículo;
+* Solicitação de corrida;
+* Aceite de corrida;
+* Alteração de status;
+* Finalização de corrida;
+* Cadastro de pagamento;
+* Cadastro de avaliação;
+* Registro de histórico;
+* Consultas e relatórios.
+
+Também foi testado o fluxo completo de uma corrida:
+
+```text
+Solicitada → Aceita → Em andamento → Finalizada
+```
+
+E o histórico registrou corretamente cada alteração.
 
 ---
 
-# 📚 Atividade Acadêmica
+## 📚 Objetivos acadêmicos
 
-Projeto desenvolvido como parte da **Atividade Integrada — Banco de Dados com Python**, aplicando conhecimentos adquiridos nas disciplinas de **Banco de Dados** e **Programação Web Backend**.
+O projeto busca demonstrar conhecimentos de:
 
-### Banco de Dados
-
-* Diagrama Entidade-Relacionamento;
-* PostgreSQL;
-* SQL;
-* `CREATE TABLE`;
-* `INSERT`;
-* `UPDATE`;
-* `DELETE`;
-* `WHERE`.
-
-### Python
-
-* Sintaxe da linguagem;
-* Estruturas de decisão;
-* Estruturas de repetição;
-* Listas;
-* Dicionários;
+* Desenvolvimento em Python;
+* Organização de projetos em módulos;
 * Funções;
-* Módulos;
-* SQLite com Python.
+* Estruturas condicionais;
+* Laços de repetição;
+* Entrada e saída de dados;
+* Tratamento de informações;
+* SQL;
+* SQLite;
+* CRUD;
+* Relacionamentos entre tabelas;
+* Chaves estrangeiras;
+* Integridade de dados;
+* Consultas com `JOIN`;
+* Agregações como `COUNT`, `SUM` e `AVG`.
 
 ---
 
-# 🎬 Slogan
+## 👨‍💻 Projeto acadêmico
 
-> ## **Uber 2: O inimigo agora é outro.**
-
-Um projeto acadêmico inspirado em aplicativos de transporte, desenvolvido para colocar em prática conhecimentos de **Python e Banco de Dados** — porque chamar uma corrida era fácil demais.
+**Projeto:** Uber 2
+**Tecnologia principal:** Python
+**Banco de dados:** SQLite
+**Tipo:** Sistema de gerenciamento de corridas

@@ -246,7 +246,7 @@ def menu_admin_motoristas():
         print("1 - Cadastrar motorista")
         print("2 - Listar motoristas")
         print("3 - Editar motorista")
-        print("4 - Alterar status")
+        print("4 - Alterar status do motorista")
         print("5 - Excluir motorista")
         print("0 - Voltar")
 

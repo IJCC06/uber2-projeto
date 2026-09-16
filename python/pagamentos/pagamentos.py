@@ -72,13 +72,15 @@ def cadastrar_pagamento(id_usuario):
         INSERT INTO pagamentos (
             id_corrida,
             forma_pagamento,
-            valor
+            valor,
+            status
         )
-        VALUES (?, ?, ?)
+        VALUES (?, ?, ?, ?)
     """, (
         id_corrida,
         forma_pagamento,
-        valor
+        valor,
+        "Pago"
     ))
 
     conexao.commit()

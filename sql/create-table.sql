@@ -8,16 +8,6 @@ CREATE TABLE usuarios (
     data_cadastro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE enderecos (
-    id SERIAL PRIMARY KEY,
-    rua VARCHAR(150) NOT NULL,
-    numero VARCHAR(10) NOT NULL,
-    bairro VARCHAR(100) NOT NULL,
-    cidade VARCHAR(100) NOT NULL,
-    estado VARCHAR(50) NOT NULL,
-    cep VARCHAR(9) NOT NULL
-);
-
 CREATE TYPE status_motorista AS ENUM (
     'Ativo',
     'Inativo'
@@ -58,8 +48,8 @@ CREATE TABLE corridas (
     id SERIAL PRIMARY KEY,
     id_usuario INTEGER NOT NULL,
     id_motorista INTEGER NOT NULL,
-    id_origem INTEGER NOT NULL,
-    id_destino INTEGER NOT NULL,
+    origem VARCHAR(100) NOT NULL,
+    destino VARCHAR(100) NOT NULL,
     data_hora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valor DECIMAL(10, 2) CHECK(valor >= 0),
     status status_corrida DEFAULT 'Solicitada',
@@ -72,13 +62,8 @@ CREATE TABLE corridas (
         FOREIGN KEY (id_motorista)
         REFERENCES motoristas(id),
 
-    CONSTRAINT fk_corrida_origem
-        FOREIGN KEY (id_origem)
-        REFERENCES enderecos(id),
-
-    CONSTRAINT fk_corrida_destino
-        FOREIGN KEY (id_destino)
-        REFERENCES enderecos(id)
+    CONSTRAINT ck_origem_destino
+        CHECK (origem <> destino)
 );
 
 CREATE TABLE avaliacoes (
