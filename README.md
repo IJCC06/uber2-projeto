@@ -79,10 +79,10 @@ uber2-projeto/
 |   └── consultas/
 |       └── consultas.py
 |
-├── sql/
-|   ├── create-table.sql
-|   ├── insert-data.sql
-|   └── query.sql
+└── sql/
+    ├── create-table.sql
+    ├── insert-data.sql
+    └── query.sql
 ```
 
 O banco de dados `uber2.db` é criado na pasta principal do projeto.
