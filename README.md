@@ -598,7 +598,7 @@ O projeto busca demonstrar conhecimentos de:
 
 ## 👨‍💻 Projeto acadêmico
 
-**Projeto:** Uber 2
-**Tecnologia principal:** Python
-**Banco de dados:** SQLite
-**Tipo:** Sistema de gerenciamento de corridas
+* **Projeto:** Uber 2
+* **Tecnologia principal:** Python
+* **Banco de dados:** SQLite
+* **Tipo:** Sistema de gerenciamento de corridas
