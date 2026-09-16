@@ -1,5 +1,4 @@
-from conexao import conectar
-
+from banco.conexao import conectar
 
 def criar_tabelas():
 

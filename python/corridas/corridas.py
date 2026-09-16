@@ -321,10 +321,12 @@ def editar_corrida():
 
     corrida = cursor.fetchone()
 
-    if corrida is None:
-        print("Corrida não encontrada.")
+    if not corrida:
+        print("\nCorrida não encontrada.")
         conexao.close()
         return
+
+    status_anterior = corrida[3]
 
     print("\n--- EDITAR CORRIDA ---")
     print("Deixe vazio para manter o valor atual.\n")
@@ -384,7 +386,10 @@ def editar_corrida():
     conexao.commit()
     conexao.close()
 
-    print("Corrida atualizada com sucesso!")
+    if status_anterior != status:
+        registrar_historico(id_corrida, status_anterior, status)
+
+    print("\nCorrida atualizada com sucesso!")
 
 
 # Excluir Corrida (ADM)
