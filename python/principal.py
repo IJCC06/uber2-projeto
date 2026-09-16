@@ -71,6 +71,7 @@ from consultas.consultas import (
     media_geral_motoristas
 )
 
+# SENHA DO ADMIN
 SENHA_ADMIN = "OInimigoEoTransito"
 
 
@@ -210,7 +211,6 @@ def menu_admin():
 
         else:
             print("\nOpção inválida.")
-
 
 
 # SubMenus do Admin
@@ -430,7 +430,6 @@ def menu_consultas():
 
         else:
             print("\nOpção inválida.")
-
 
 
 # Login
