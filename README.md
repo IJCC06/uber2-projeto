@@ -14,7 +14,6 @@ O **Uber 2** foi desenvolvido como um projeto acadêmico com o objetivo de aplic
 * Programação modular;
 * Banco de dados relacional;
 * SQLite;
-* CRUD;
 * Chaves primárias e estrangeiras;
 * Validações;
 * Consultas SQL;
@@ -34,7 +33,7 @@ O sistema possui três tipos de acesso:
 * **Python 3**
 * **SQLite**
 * Biblioteca `sqlite3`
-* Programação modular
+* Módulos
 * SQL
 
 Não são necessárias bibliotecas externas para executar o projeto.
@@ -44,46 +43,46 @@ Não são necessárias bibliotecas externas para executar o projeto.
 ## 📁 Estrutura do projeto
 
 ```text
-Uber2/
+uber2-projeto/
 │
-├── principal.py
+├── der/
+|   └── der.png
 │
-├── banco/
-│   ├── __init__.py
-│   ├── conexao.py
-│   └── criar_banco.py
-│
-├── usuarios/
-│   ├── __init__.py
-│   └── usuarios.py
-│
-├── motoristas/
-│   ├── __init__.py
-│   └── motoristas.py
-│
-├── veiculos/
-│   ├── __init__.py
-│   └── veiculos.py
-│
-├── corridas/
-│   ├── __init__.py
-│   └── corridas.py
-│
-├── pagamentos/
-│   ├── __init__.py
-│   └── pagamentos.py
-│
-├── avaliacoes/
-│   ├── __init__.py
-│   └── avaliacoes.py
-│
-├── historico/
-│   ├── __init__.py
-│   └── historico.py
-│
-└── consultas/
-    ├── __init__.py
-    └── consultas.py
+├── python/
+|   ├── principal.py
+|   |
+|   ├── banco/
+│   |   ├── conexao.py
+│   |   └── criar_banco.py
+│   |
+|   ├── usuarios/
+│   |   └── usuarios.py
+│   |
+|   ├── motoristas/
+│   |   └── motoristas.py
+│   |
+|   ├── veiculos/
+│   |   └── veiculos.py
+│   |
+|   ├── corridas/
+│   |   └── corridas.py
+│   |
+|   ├── pagamentos/
+│   |   └── pagamentos.py
+│   |
+|   ├── avaliacoes/
+│   |   └── avaliacoes.py
+│   |
+|   ├── historico/
+│   |   └── historico.py
+│   |
+|   └── consultas/
+|       └── consultas.py
+|
+├── sql/
+|   ├── create-table.sql
+|   ├── insert-data.sql
+|   └── query.sql
 ```
 
 O banco de dados `uber2.db` é criado na pasta principal do projeto.
@@ -477,7 +476,7 @@ Coloque o projeto em uma pasta de sua preferência.
 Exemplo:
 
 ```bash
-cd Uber2
+cd uber2-projeto
 ```
 
 ### 3. Crie o banco de dados
@@ -485,7 +484,7 @@ cd Uber2
 Execute:
 
 ```bash
-python banco/criar_banco.py
+python python/banco/criar_banco.py
 ```
 
 Isso criará o arquivo:
@@ -497,7 +496,7 @@ uber2.db
 ### 4. Execute o sistema
 
 ```bash
-python principal.py
+python python/principal.py
 ```
 
 O menu principal será exibido:
