@@ -1,53 +1,45 @@
-# Uber 2.0.0 — Arquitetura inicial
+# Uber 2.0.0 — Arquitetura simplificada
 
 ## Objetivo
 
-Evoluir o Uber 2 de uma aplicação Python/SQLite de terminal para uma aplicação web com Flask e PostgreSQL.
-
-## Estilo arquitetural
-
-Monólito modular com separação entre:
-- **Routes:** recebe requisições HTTP e devolve respostas.
-- **Services:** implementa regras de negócio e coordena operações.
-- **Models:** representa entidades e relacionamentos persistidos pelo SQLAlchemy.
-- **Templates e static:** interface HTML, CSS e JavaScript.
+Evoluir o Uber 2 de uma aplicação Python/SQLite de terminal para uma aplicação web Flask com PostgreSQL, mantendo a base pequena e explícita.
 
 ## Stack
 
 - Python
 - Flask
-- Flask-SQLAlchemy
-- Flask-Migrate
-- Flask-Login
-- PostgreSQL com Psycopg 3
-- Bootstrap, HTML, CSS e JavaScript
-- pytest
+- python-dotenv
+- PostgreSQL com Psycopg 3 (`psycopg[binary]`)
+- HTML, CSS e JavaScript
+- `unittest` da biblioteca padrão do Python
 
-## Entidades previstas
+Não são usadas extensões de ORM, migrações, formulários ou autenticação.
 
-Usuário, Motorista, Veículo, Corrida, Pagamento, Avaliação e Histórico de Corridas.
+## Estrutura
 
-## Regras importantes a preservar e melhorar
-
-- Ciclo da corrida: Solicitada → Aceita → Em andamento → Finalizada; também pode ser Cancelada conforme as regras de transição.
-- Pagamento apenas para corrida finalizada.
-- No máximo um pagamento por corrida.
-- No máximo uma avaliação por corrida.
-- Nota de avaliação entre 1 e 5.
-- Toda mudança de status da corrida deve gerar histórico na mesma transação do banco.
-- Disponibilidade do motorista deve ser separada do estado da conta.
-- Senhas devem ser armazenadas com hash seguro; nunca em texto puro.
-- Ações administrativas devem exigir autorização explícita.
+- `app.py`: cria a aplicação Flask e concentra as rotas enquanto o projeto é pequeno.
+- `../conexao.py`: abre conexões Psycopg usando `DATABASE_URL`.
+- `run.py`: ponto de entrada para iniciar o servidor.
+- `sql/`: scripts SQL versionados, aplicados manualmente e em ordem.
+- `templates/` e `static/`: páginas HTML, CSS e JavaScript.
+- `tests/`: testes automatizados com `unittest`.
 
 ## Configuração local
 
-1. Criar e ativar um ambiente virtual.
-2. Instalar as dependências de requirements.txt.
-3. Copiar .env.example para .env e ajustar as credenciais.
-4. Criar o banco PostgreSQL uber2_v2.
-5. Inicializar migrações com Flask-Migrate.
-6. Executar flask --app run.py run --debug.
+1. Crie e ative um ambiente virtual.
+2. Instale as dependências de `requirements.txt`.
+3. Copie `.env.example` para `.env` e ajuste as credenciais.
+4. Crie o banco PostgreSQL `uber2_v2`.
+5. Execute `python -m flask --app run.py run --debug`.
 
-## Primeira verificação
+`DATABASE_URL` usa o formato `postgresql://usuario:senha@host:porta/banco`.
 
-A rota GET /health confirma que o servidor Flask está ativo. Ela não confirma, por si só, a disponibilidade do PostgreSQL.
+## Regras de negócio
+
+- Ciclo da corrida: Solicitada → Aceita → Em andamento → Finalizada; também pode ser Cancelada conforme as regras de transição.
+- Pagamento apenas para corrida finalizada e no máximo um por corrida.
+- No máximo uma avaliação por corrida, com nota entre 1 e 5.
+- Mudanças de status geram histórico na mesma transação do banco.
+- A disponibilidade do motorista é separada do estado da conta.
+- Senhas usam hash seguro; nunca são armazenadas em texto puro.
+- Ações administrativas exigem autorização explícita.
