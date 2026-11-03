@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Acesso administrativo | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login_admin.css') }}">
+</head>
+<body>
+    <main class="admin-login-page">
+        <section class="admin-login-card" aria-labelledby="admin-login-title">
+            <a class="back-link" href="{{ url_for('login') }}">← Voltar para os acessos</a>
+
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">U2</span>
+                <span>Uber 2</span>
+            </div>
+
+            <header class="admin-login-header">
+                <p class="eyebrow">Área restrita</p>
+                <h1 id="admin-login-title">Acesso administrativo</h1>
+                <p>Entre com as credenciais da sua conta de administrador.</p>
+            </header>
+
+            <form class="admin-login-form" action="#" method="post">
+                <div class="form-field">
+                    <label for="admin-email">E-mail</label>
+                    <input id="admin-email" name="email" type="email" autocomplete="email" placeholder="admin@exemplo.com" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="admin-password">Senha</label>
+                    <input id="admin-password" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                </div>
+
+                <button type="submit">Entrar na área administrativa</button>
+            </form>
+
+            <p class="security-note">Use uma conta de administrador autorizada para continuar.</p>
+        </section>
+    </main>
+</body>
+</html>

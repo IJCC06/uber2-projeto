@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Entrar | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+    <main class="login-page">
+        <section class="login-card" aria-labelledby="login-title">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">U2</span>
+                <span>Uber 2</span>
+            </div>
+
+            <header class="login-header">
+                <h1 id="login-title">Acesse o Uber 2</h1>
+                <p>Escolha abaixo o tipo de acesso.</p>
+            </header>
+
+            <div class="login-options">
+                <section class="login-option" aria-labelledby="user-login-title">
+                    <h2 id="user-login-title">Sou usuário</h2>
+                    <p>Entre com seu e-mail e sua senha.</p>
+
+                    <form class="login-form" action="#" method="post">
+                        <div class="form-field">
+                            <label for="email">E-mail</label>
+                            <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="password">Senha</label>
+                            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                        </div>
+
+                        <button type="submit">Entrar como usuário</button>
+                    </form>
+                </section>
+
+                <section class="login-option" aria-labelledby="driver-login-title">
+                    <h2 id="driver-login-title">Sou motorista</h2>
+                    <p>Entre com o CPF cadastrado. Sua conta precisa estar ativa.</p>
+
+                    <form class="login-form" action="#" method="post">
+                        <div class="form-field">
+                            <label for="cpf">CPF</label>
+                            <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
+                        </div>
+
+                        <button type="submit">Entrar como motorista</button>
+                    </form>
+                </section>
+            </div>
+
+            <p class="login-footer">Ainda não tem uma conta? <a href="#">Cadastre-se como usuário</a></p>
+        </section>
+    </main>
+</body>
+</html>
