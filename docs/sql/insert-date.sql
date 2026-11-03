@@ -364,3 +364,15 @@ UNION ALL
 
 SELECT 'historico_corridas', COUNT(*)
 FROM historico_corridas;
+
+
+-- =========================================================
+-- ADMINISTRADORES
+-- =========================================================
+INSERT INTO administradores (nome, email, senha, ativo)
+VALUES (
+    'Administrador',
+    'admin01@gmail.com',
+    'admin01',
+    TRUE
+);

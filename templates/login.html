@@ -24,15 +24,15 @@
                     <h2 id="user-login-title">Sou usuário</h2>
                     <p>Entre com seu e-mail e sua senha.</p>
 
-                    <form class="login-form" action="#" method="post">
+                    <form class="login-form" action="/login/usuario" method="post">
                         <div class="form-field">
                             <label for="email">E-mail</label>
-                            <input id="email" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
+                            <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
                         </div>
 
                         <div class="form-field">
                             <label for="password">Senha</label>
-                            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                            <input name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
                         </div>
 
                         <button type="submit">Entrar como usuário</button>
@@ -43,10 +43,10 @@
                     <h2 id="driver-login-title">Sou motorista</h2>
                     <p>Entre com o CPF cadastrado. Sua conta precisa estar ativa.</p>
 
-                    <form class="login-form" action="#" method="post">
+                    <form class="login-form" action="/login/motorista" method="post">
                         <div class="form-field">
                             <label for="cpf">CPF</label>
-                            <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
+                            <input name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
                         </div>
 
                         <button type="submit">Entrar como motorista</button>

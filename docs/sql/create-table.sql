@@ -115,5 +115,14 @@ CREATE TABLE historico_corridas (
         REFERENCES corridas(id)
 );
 
+CREATE TABLE IF NOT EXISTS administradores (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    senha VARCHAR(255) NOT NULL,
+    ativo BOOLEAN NOT NULL DEFAULT TRUE,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 ALTER TABLE corridas
 ALTER COLUMN id_motorista DROP NOT NULL;

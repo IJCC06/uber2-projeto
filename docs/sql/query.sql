@@ -1,6 +1,8 @@
+-- Active: 1788283797601@@127.0.0.1@5432@uber2
 -- Exibir todos os Dados
 SELECT * FROM usuarios;
 SELECT * FROM motoristas;
+SELECT * FROM administradores;
 SELECT * FROM veiculos;
 SELECT * FROM corridas;
 SELECT * FROM avaliacoes;
