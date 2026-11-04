@@ -1,11 +1,116 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | Uber 2</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Área do motorista | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
 </head>
 <body>
-    
+    <header class="topbar">
+        <a class="brand" href="{{ url_for('motoristas.home') }}" aria-label="Uber 2: início">
+            U2 <span>Uber 2</span>
+        </a>
+
+        <nav aria-label="Navegação principal">
+            <a class="active" href="{{ url_for('motoristas.home') }}">Início</a>
+            <a href="{{ url_for('motoristas.corridas_disponiveis') }}">Corridas disponíveis</a>
+        </nav>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+            <button class="logout" type="submit">Sair</button>
+        </form>
+    </header>
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="welcome-title">
+            <div>
+                <p class="eyebrow">Área do motorista</p>
+                <h1 id="welcome-title">Olá, {{ current_user.nome }}!</h1>
+                <p>Consulte as corridas disponíveis para você.</p>
+            </div>
+            <a class="primary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+                Ver corridas disponíveis
+            </a>
+        </section>
+
+        {% if pode_receber is defined %}
+            <section class="availability-card" aria-live="polite">
+                {% if pode_receber %}
+                    <span class="availability-indicator available" aria-hidden="true"></span>
+                    <div>
+                        <h2>Você está disponível</h2>
+                        <p>As corridas solicitadas aparecem abaixo.</p>
+                    </div>
+                {% else %}
+                    <span class="availability-indicator unavailable" aria-hidden="true"></span>
+                    <div>
+                        <h2>Você não está disponível para receber corridas</h2>
+                        <p>Sua conta precisa estar ativa e sua disponibilidade habilitada.</p>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+
+        {% if corridas_disponiveis is defined %}
+            <section class="panel rides-panel" aria-labelledby="rides-title">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Solicitações abertas</p>
+                        <h2 id="rides-title">Corridas disponíveis</h2>
+                    </div>
+                    <span class="ride-count">{{ corridas_disponiveis|length }}</span>
+                </div>
+
+                {% if not pode_receber %}
+                    <div class="empty-state">
+                        <h3>Disponibilidade desativada</h3>
+                        <p>Ative sua disponibilidade para consultar solicitações de corrida.</p>
+                    </div>
+                {% elif corridas_disponiveis %}
+                    <div class="ride-list">
+                        {% for corrida in corridas_disponiveis %}
+                            <article class="ride-card">
+                                <div class="ride-card-header">
+                                    <h3>Corrida #{{ corrida.id }}</h3>
+                                    <time datetime="{{ corrida.data_hora.isoformat() }}">
+                                        {{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}
+                                    </time>
+                                </div>
+
+                                <dl class="ride-details">
+                                    <div>
+                                        <dt>Passageiro</dt>
+                                        <dd>{{ corrida.usuario }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Origem</dt>
+                                        <dd>{{ corrida.origem }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Destino</dt>
+                                        <dd>{{ corrida.destino }}</dd>
+                                    </div>
+                                </dl>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>Nenhuma corrida disponível</h3>
+                        <p>Quando um passageiro solicitar uma corrida, ela aparecerá aqui.</p>
+                    </div>
+                {% endif %}
+            </section>
+        {% else %}
+            <section class="panel intro-panel" aria-labelledby="next-step-title">
+                <h2 id="next-step-title">Próximo passo</h2>
+                <p>Abra a lista de corridas para conferir as solicitações que aguardam motorista.</p>
+                <a class="secondary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+                    Consultar corridas
+                </a>
+            </section>
+        {% endif %}
+    </main>
 </body>
 </html>
