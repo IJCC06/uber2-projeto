@@ -29,7 +29,7 @@
                 <h1 id="welcome-title">Olá, usuário!</h1>
                 <p>Para onde você quer ir hoje?</p>
             </div>
-            <a class="primary-action" href="#">Solicitar corrida</a>
+            <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar corrida</a>
         </section>
 
         <section class="summary" aria-label="Resumo das corridas">
@@ -57,13 +57,13 @@
                 <div class="empty-state">
                     <h3>Nenhuma corrida encontrada</h3>
                     <p>Quando você solicitar uma corrida, ela aparecerá aqui.</p>
-                    <a class="secondary-action" href="#">Solicitar a primeira corrida</a>
+                    <a class="secondary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar a primeira corrida</a>
                 </div>
             </section>
 
             <aside class="panel quick-actions" aria-labelledby="quick-actions-title">
                 <h2 id="quick-actions-title">Ações rápidas</h2>
-                <a href="#">Solicitar corrida</a>
+                <a href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar corrida</a>
                 <a href="#">Consultar pagamentos</a>
                 <a href="#">Editar meus dados</a>
             </aside>
