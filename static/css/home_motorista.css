@@ -144,6 +144,23 @@ h1 {
     border-radius: 12px;
 }
 
+.form-message {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    line-height: 1.45;
+}
+
+.success-message {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.error-message {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
 .availability-card {
     display: flex;
     align-items: center;
@@ -259,6 +276,12 @@ h1 {
     margin: 0;
     font-weight: 700;
     overflow-wrap: anywhere;
+}
+
+.ride-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
 }
 
 .empty-state {

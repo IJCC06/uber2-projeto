@@ -34,6 +34,15 @@
             </a>
         </section>
 
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="form-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
         {% if pode_receber is defined %}
             <section class="availability-card" aria-live="polite">
                 {% if pode_receber %}
@@ -92,6 +101,14 @@
                                         <dd>{{ corrida.destino }}</dd>
                                     </div>
                                 </dl>
+
+                                <form
+                                    class="ride-actions"
+                                    action="{{ url_for('motoristas.aceitar_corrida', corrida_id=corrida.id) }}"
+                                    method="post"
+                                >
+                                    <button class="primary-action" type="submit">Aceitar corrida</button>
+                                </form>
                             </article>
                         {% endfor %}
                     </div>
