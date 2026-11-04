@@ -209,7 +209,10 @@ def login_admin():
             login_user(admin)
             return redirect(url_for('home_admin'))
         
-        return render_template('logins/login_admin.html')
+        return render_template(
+            'logins/login_admin.html',
+            erro="E-mail ou senha incorretos."
+        )
 
     return render_template('logins/login_admin.html')
 

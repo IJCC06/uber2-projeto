@@ -22,6 +22,12 @@
                 <p>Entre com as credenciais da sua conta de administrador.</p>
             </header>
 
+            {% if erro %}
+                <p class="form-message error-message" role="alert">
+                    {{ erro }}
+                </p>
+            {% endif %}
+
             <form class="admin-login-form" action="/login/admin" method="post">
                 <div class="form-field">
                     <label for="admin-email">E-mail</label>
