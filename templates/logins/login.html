@@ -30,7 +30,7 @@
                     <h2 id="user-login-title">Sou usuário</h2>
                     <p>Entre com seu e-mail e sua senha.</p>
 
-                    <form class="login-form" action="/login/usuario" method="post">
+                    <form class="login-form" action="{{ url_for('auth.login_usuario') }}" method="post">
                         <div class="form-field">
                             <label for="email">E-mail</label>
                             <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
@@ -49,7 +49,7 @@
                     <h2 id="driver-login-title">Sou motorista</h2>
                     <p>Entre com o CPF cadastrado. Sua conta precisa estar ativa.</p>
 
-                    <form class="login-form" action="/login/motorista" method="post">
+                    <form class="login-form" action="{{ url_for('auth.login_motorista') }}" method="post">
                         <div class="form-field">
                             <label for="cpf">CPF</label>
                             <input name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
@@ -65,7 +65,7 @@
                 </section>
             </div>
 
-            <p class="login-footer">Ainda não tem uma conta? <a href="{{ url_for('cadastro') }}">Cadastre-se como usuário</a></p>
+            <p class="login-footer">Ainda não tem uma conta? <a href="{{ url_for('auth.cadastro') }}">Cadastre-se como usuário</a></p>
         </section>
     </main>
 </body>
