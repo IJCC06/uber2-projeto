@@ -176,7 +176,10 @@ def login_usuario():
         login_user(usuario)
         return redirect(url_for('home_usuarios'))
 
-    return redirect(url_for('login'))
+    return render_template(
+        'logins/login.html',
+        erro = 'E-mail ou senha incorretos.'
+    )
 
 
 # Validação do Login do Motorista

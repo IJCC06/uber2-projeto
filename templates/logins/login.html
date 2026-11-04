@@ -19,6 +19,12 @@
                 <p>Escolha abaixo o tipo de acesso.</p>
             </header>
 
+            {% if erro %}
+                <p class="form-message error-message" role="alert">
+                    {{ erro }}
+                </p>
+            {% endif %}
+
             <div class="login-options">
                 <section class="login-option" aria-labelledby="user-login-title">
                     <h2 id="user-login-title">Sou usuário</h2>
