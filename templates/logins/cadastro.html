@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cadastro | Uber 2</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+
+<body>
+    <main class="login-page">
+        <section class="login-card" aria-labelledby="cadastro-title">
+
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">U2</span>
+                <span>Uber 2</span>
+            </div>
+
+            <header class="login-header">
+                <h1 id="cadastro-title">Crie sua conta</h1>
+                <p>Preencha seus dados para começar a utilizar o Uber 2.</p>
+            </header>
+
+            <form class="login-form"
+                  action="{{ url_for('cadastro') }}"
+                  method="POST">
+
+                <div class="form-field">
+                    <label for="nome">Nome completo</label>
+                    <input
+                        id="nome"
+                        name="nome"
+                        type="text"
+                        autocomplete="name"
+                        placeholder="Digite seu nome completo"
+                        maxlength="100"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="email">E-mail</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        autocomplete="email"
+                        placeholder="voce@exemplo.com"
+                        maxlength="150"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="telefone">Telefone</label>
+                    <input
+                        id="telefone"
+                        name="telefone"
+                        type="tel"
+                        autocomplete="tel"
+                        placeholder="(00) 00000-0000"
+                        maxlength="20"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="senha">Senha</label>
+                    <input
+                        id="senha"
+                        name="senha"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Crie uma senha"
+                        minlength="8"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label for="confirmar_senha">Confirmar senha</label>
+                    <input
+                        id="confirmar_senha"
+                        name="confirmar_senha"
+                        type="password"
+                        autocomplete="new-password"
+                        placeholder="Digite sua senha novamente"
+                        minlength="8"
+                        required>
+                </div>
+
+                <button type="submit">Criar minha conta</button>
+
+            </form>
+
+            <p class="login-footer">
+                Já possui uma conta?
+                <a href="{{ url_for('login') }}">Faça login</a>
+            </p>
+
+        </section>
+    </main>
+</body>
+</html>
