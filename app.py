@@ -5,6 +5,8 @@ import os
 from conexao import criar_conexao
 from python.usuario import Usuario
 
+# E-mail Admin Teste = admin.bdfb6e6958@example.test
+
 
 uber2 = Flask(__name__)
 
