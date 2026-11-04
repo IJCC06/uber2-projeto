@@ -12,6 +12,8 @@ from python.logins import realizar_login_admin, realizar_login_usuario, realizar
 uber2 = Flask(__name__)
 
 uber2.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
+if not uber2.config["SECRET_KEY"]:
+    raise RuntimeError("A variável SECRET_KEY não foi configurada.")
 
 login_manager = LoginManager()
 login_manager.init_app(uber2)

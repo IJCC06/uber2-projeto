@@ -5,6 +5,7 @@
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
 
 # Ferramentas e testes
 .pytest_cache/
