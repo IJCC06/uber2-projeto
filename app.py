@@ -250,6 +250,7 @@ def home_admin():
 
 
 @uber2.route('/logout', methods=['POST'])
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('login'))
