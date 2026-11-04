@@ -159,6 +159,26 @@ button:focus-visible {
     outline-offset: 3px;
 }
 
+.form-message {
+    padding: 12px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.error-message {
+    background: #fff0f0;
+    border: 1px solid #e5aaaa;
+    color: #a32121;
+}
+
+.sucess-message {
+    background: #edf8ef;
+    border: 1px solid #a8d5b0;
+    color: #216b32;
+}
+
 @media (max-width: 700px) {
     .login-page {
         padding: 16px;

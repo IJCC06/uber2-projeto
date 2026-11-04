@@ -22,6 +22,18 @@
                 <h1 id="cadastro-title">Crie sua conta</h1>
                 <p>Preencha seus dados para começar a utilizar o Uber 2.</p>
             </header>
+            
+            {% if erro %}
+                <p class="form-message error-message" role="alert">
+                    {{ erro }}
+                </p>
+            {% endif %}
+
+            {% if sucesso %}
+                <p class="form-message sucess-message" role="status">
+                    {{ sucesso }}
+                </p>
+            {% endif %}
 
             <form class="login-form"
                   action="{{ url_for('cadastro') }}"
