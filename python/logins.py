@@ -1,57 +1,85 @@
 from conexao import criar_conexao
+from python.usuario import Usuario
 
 def realizar_login_admin(email, senha):
     sql = '''
-        SELECT email, senha, ativo
+        SELECT id, nome
         FROM administradores
         WHERE email = %s AND senha = %s AND ativo = True
     '''
 
     con = criar_conexao()
     cursor = con.cursor()
-    cursor.execute(sql, (email, senha))
-    resposta = cursor.fetchone()
-    con.close()
 
-    if resposta:
-        return True
-    else:
-        return False
+    try:
+        cursor.execute(sql, (email, senha))
+        resposta = cursor.fetchone()
+
+        if resposta:
+            return Usuario(
+                id = resposta[0],
+                nome = resposta[1],
+                tipo = "admin"
+            )
+
+        return None
+
+    finally:
+        cursor.close()
+        con.close()
 
 
 def realizar_login_usuario(email, senha):
     sql = '''
-        SELECT email, senha
+        SELECT id, nome
         FROM usuarios
         WHERE email = %s AND senha = %s
     '''
 
     con = criar_conexao()
     cursor = con.cursor()
-    cursor.execute(sql, (email, senha))
-    resposta = cursor.fetchone()
-    con.close()
 
-    if resposta:
-        return True
-    else:
-        return False
+    try:
+        cursor.execute(sql, (email, senha))
+        resposta = cursor.fetchone()
+
+        if resposta:
+            return Usuario(
+                id = resposta[0],
+                nome = resposta[1],
+                tipo = "usuario"
+            )
+
+        return None
+
+    finally:
+        cursor.close()
+        con.close()
 
 
 def realizar_login_motorista(cpf):
     sql = '''
-        SELECT cpf
+        SELECT id, nome
         FROM motoristas
         WHERE cpf = %s
     '''
     
     con = criar_conexao()
     cursor = con.cursor()
-    cursor.execute(sql, (cpf,))
-    resposta = cursor.fetchone()
-    con.close()
-    
-    if resposta:
-        return True
-    else:
-        return False
+
+    try:
+        cursor.execute(sql, (cpf,))
+        resposta = cursor.fetchone()
+
+        if resposta:
+            return Usuario(
+                id = resposta[0],
+                none = resposta[1],
+                tipo = "motorista"
+            )
+
+        return None
+
+    finally:
+        cursor.close()
+        con.close()
