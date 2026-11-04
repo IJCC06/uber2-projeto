@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, render_template, url_for, redirect, request
-from flask_login import LoginManager
+from flask import Flask, jsonify, render_template, url_for, redirect, request, abort
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 import psycopg2
 from conexao import criar_conexao
 import os
@@ -73,28 +73,35 @@ def carregar_usuario(user_id):
 def login():
     return render_template('logins/login.html')
 
+
 # Validação do Login do Usuário
 @uber2.route('/login/usuario', methods=['POST'])
 def login_usuario():
     email = request.form["email"]
     senha = request.form["password"]
 
-    logado = realizar_login_usuario(email, senha)
-    if logado:
+    usuario = realizar_login_usuario(email, senha)
+
+    if usuario:
+        login_user(usuario)
         return redirect(url_for('home_usuarios'))
-    else:
-        return redirect(url_for('login'))
+
+    return redirect(url_for('login'))
+
 
 # Validação do Login do Motorista
 @uber2.route('/login/motorista', methods=['POST'])
 def login_motorista():
     cpf = request.form["cpf"]
 
-    logado = realizar_login_motorista(cpf)
-    if logado:
-        return render_template('motorista/home_motorista.html')
-    else:
-        return redirect(url_for('login'))
+    motorista = realizar_login_motorista(cpf)
+
+    if motorista:
+        login_user(motorista)
+        return redirect(url_for('home_motorista'))
+    
+    return redirect(url_for('login'))
+
 
 # Validação do Login Administrativo
 @uber2.route('/login/admin', methods=['GET', 'POST'])
@@ -103,19 +110,49 @@ def login_admin():
         email = request.form["email"]
         senha = request.form["password"]
 
-        logado = realizar_login_admin(email, senha)
-        if logado:
-            return render_template('admins/home_admin.html')
-        else:
-            return render_template('logins/login_admin.html')
+        admin = realizar_login_admin(email, senha)
+
+        if admin:
+            login_user(admin)
+            return redirect(url_for('home_admin'))
+        
+        return render_template('logins/login_admin.html')
 
     return render_template('logins/login_admin.html')
 
 
 # Renderiza a Tela Inicial dos Usuários
-@uber2.route('/usuarios/home', methods=['GET'])
+@uber2.route('/usuario/home', methods=['GET'])
+@login_required
 def home_usuarios():
+    if current_user.tipo != "usuario":
+        abort(403)
+    
     return render_template('/usuarios/home_usuarios.html')
+
+# Renderizar a Tela Inicial dos Motoristas
+@uber2.route('/motorista/home', methods=['GET'])
+@login_required
+def home_motorista():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    return render_template('motoristas/home_motorista.html')
+
+# Renderizar a Tela Inicial dos Admins
+@uber2.route('/admin/home', methods=['GET'])
+@login_required
+def home_admin():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    return render_template('admins/home_admin.html')
+
+
+@uber2.route('/logout', methods=['POST'])
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 
 if __name__ == "__main__":

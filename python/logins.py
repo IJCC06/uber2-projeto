@@ -74,7 +74,7 @@ def realizar_login_motorista(cpf):
         if resposta:
             return Usuario(
                 id = resposta[0],
-                none = resposta[1],
+                nome = resposta[1],
                 tipo = "motorista"
             )
 
