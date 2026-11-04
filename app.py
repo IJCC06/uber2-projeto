@@ -2,11 +2,10 @@ from flask import Flask, jsonify, render_template, url_for, redirect, request
 import psycopg2
 from conexao import criar_conexao
 
-from blueprints.login.logins import logins_bp
 from python.logins import realizar_login_admin, realizar_login_usuario, realizar_login_motorista
 
+
 uber2 = Flask(__name__)
-uber2.register_blueprint(logins_bp, url_prefix='/login')
 
 
 # Renderiza a Tela de Login
