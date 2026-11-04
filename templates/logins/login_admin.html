@@ -9,7 +9,7 @@
 <body>
     <main class="admin-login-page">
         <section class="admin-login-card" aria-labelledby="admin-login-title">
-            <a class="back-link" href="{{ url_for('login') }}">← Voltar para os acessos</a>
+            <a class="back-link" href="{{ url_for('auth.login') }}">← Voltar para os acessos</a>
 
             <div class="brand">
                 <span class="brand-mark" aria-hidden="true">U2</span>
@@ -28,7 +28,7 @@
                 </p>
             {% endif %}
 
-            <form class="admin-login-form" action="/login/admin" method="post">
+            <form class="admin-login-form" action="{{ url_for('auth.login_admin') }}" method="post">
                 <div class="form-field">
                     <label for="admin-email">E-mail</label>
                     <input name="email" type="email" autocomplete="email" placeholder="admin@exemplo.com" required>

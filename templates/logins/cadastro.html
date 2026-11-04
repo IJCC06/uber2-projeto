@@ -36,7 +36,7 @@
             {% endif %}
 
             <form class="login-form"
-                  action="{{ url_for('cadastro') }}"
+                  action="{{ url_for('auth.cadastro') }}"
                   method="POST">
 
                 <div class="form-field">
@@ -105,7 +105,7 @@
 
             <p class="login-footer">
                 Já possui uma conta?
-                <a href="{{ url_for('login') }}">Faça login</a>
+                <a href="{{ url_for('auth.login') }}">Faça login</a>
             </p>
 
         </section>
