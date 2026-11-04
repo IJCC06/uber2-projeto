@@ -68,9 +68,9 @@ def realizar_login_usuario(email, senha):
         con.close()
 
 
-def realizar_login_motorista(cpf):
+def realizar_login_motorista(cpf, senha):
     sql = '''
-        SELECT id, nome
+        SELECT id, nome, senha
         FROM motoristas
         WHERE cpf = %s
     '''
@@ -82,14 +82,19 @@ def realizar_login_motorista(cpf):
         cursor.execute(sql, (cpf,))
         resposta = cursor.fetchone()
 
-        if resposta:
-            return Usuario(
-                id = resposta[0],
-                nome = resposta[1],
-                tipo = "motorista"
-            )
+        if resposta is None:
+            return None
 
-        return None
+        id_motorista, nome, senha_hash = resposta
+
+        if not verificar_senha(senha, senha_hash):
+            return None
+
+        return Usuario(
+            id = id_motorista,
+            nome = nome,
+            tipo = "motorista"
+        )
 
     finally:
         cursor.close()

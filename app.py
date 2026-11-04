@@ -186,14 +186,18 @@ def login_usuario():
 @uber2.route('/login/motorista', methods=['POST'])
 def login_motorista():
     cpf = request.form["cpf"]
+    senha = request.form["password"]
 
-    motorista = realizar_login_motorista(cpf)
+    motorista = realizar_login_motorista(cpf, senha)
 
     if motorista:
         login_user(motorista)
         return redirect(url_for('home_motorista'))
     
-    return redirect(url_for('login'))
+    return render_template(
+        'logins/login.html',
+        erro="CPF ou senha inválidos"
+    )
 
 
 # Validação do Login Administrativo

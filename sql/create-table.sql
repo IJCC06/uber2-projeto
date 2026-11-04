@@ -126,3 +126,6 @@ CREATE TABLE IF NOT EXISTS administradores (
 
 ALTER TABLE corridas
 ALTER COLUMN id_motorista DROP NOT NULL;
+
+ALTER TABLE motoristas
+ADD COLUMN senha VARCHAR(255);
