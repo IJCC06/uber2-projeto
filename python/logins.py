@@ -4,26 +4,31 @@ from python.seguranca import verificar_senha
 
 def realizar_login_admin(email, senha):
     sql = '''
-        SELECT id, nome
+        SELECT id, nome, senha
         FROM administradores
-        WHERE email = %s AND senha = %s AND ativo = True
+        WHERE email = %s AND ativo = True
     '''
 
     con = criar_conexao()
     cursor = con.cursor()
 
     try:
-        cursor.execute(sql, (email, senha))
+        cursor.execute(sql, (email,))
         resposta = cursor.fetchone()
 
-        if resposta:
-            return Usuario(
-                id = resposta[0],
-                nome = resposta[1],
-                tipo = "admin"
-            )
+        if resposta is None:
+            return None
 
-        return None
+        id_admin, nome, senha_hash = resposta
+
+        if not verificar_senha(senha, senha_hash):
+            return None
+
+        return Usuario(
+            id = id_admin,
+            nome = nome,
+            tipo = "admin"
+        )
 
     finally:
         cursor.close()
