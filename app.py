@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, render_template, url_for, redirect, request
-import psycopg2
 from conexao import criar_conexao
 
 from python.logins import realizar_login_admin, realizar_login_usuario, realizar_login_motorista
