@@ -74,6 +74,11 @@ def login():
     return render_template('logins/login.html')
 
 
+@uber2.route('/cadastro', methods=['GET'])
+def cadastro():
+    return render_template('logins/cadastro.html')
+
+
 # Validação do Login do Usuário
 @uber2.route('/login/usuario', methods=['POST'])
 def login_usuario():
