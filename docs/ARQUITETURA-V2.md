@@ -1,45 +1,136 @@
-# Uber 2.0.0 — Arquitetura simplificada
+# Uber 2.0.0 — Arquitetura
 
 ## Objetivo
 
-Evoluir o Uber 2 de uma aplicação Python/SQLite de terminal para uma aplicação web Flask com PostgreSQL, mantendo a base pequena e explícita.
+A versão 2.0.0 evolui o projeto acadêmico Uber 2, originalmente desenvolvido como aplicação de terminal em Python com SQLite, para uma aplicação web com Flask e PostgreSQL. A versão anterior é preservada na branch v1.0.0.
 
-## Stack
+A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenvolvimento incremental.
 
-- Python
-- Flask
-- python-dotenv
-- PostgreSQL com Psycopg 3 (`psycopg[binary]`)
-- HTML, CSS e JavaScript
-- `unittest` da biblioteca padrão do Python
+## Tecnologias
 
-Não são usadas extensões de ORM, migrações, formulários ou autenticação.
+- Python 3
+- Flask — aplicação web e rotas HTTP
+- PostgreSQL — banco de dados relacional
+- psycopg2-binary — conexão entre Python e PostgreSQL
+- python-dotenv — leitura das configurações locais em .env
+- HTML, CSS e JavaScript — interface
+- Flask-Login — dependência mantida para uma futura implementação de gerenciamento de sessão e autenticação web
 
-## Estrutura
+O Flask-Login está previsto para uso futuro; sua presença nas dependências não significa que o fluxo de autenticação já esteja integrado à aplicação.
 
-- `app.py`: cria a aplicação Flask e concentra as rotas enquanto o projeto é pequeno.
-- `../conexao.py`: abre conexões Psycopg usando `DATABASE_URL`.
-- `run.py`: ponto de entrada para iniciar o servidor.
-- `sql/`: scripts SQL versionados, aplicados manualmente e em ordem.
-- `templates/` e `static/`: páginas HTML, CSS e JavaScript.
-- `tests/`: testes automatizados com `unittest`.
+Não está previsto, neste momento, utilizar ORM ou ferramenta de migração de banco de dados. O acesso ao PostgreSQL é feito com SQL e Psycopg2.
 
-## Configuração local
+## Estrutura atual do repositório
 
-1. Crie e ative um ambiente virtual.
-2. Instale as dependências de `requirements.txt`.
-3. Copie `.env.example` para `.env` e ajuste as credenciais.
-4. Crie o banco PostgreSQL `uber2_v2`.
-5. Execute `python -m flask --app run.py run --debug`.
+A estrutura abaixo representa os diretórios e arquivos relevantes já existentes na branch:
 
-`DATABASE_URL` usa o formato `postgresql://usuario:senha@host:porta/banco`.
+```text
+uber2-projeto/
+├── app.py
+├── conexao.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── docs/
+│   ├── ARQUITETURA-V2.md
+│   └── sql/
+│       ├── create-table.sql
+│       ├── insert-date.sql
+│       └── query.sql
+├── python/
+│   └── logins.py
+├── templates/
+│   ├── admins/
+│   ├── logins/
+│   ├── motoristas/
+│   └── usuarios/
+└── static/
+    ├── css/
+    └── js/
+```
 
-## Regras de negócio
+A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O módulo python/logins.py é utilizado atualmente por app.py; os demais módulos antigos ainda precisam ser avaliados antes de uma reorganização. A estrutura poderá ser simplificada conforme as funcionalidades web forem implementadas.
 
-- Ciclo da corrida: Solicitada → Aceita → Em andamento → Finalizada; também pode ser Cancelada conforme as regras de transição.
-- Pagamento apenas para corrida finalizada e no máximo um por corrida.
-- No máximo uma avaliação por corrida, com nota entre 1 e 5.
-- Mudanças de status geram histórico na mesma transação do banco.
-- A disponibilidade do motorista é separada do estado da conta.
-- Senhas usam hash seguro; nunca são armazenadas em texto puro.
-- Ações administrativas exigem autorização explícita.
+## Responsabilidade dos arquivos principais
+
+- app.py: instancia a aplicação Flask, define as rotas e encaminha as requisições.
+- conexao.py: centraliza a criação de conexões com o PostgreSQL usando Psycopg2.
+- python/logins.py: contém as funções de validação de login chamadas atualmente pelas rotas.
+- templates/: reúne os arquivos HTML renderizados pelo Flask.
+- static/: reúne os arquivos estáticos, como CSS e JavaScript.
+- docs/sql/: contém os scripts SQL versionados para criação, inserção de dados e consultas.
+
+## Configuração do banco de dados
+
+A aplicação carrega as variáveis locais com python-dotenv. O arquivo .env deve permanecer local e não deve ser enviado ao Git.
+
+Variáveis utilizadas atualmente:
+
+```env
+DB_HOST=localhost
+DB_NAME=uber2_v2
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
+```
+
+A função criar_conexao(), em conexao.py, utiliza essas quatro variáveis para abrir a conexão com PostgreSQL por meio de psycopg2.
+
+O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em docs/sql/ e devem ser revisados antes da execução. Em especial, o script de dados de exemplo contém comandos de limpeza de tabelas e não deve ser executado em um banco com dados que precisem ser preservados.
+
+## Instalação e execução
+
+1. Instale Python 3 e PostgreSQL.
+2. Crie e ative um ambiente virtual na pasta do projeto.
+3. Instale as dependências listadas em requirements.txt.
+4. Configure DB_HOST, DB_NAME, DB_USER e DB_PASSWORD em um arquivo local .env.
+5. Crie o banco configurado no PostgreSQL.
+6. Execute os scripts SQL necessários, após revisar seu conteúdo.
+7. Inicie a aplicação:
+
+```bash
+python app.py
+```
+
+O arquivo app.py inicia o servidor Flask em modo de depuração quando executado diretamente. O modo de depuração é destinado ao desenvolvimento local, não à produção.
+
+## Estado atual da versão 2
+
+Já estão presentes:
+
+- aplicação Flask inicializada em app.py;
+- conexão PostgreSQL centralizada em conexao.py, utilizando Psycopg2;
+- carregamento de variáveis de ambiente com python-dotenv;
+- rotas iniciais para exibir a tela de login;
+- rotas POST para tentativa de login de usuário e motorista;
+- rota de login administrativo;
+- rota para exibir a página inicial do usuário;
+- integração das rotas com funções existentes em python/logins.py;
+- templates HTML, arquivos estáticos e scripts SQL no repositório.
+
+A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não significa que todos os fluxos de negócio da versão anterior já foram migrados para a aplicação web.
+
+## Próximas etapas previstas
+
+- revisar e alinhar a estrutura de diretórios;
+- atualizar as dependências para refletir a escolha de Psycopg2;
+- migrar gradualmente as funcionalidades da versão de terminal para rotas web;
+- implementar autenticação e gerenciamento de sessão com Flask-Login;
+- aplicar controle de acesso para usuários, motoristas e administradores;
+- revisar o armazenamento de senhas para utilizar hash seguro;
+- revisar os scripts SQL, constraints e integridade das operações;
+- criar testes automatizados para rotas e regras de negócio;
+- atualizar a documentação conforme cada funcionalidade for concluída.
+
+## Regras de negócio previstas
+
+As regras funcionais da versão anterior servirão como referência para a migração, com validação e ajustes durante a implementação web. Entre elas:
+
+- fluxo de corrida: Solicitada → Aceita → Em andamento → Finalizada, com possibilidade de cancelamento conforme as regras definidas;
+- pagamentos associados a corridas finalizadas;
+- no máximo um pagamento por corrida;
+- no máximo uma avaliação por corrida, com nota de 1 a 5;
+- registro do histórico de mudanças de status;
+- separação entre situação da conta do motorista e disponibilidade para receber corridas;
+- autorização adequada para operações administrativas e para acesso aos dados de cada usuário.
+
+As regras devem ser garantidas no backend e, quando aplicável, também por constraints no banco de dados.
