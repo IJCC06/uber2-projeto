@@ -1,5 +1,6 @@
 from conexao import criar_conexao
 from python.usuario import Usuario
+from python.seguranca import verificar_senha
 
 def realizar_login_admin(email, senha):
     sql = '''
@@ -31,26 +32,31 @@ def realizar_login_admin(email, senha):
 
 def realizar_login_usuario(email, senha):
     sql = '''
-        SELECT id, nome
+        SELECT id, nome, senha
         FROM usuarios
-        WHERE email = %s AND senha = %s
+        WHERE email = %s
     '''
 
     con = criar_conexao()
     cursor = con.cursor()
 
     try:
-        cursor.execute(sql, (email, senha))
+        cursor.execute(sql, (email,))
         resposta = cursor.fetchone()
 
-        if resposta:
-            return Usuario(
-                id = resposta[0],
-                nome = resposta[1],
-                tipo = "usuario"
-            )
+        if resposta is None:
+            return None
 
-        return None
+        id_usuario, nome, senha_hash = resposta
+
+        if not verificar_senha(senha, senha_hash):
+            return None
+
+        return Usuario(
+            id = id_usuario,
+            nome = nome,
+            tipo = "usuario"
+        )
 
     finally:
         cursor.close()
