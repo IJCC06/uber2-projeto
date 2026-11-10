@@ -372,6 +372,118 @@ def atualizar_status_motorista(motorista_id):
     return redirect(url_for("admins.motoristas"))
 
 
+@admins.route("/corridas", methods=["GET"])
+@login_required
+def corridas():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    status_filtro = request.args.get("status", "").strip()
+    status_validos = (
+        "Solicitada",
+        "Aceita",
+        "Em andamento",
+        "Finalizada",
+        "Cancelada",
+    )
+    if status_filtro and status_filtro not in status_validos:
+        abort(400)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    c.id,
+                    c.origem,
+                    c.destino,
+                    c.data_hora,
+                    c.status,
+                    c.distancia_km,
+                    c.valor,
+                    u.nome,
+                    m.nome,
+                    p.forma_pagamento,
+                    p.status,
+                    p.valor,
+                    a.nota,
+                    a.comentario,
+                    h.id,
+                    h.status_anterior,
+                    h.novo_status,
+                    h.data_alteracao
+                FROM corridas AS c
+                JOIN usuarios AS u ON u.id = c.id_usuario
+                LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                LEFT JOIN pagamentos AS p ON p.id_corrida = c.id
+                LEFT JOIN avaliacoes AS a ON a.id_corrida = c.id
+                LEFT JOIN historico_corridas AS h ON h.id_corrida = c.id
+                WHERE (%s = '' OR c.status::text = %s)
+                ORDER BY c.data_hora DESC, c.id DESC, h.data_alteracao, h.id
+                """,
+                (status_filtro, status_filtro),
+            )
+
+            corridas_por_id = {}
+            for linha in cursor.fetchall():
+                corrida = corridas_por_id.get(linha[0])
+                if corrida is None:
+                    corrida = {
+                        "id": linha[0],
+                        "origem": linha[1],
+                        "destino": linha[2],
+                        "data_hora": linha[3],
+                        "status": linha[4],
+                        "distancia_km": linha[5],
+                        "valor": linha[6],
+                        "usuario": linha[7],
+                        "motorista": linha[8],
+                        "pagamento": (
+                            {
+                                "forma": linha[9],
+                                "status": linha[10],
+                                "valor": linha[11],
+                            }
+                            if linha[9] is not None
+                            else None
+                        ),
+                        "avaliacao": (
+                            {"nota": linha[12], "comentario": linha[13]}
+                            if linha[12] is not None
+                            else None
+                        ),
+                        "historico": [],
+                    }
+                    corridas_por_id[linha[0]] = corrida
+
+                if linha[14] is not None:
+                    corrida["historico"].append(
+                        {
+                            "status_anterior": linha[15],
+                            "novo_status": linha[16],
+                            "data_alteracao": linha[17],
+                        }
+                    )
+
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar o histórico administrativo de corridas.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "admins/corridas.html",
+        corridas=list(corridas_por_id.values()),
+        status_filtro=status_filtro,
+        status_validos=status_validos,
+    )
+
+
 @admins.route("/home", methods=["GET"])
 @login_required
 def home():

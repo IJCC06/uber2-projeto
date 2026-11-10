@@ -251,6 +251,74 @@ h1 {
     gap: 18px;
 }
 
+.admin-ride-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 12px;
+}
+
+.admin-ride-filter label {
+    display: grid;
+    gap: 6px;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.admin-ride-filter select {
+    min-height: 44px;
+    min-width: 190px;
+    padding: 0 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--gray-900);
+    font: inherit;
+}
+
+.admin-filter-reset {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.admin-ride-card {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-ride-timeline {
+    padding-top: 16px;
+    border-top: 1px solid var(--gray-200);
+}
+
+.admin-ride-timeline summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.admin-ride-timeline ol {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0 0;
+    padding-left: 22px;
+}
+
+.admin-ride-timeline li {
+    padding-left: 4px;
+}
+
+.admin-ride-timeline time {
+    display: block;
+    margin-top: 3px;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+}
+
 .admin-user-list {
     display: grid;
     gap: 14px;
@@ -699,6 +767,16 @@ button:focus-visible {
 
     .payment-form {
         display: grid;
+    }
+
+    .admin-ride-filter {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .admin-ride-filter select,
+    .admin-ride-filter .primary-action {
+        width: 100%;
     }
 
     .admin-user-card {

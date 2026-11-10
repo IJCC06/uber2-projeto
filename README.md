@@ -47,6 +47,7 @@ Até o momento, o repositório contém:
 - edição dos dados pessoais e alteração de senha pelo próprio administrador;
 - consulta administrativa de usuários e ativação/desativação de contas;
 - consulta administrativa de motoristas e ativação/desativação de contas, preservando corridas já atribuídas;
+- histórico administrativo completo de corridas, com filtro por status, pagamentos, avaliações e linha do tempo;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
