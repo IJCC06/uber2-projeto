@@ -14,9 +14,7 @@ A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenv
 - psycopg2-binary — conexão entre Python e PostgreSQL
 - python-dotenv — leitura das configurações locais em .env
 - HTML, CSS e JavaScript — interface
-- Flask-Login — dependência mantida para uma futura implementação de gerenciamento de sessão e autenticação web
-
-O Flask-Login está previsto para uso futuro; sua presença nas dependências não significa que o fluxo de autenticação já esteja integrado à aplicação.
+- Flask-Login — autenticação web e gerenciamento de sessões
 
 Não está previsto, neste momento, utilizar ORM ou ferramenta de migração de banco de dados. O acesso ao PostgreSQL é feito com SQL e Psycopg2.
 
@@ -113,6 +111,7 @@ Já estão presentes:
 - edição dos dados pessoais e alteração de senha pelo usuário autenticado;
 - edição dos dados pessoais e alteração de senha pelo motorista autenticado;
 - edição dos dados pessoais e alteração de senha pelo administrador autenticado;
+- consulta administrativa de usuários e ativação/desativação de contas;
 - histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
@@ -124,9 +123,6 @@ A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não signif
 - revisar e alinhar a estrutura de diretórios;
 - atualizar as dependências para refletir a escolha de Psycopg2;
 - migrar gradualmente as funcionalidades da versão de terminal para rotas web;
-- implementar autenticação e gerenciamento de sessão com Flask-Login;
-- aplicar controle de acesso para usuários, motoristas e administradores;
-- revisar o armazenamento de senhas para utilizar hash seguro;
 - revisar os scripts SQL, constraints e integridade das operações;
 - criar testes automatizados para rotas e regras de negócio;
 - atualizar a documentação conforme cada funcionalidade for concluída.
@@ -147,6 +143,7 @@ As regras funcionais da versão anterior servirão como referência para a migra
 - no máximo uma avaliação por corrida, com nota de 1 a 5;
 - registro do histórico de mudanças de status;
 - separação entre situação da conta do motorista e disponibilidade para receber corridas;
+- contas de usuário desativadas pela administração não podem iniciar sessão nem continuar usando sessão existente;
 - autorização adequada para operações administrativas e para acesso aos dados de cada usuário.
 
 As regras devem ser garantidas no backend e, quando aplicável, também por constraints no banco de dados.

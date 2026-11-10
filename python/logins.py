@@ -39,7 +39,7 @@ def realizar_login_usuario(email, senha):
     sql = '''
         SELECT id, nome, senha
         FROM usuarios
-        WHERE email = %s
+        WHERE email = %s AND ativo = TRUE
     '''
 
     con = criar_conexao()

@@ -153,6 +153,97 @@ def conta():
     )
 
 
+@admins.route("/usuarios", methods=["GET"])
+@login_required
+def usuarios():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nome, email, telefone, ativo, data_cadastro
+                FROM usuarios
+                ORDER BY nome, id
+                """
+            )
+            usuarios_cadastrados = [
+                {
+                    "id": linha[0],
+                    "nome": linha[1],
+                    "email": linha[2],
+                    "telefone": linha[3],
+                    "ativo": linha[4],
+                    "data_cadastro": linha[5],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar a lista de usuários.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "admins/usuarios.html",
+        usuarios=usuarios_cadastrados,
+    )
+
+
+@admins.route("/usuarios/<int:usuario_id>/status", methods=["POST"])
+@login_required
+def atualizar_status_usuario(usuario_id):
+    if current_user.tipo != "admin":
+        abort(403)
+
+    ativo_texto = request.form.get("ativo", "")
+    if ativo_texto not in ("0", "1"):
+        abort(400)
+
+    ativo = ativo_texto == "1"
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE usuarios
+                SET ativo = %s
+                WHERE id = %s
+                RETURNING id
+                """,
+                (ativo, usuario_id),
+            )
+            usuario = cursor.fetchone()
+
+        if usuario is None:
+            conexao.rollback()
+            abort(404)
+
+        conexao.commit()
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao atualizar o status do usuário %s.",
+            usuario_id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    acao = "ativada" if ativo else "desativada"
+    flash(f"Conta do usuário #{usuario_id} {acao}.", "success")
+    return redirect(url_for("admins.usuarios"))
+
+
 @admins.route("/home", methods=["GET"])
 @login_required
 def home():

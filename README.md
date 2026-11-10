@@ -21,10 +21,8 @@ Na versão 2.0.0, a proposta é disponibilizar essas funcionalidades por uma int
 - **PostgreSQL** — banco de dados
 - **psycopg2-binary** — driver de conexão com PostgreSQL
 - **python-dotenv** — carregamento das configurações locais
-- **Flask-Login** — dependência mantida para implementação futura de autenticação e sessões
+- **Flask-Login** — autenticação e gerenciamento de sessões
 - **HTML, CSS e JavaScript** — frontend
-
-O Flask-Login está mantido para uso futuro. A autenticação web com gerenciamento de sessão ainda não está concluída.
 
 ## O que já foi desenvolvido na v2
 
@@ -47,6 +45,7 @@ Até o momento, o repositório contém:
 - edição dos dados pessoais e alteração de senha da própria conta de usuário;
 - edição dos dados pessoais e alteração de senha pelo próprio motorista;
 - edição dos dados pessoais e alteração de senha pelo próprio administrador;
+- consulta administrativa de usuários e ativação/desativação de contas;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
@@ -56,6 +55,7 @@ Usuários podem cancelar suas próprias solicitações enquanto o status ainda f
 Motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas solicitações, sem afetar as corridas que já aceitaram.
 
 Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
+Contas de usuário desativadas pela administração não podem iniciar uma sessão nem continuar usando uma sessão existente.
 
 ## Estrutura atual
 
@@ -144,9 +144,9 @@ python app.py
 
 O servidor Flask será iniciado em modo de depuração para desenvolvimento local.
 
-## Funcionalidades planejadas para a aplicação web
+## Funcionalidades previstas para a aplicação web
 
-A migração pretende contemplar os principais recursos do sistema original:
+A migração contempla os principais recursos do sistema original em diferentes estágios de implementação:
 
 - cadastro e gerenciamento de usuários;
 - autenticação e sessões para os diferentes perfis;
@@ -157,7 +157,7 @@ A migração pretende contemplar os principais recursos do sistema original:
 - histórico de alterações;
 - área administrativa e consultas.
 
-Essas funcionalidades são objetivos de desenvolvimento, não uma lista de recursos já concluídos na v2.
+Alguns recursos dessa lista já estão disponíveis; outros ainda serão implementados ou ampliados.
 
 ## Regras de negócio de referência
 

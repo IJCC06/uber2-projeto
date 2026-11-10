@@ -36,7 +36,7 @@ def carregar_usuario(user_id):
     try:
         if tipo == "usuario":
             cursor.execute(
-                "SELECT id, nome FROM usuarios WHERE id = %s",
+                "SELECT id, nome FROM usuarios WHERE id = %s AND ativo = TRUE",
                 (id_usuario,)
             )
 
