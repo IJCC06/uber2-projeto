@@ -222,6 +222,95 @@ h1 {
     padding: 24px;
 }
 
+.vehicle-form-panel,
+.vehicle-list-panel {
+    margin-bottom: 24px;
+}
+
+.vehicle-form-panel h2,
+.vehicle-list-panel h2 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.vehicle-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: end;
+}
+
+.vehicle-field {
+    display: grid;
+    gap: 7px;
+}
+
+.vehicle-field label {
+    color: var(--gray-900);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.vehicle-field input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--gray-900);
+    font: inherit;
+}
+
+.vehicle-field input:focus {
+    border-color: var(--focus);
+    outline: 2px solid rgb(42 104 255 / 18%);
+}
+
+.vehicle-form .primary-action {
+    justify-self: start;
+}
+
+.vehicle-list {
+    display: grid;
+    gap: 14px;
+}
+
+.vehicle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+}
+
+.vehicle-card .eyebrow {
+    margin-bottom: 6px;
+}
+
+.vehicle-card h3 {
+    margin-bottom: 0;
+}
+
+.vehicle-details {
+    display: flex;
+    gap: 28px;
+    margin: 0;
+}
+
+.vehicle-details dt {
+    margin-bottom: 6px;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+}
+
+.vehicle-details dd {
+    margin: 0;
+    font-weight: 700;
+}
+
 .panel-header {
     display: flex;
     align-items: center;
@@ -409,6 +498,19 @@ button:focus-visible {
     .ride-details {
         grid-template-columns: 1fr;
         gap: 12px;
+    }
+
+    .vehicle-form {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-form .primary-action {
+        width: 100%;
+    }
+
+    .vehicle-card {
+        align-items: start;
+        flex-direction: column;
     }
 }
 

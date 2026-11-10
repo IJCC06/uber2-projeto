@@ -40,6 +40,7 @@ Até o momento, o repositório contém:
 - scripts SQL para criação das tabelas, dados de exemplo e consultas;
 - módulo de funções de login em python/logins.py, utilizado pelo app.py;
 - solicitação de corridas por usuários e fluxo de aceite, início, cancelamento e finalização por motoristas;
+- cadastro e consulta dos veículos vinculados à conta do motorista;
 - cálculo de tarifa de teste de R$ 2,50 por quilômetro informado pelo motorista;
 - registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente;
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;

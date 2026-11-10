@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meus veículos | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
+</head>
+<body>
+    {% include "includes/header_motorista.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="vehicles-title">
+            <div>
+                <p class="eyebrow">Área do motorista</p>
+                <h1 id="vehicles-title">Meus veículos</h1>
+                <p>Cadastre e consulte os veículos vinculados à sua conta.</p>
+            </div>
+        </section>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="form-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="panel vehicle-form-panel" aria-labelledby="vehicle-form-title">
+            <h2 id="vehicle-form-title">Cadastrar veículo</h2>
+            <form class="vehicle-form" action="{{ url_for('motoristas.meus_veiculos') }}" method="post">
+                <div class="vehicle-field">
+                    <label for="marca">Marca</label>
+                    <input id="marca" name="marca" maxlength="50" autocomplete="organization" required>
+                </div>
+                <div class="vehicle-field">
+                    <label for="modelo">Modelo</label>
+                    <input id="modelo" name="modelo" maxlength="50" required>
+                </div>
+                <div class="vehicle-field">
+                    <label for="placa">Placa</label>
+                    <input id="placa" name="placa" maxlength="10" autocomplete="off" required>
+                </div>
+                <div class="vehicle-field">
+                    <label for="ano">Ano</label>
+                    <input id="ano" name="ano" type="number" min="1" step="1" required>
+                </div>
+                <div class="vehicle-field">
+                    <label for="cor">Cor (opcional)</label>
+                    <input id="cor" name="cor" maxlength="30">
+                </div>
+                <button class="primary-action" type="submit">Cadastrar veículo</button>
+            </form>
+        </section>
+
+        <section class="panel vehicle-list-panel" aria-labelledby="vehicle-list-title">
+            <div class="panel-header">
+                <h2 id="vehicle-list-title">Veículos cadastrados</h2>
+                <span class="ride-count">{{ veiculos|length }}</span>
+            </div>
+            {% if veiculos %}
+                <div class="vehicle-list">
+                    {% for veiculo in veiculos %}
+                        <article class="vehicle-card">
+                            <div>
+                                <p class="eyebrow">{{ veiculo.marca }} {{ veiculo.modelo }}</p>
+                                <h3>{{ veiculo.placa }}</h3>
+                            </div>
+                            <dl class="vehicle-details">
+                                <div>
+                                    <dt>Ano</dt>
+                                    <dd>{{ veiculo.ano }}</dd>
+                                </div>
+                                {% if veiculo.cor %}
+                                    <div>
+                                        <dt>Cor</dt>
+                                        <dd>{{ veiculo.cor }}</dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhum veículo cadastrado</h3>
+                    <p>Use o formulário acima para cadastrar seu primeiro veículo.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

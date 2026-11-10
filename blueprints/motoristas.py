@@ -175,6 +175,114 @@ def atualizar_disponibilidade():
     return redirect(url_for("motoristas.corridas_disponiveis"))
 
 
+@motoristas.route("/veiculos", methods=["GET", "POST"])
+@login_required
+def meus_veiculos():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    if request.method == "POST":
+        modelo = request.form.get("modelo", "").strip()
+        marca = request.form.get("marca", "").strip()
+        placa = request.form.get("placa", "").strip().upper()
+        ano_texto = request.form.get("ano", "").strip()
+        cor = request.form.get("cor", "").strip() or None
+
+        erros = []
+        if not modelo or len(modelo) > 50:
+            erros.append("Informe um modelo com até 50 caracteres.")
+        if not marca or len(marca) > 50:
+            erros.append("Informe uma marca com até 50 caracteres.")
+        if not placa or len(placa) > 10:
+            erros.append("Informe uma placa com até 10 caracteres.")
+        if cor is not None and len(cor) > 30:
+            erros.append("A cor deve ter até 30 caracteres.")
+
+        try:
+            ano = int(ano_texto)
+            if ano <= 0:
+                raise ValueError
+        except ValueError:
+            ano = None
+            erros.append("Informe um ano válido.")
+
+        if erros:
+            for erro in erros:
+                flash(erro, "error")
+            return redirect(url_for("motoristas.meus_veiculos"))
+
+        conexao = None
+        try:
+            conexao = criar_conexao()
+            with conexao.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO veiculos
+                        (id_motorista, modelo, marca, placa, ano, cor)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (current_user.id, modelo, marca, placa, ano, cor),
+                )
+            conexao.commit()
+        except psycopg2.errors.UniqueViolation:
+            if conexao is not None:
+                conexao.rollback()
+            flash("Já existe um veículo cadastrado com essa placa.", "error")
+            return redirect(url_for("motoristas.meus_veiculos"))
+        except psycopg2.Error:
+            if conexao is not None:
+                conexao.rollback()
+            current_app.logger.exception(
+                "Falha ao cadastrar veículo para o motorista %s.",
+                current_user.id,
+            )
+            abort(500)
+        finally:
+            if conexao is not None:
+                conexao.close()
+
+        flash("Veículo cadastrado com sucesso.", "success")
+        return redirect(url_for("motoristas.meus_veiculos"))
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, modelo, marca, placa, ano, cor
+                FROM veiculos
+                WHERE id_motorista = %s
+                ORDER BY id DESC
+                """,
+                (current_user.id,),
+            )
+            veiculos = [
+                {
+                    "id": linha[0],
+                    "modelo": linha[1],
+                    "marca": linha[2],
+                    "placa": linha[3],
+                    "ano": linha[4],
+                    "cor": linha[5],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao carregar os veículos do motorista %s.",
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template("motoristas/meus_veiculos.html", veiculos=veiculos)
+
+
 @motoristas.route("/corridas/<int:corrida_id>/aceitar", methods=["POST"])
 @login_required
 def aceitar_corrida(corrida_id):
