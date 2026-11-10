@@ -26,7 +26,7 @@
         <section class="welcome" aria-labelledby="welcome-title">
             <div>
                 <p class="eyebrow">Área do usuário</p>
-                <h1 id="welcome-title">Olá, usuário!</h1>
+                <h1 id="welcome-title">Olá, {{ current_user.nome }}!</h1>
                 <p>Para onde você quer ir hoje?</p>
             </div>
             <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar corrida</a>
@@ -35,15 +35,15 @@
         <section class="summary" aria-label="Resumo das corridas">
             <article class="summary-card">
                 <span class="summary-label">Corridas realizadas</span>
-                <strong>0</strong>
+                <strong>{{ corridas_realizadas }}</strong>
             </article>
             <article class="summary-card">
                 <span class="summary-label">Corridas em andamento</span>
-                <strong>0</strong>
+                <strong>{{ corridas_ativas }}</strong>
             </article>
             <article class="summary-card">
                 <span class="summary-label">Pagamentos pendentes</span>
-                <strong>0</strong>
+                <strong>{{ pagamentos_pendentes }}</strong>
             </article>
         </section>
 
@@ -54,11 +54,50 @@
                     <a href="{{ url_for('usuarios.minhas_corridas') }}">Ver todas</a>
                 </div>
 
-                <div class="empty-state">
-                    <h3>Nenhuma corrida encontrada</h3>
-                    <p>Quando você solicitar uma corrida, ela aparecerá aqui.</p>
-                    <a class="secondary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar a primeira corrida</a>
-                </div>
+                {% if corridas_recentes %}
+                    <div class="ride-history">
+                        {% for corrida in corridas_recentes %}
+                            <article class="ride-history-card">
+                                <header class="ride-history-header">
+                                    <div>
+                                        <p class="eyebrow">Corrida #{{ corrida.id }}</p>
+                                        <h3>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h3>
+                                    </div>
+                                    <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                                        {{ corrida.status }}
+                                    </span>
+                                </header>
+
+                                <dl class="ride-history-details">
+                                    <div>
+                                        <dt>Data</dt>
+                                        <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Motorista</dt>
+                                        <dd>{{ corrida.motorista or "Aguardando motorista" }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Valor</dt>
+                                        <dd>
+                                            {% if corrida.valor is not none %}
+                                                R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                            {% else %}
+                                                A definir
+                                            {% endif %}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>Nenhuma corrida encontrada</h3>
+                        <p>Quando você solicitar uma corrida, ela aparecerá aqui.</p>
+                        <a class="secondary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar a primeira corrida</a>
+                    </div>
+                {% endif %}
             </section>
 
             <aside class="panel quick-actions" aria-labelledby="quick-actions-title">

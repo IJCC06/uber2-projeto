@@ -23,7 +23,72 @@ def home():
     if current_user.tipo != "usuario":
         abort(403)
 
-    return render_template("usuarios/home_usuarios.html")
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) FILTER (WHERE c.status = 'Finalizada'),
+                    COUNT(*) FILTER (
+                        WHERE c.status IN ('Aceita', 'Em andamento')
+                    ),
+                    COUNT(p.id) FILTER (WHERE p.status = 'Pendente')
+                FROM corridas AS c
+                LEFT JOIN pagamentos AS p ON p.id_corrida = c.id
+                WHERE c.id_usuario = %s
+                """,
+                (current_user.id,),
+            )
+            resumo = cursor.fetchone()
+
+            cursor.execute(
+                """
+                SELECT
+                    c.id,
+                    c.origem,
+                    c.destino,
+                    c.data_hora,
+                    c.status,
+                    c.valor,
+                    m.nome
+                FROM corridas AS c
+                LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                WHERE c.id_usuario = %s
+                ORDER BY c.data_hora DESC, c.id DESC
+                LIMIT 5
+                """,
+                (current_user.id,),
+            )
+            corridas_recentes = [
+                {
+                    "id": linha[0],
+                    "origem": linha[1],
+                    "destino": linha[2],
+                    "data_hora": linha[3],
+                    "status": linha[4],
+                    "valor": linha[5],
+                    "motorista": linha[6],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar o painel do usuário.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "usuarios/home_usuarios.html",
+        corridas_realizadas=resumo[0],
+        corridas_ativas=resumo[1],
+        pagamentos_pendentes=resumo[2],
+        corridas_recentes=corridas_recentes,
+    )
 
 
 @usuarios.route("/corridas", methods=["GET"])
