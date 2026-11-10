@@ -13,6 +13,7 @@ from flask import (
 from flask_login import login_required, current_user
 
 from conexao import criar_conexao
+from python.seguranca import criar_hash_senha, verificar_senha
 
 usuarios = Blueprint("usuarios", __name__, url_prefix="/usuario")
 
@@ -430,3 +431,142 @@ def pagamentos():
             conexao.close()
 
     return render_template("usuarios/pagamentos.html", corridas=corridas)
+
+
+@usuarios.route("/conta", methods=["GET", "POST"])
+@login_required
+def conta():
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        telefone = request.form.get("telefone", "").strip()
+        senha_atual = request.form.get("senha_atual", "")
+        nova_senha = request.form.get("nova_senha", "")
+        confirmar_senha = request.form.get("confirmar_senha", "")
+        alterar_senha = bool(nova_senha or confirmar_senha)
+
+        if not nome or not email or not telefone:
+            flash("Nome, e-mail e telefone são obrigatórios.", "error")
+            return redirect(url_for("usuarios.conta"))
+
+        if len(nome) > 100 or len(email) > 150 or len(telefone) > 20:
+            flash("Um ou mais campos ultrapassaram o limite permitido.", "error")
+            return redirect(url_for("usuarios.conta"))
+
+        if alterar_senha:
+            if not senha_atual:
+                flash("Informe sua senha atual para definir uma nova senha.", "error")
+                return redirect(url_for("usuarios.conta"))
+            if len(nova_senha) < 8:
+                flash("A nova senha deve possuir pelo menos 8 caracteres.", "error")
+                return redirect(url_for("usuarios.conta"))
+            if nova_senha != confirmar_senha:
+                flash("A nova senha e a confirmação não coincidem.", "error")
+                return redirect(url_for("usuarios.conta"))
+
+        conexao = None
+        try:
+            conexao = criar_conexao()
+            with conexao.cursor() as cursor:
+                if alterar_senha:
+                    cursor.execute(
+                        "SELECT senha FROM usuarios WHERE id = %s FOR UPDATE",
+                        (current_user.id,),
+                    )
+                    credenciais = cursor.fetchone()
+                    if credenciais is None:
+                        conexao.rollback()
+                        abort(404)
+                    if not verificar_senha(senha_atual, credenciais[0]):
+                        conexao.rollback()
+                        flash("A senha atual está incorreta.", "error")
+                        return redirect(url_for("usuarios.conta"))
+
+                    cursor.execute(
+                        """
+                        UPDATE usuarios
+                        SET nome = %s, email = %s, telefone = %s, senha = %s
+                        WHERE id = %s
+                        RETURNING id
+                        """,
+                        (
+                            nome,
+                            email,
+                            telefone,
+                            criar_hash_senha(nova_senha),
+                            current_user.id,
+                        ),
+                    )
+                else:
+                    cursor.execute(
+                        """
+                        UPDATE usuarios
+                        SET nome = %s, email = %s, telefone = %s
+                        WHERE id = %s
+                        RETURNING id
+                        """,
+                        (nome, email, telefone, current_user.id),
+                    )
+
+                usuario = cursor.fetchone()
+
+            if usuario is None:
+                conexao.rollback()
+                abort(404)
+
+            conexao.commit()
+        except psycopg2.errors.UniqueViolation:
+            if conexao is not None:
+                conexao.rollback()
+            flash("Esse e-mail já está cadastrado em outra conta.", "error")
+            return redirect(url_for("usuarios.conta"))
+        except psycopg2.Error:
+            if conexao is not None:
+                conexao.rollback()
+            current_app.logger.exception(
+                "Falha ao atualizar a conta do usuário %s.",
+                current_user.id,
+            )
+            abort(500)
+        finally:
+            if conexao is not None:
+                conexao.close()
+
+        flash("Seus dados foram atualizados com sucesso.", "success")
+        return redirect(url_for("usuarios.conta"))
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT nome, email, telefone
+                FROM usuarios
+                WHERE id = %s
+                """,
+                (current_user.id,),
+            )
+            usuario = cursor.fetchone()
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao carregar a conta do usuário %s.",
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    if usuario is None:
+        abort(404)
+
+    return render_template(
+        "usuarios/conta.html",
+        usuario={"nome": usuario[0], "email": usuario[1], "telefone": usuario[2]},
+    )

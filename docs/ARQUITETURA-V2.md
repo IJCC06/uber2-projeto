@@ -110,6 +110,7 @@ Já estão presentes:
 - cadastro, consulta, edição e remoção de veículos, sempre vinculados ao motorista autenticado;
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
 - consulta pelo motorista da própria média e das avaliações recentes recebidas;
+- edição dos dados pessoais e alteração de senha pelo usuário autenticado;
 - histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.

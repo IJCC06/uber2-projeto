@@ -20,6 +20,10 @@
            {% if request.endpoint == 'usuarios.pagamentos' %}class="active" aria-current="page"{% endif %}>
             Pagamentos
         </a>
+        <a href="{{ url_for('usuarios.conta') }}"
+           {% if request.endpoint == 'usuarios.conta' %}class="active" aria-current="page"{% endif %}>
+            Minha conta
+        </a>
     </nav>
 
     <form action="{{ url_for('auth.logout') }}" method="POST">
