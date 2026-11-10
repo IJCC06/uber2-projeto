@@ -106,6 +106,7 @@ Já estão presentes:
 - rotas POST para tentativa de login de usuário e motorista;
 - rota de login administrativo;
 - rota para exibir a página inicial do usuário;
+- painel administrativo com indicadores agregados e lista das corridas recentes;
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
