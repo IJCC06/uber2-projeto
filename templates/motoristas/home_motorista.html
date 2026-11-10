@@ -94,6 +94,14 @@
                                     >
                                         <button class="primary-action" type="submit">Iniciar corrida</button>
                                     </form>
+                                    <form
+                                        class="ride-actions"
+                                        action="{{ url_for('motoristas.cancelar_corrida', corrida_id=corrida.id) }}"
+                                        method="post"
+                                        onsubmit="return confirm('Deseja cancelar esta corrida?');"
+                                    >
+                                        <button class="danger-action" type="submit">Cancelar corrida</button>
+                                    </form>
                                 {% elif corrida.status == "Em andamento" %}
                                     <form
                                         class="ride-actions"
@@ -115,6 +123,14 @@
                                             <small>Tarifa de teste: R$ 2,50 por km.</small>
                                         </label>
                                         <button class="primary-action" type="submit">Finalizar corrida</button>
+                                    </form>
+                                    <form
+                                        class="ride-actions"
+                                        action="{{ url_for('motoristas.cancelar_corrida', corrida_id=corrida.id) }}"
+                                        method="post"
+                                        onsubmit="return confirm('Deseja cancelar esta corrida?');"
+                                    >
+                                        <button class="danger-action" type="submit">Cancelar corrida</button>
                                     </form>
                                 {% endif %}
                             </article>

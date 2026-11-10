@@ -129,6 +129,7 @@ A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não signif
 As regras funcionais da versão anterior servirão como referência para a migração, com validação e ajustes durante a implementação web. Entre elas:
 
 - fluxo de corrida: Solicitada → Aceita → Em andamento → Finalizada, com possibilidade de cancelamento conforme as regras definidas;
+- motoristas podem cancelar suas corridas nos estados Aceita ou Em andamento; o cancelamento é registrado no histórico;
 - valor da corrida calculado no protótipo por R$ 2,50 por quilômetro informado pelo motorista ao finalizar;
 - pagamentos associados a corridas finalizadas, com método escolhido pelo usuário e status inicial Pendente;
 - o registro de pagamento não processa nem confirma uma cobrança; integração com gateway permanece futura;

@@ -116,7 +116,8 @@ h1 {
 }
 
 .primary-action,
-.secondary-action {
+.secondary-action,
+.danger-action {
     display: inline-flex;
     min-height: 46px;
     align-items: center;
@@ -132,9 +133,20 @@ h1 {
     white-space: nowrap;
 }
 
+.danger-action {
+    border: 1px solid var(--red);
+    background: var(--white);
+    color: var(--red);
+    cursor: pointer;
+}
+
 .primary-action:hover,
 .secondary-action:hover {
     background: #333333;
+}
+
+.danger-action:hover {
+    background: var(--red-bg);
 }
 
 .availability-card,

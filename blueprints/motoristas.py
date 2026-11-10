@@ -232,6 +232,73 @@ def iniciar_corrida(corrida_id):
     return redirect(url_for("motoristas.corridas_disponiveis"))
 
 
+@motoristas.route("/corridas/<int:corrida_id>/cancelar", methods=["POST"])
+@login_required
+def cancelar_corrida(corrida_id):
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT status
+                FROM corridas
+                WHERE id = %s
+                  AND id_motorista = %s
+                FOR UPDATE
+                """,
+                (corrida_id, current_user.id),
+            )
+            corrida = cursor.fetchone()
+
+            if corrida is None or corrida[0] not in ("Aceita", "Em andamento"):
+                conexao.rollback()
+                flash("Esta corrida não pode mais ser cancelada.", "error")
+                return redirect(url_for("motoristas.corridas_disponiveis"))
+
+            status_anterior = corrida[0]
+            cursor.execute(
+                """
+                UPDATE corridas
+                SET status = 'Cancelada'
+                WHERE id = %s
+                  AND id_motorista = %s
+                  AND status = %s
+                """,
+                (corrida_id, current_user.id, status_anterior),
+            )
+
+            if cursor.rowcount == 0:
+                conexao.rollback()
+                flash("Esta corrida não pode mais ser cancelada.", "error")
+                return redirect(url_for("motoristas.corridas_disponiveis"))
+
+            cursor.execute(
+                """
+                INSERT INTO historico_corridas
+                    (id_corrida, status_anterior, novo_status)
+                VALUES (%s, %s, 'Cancelada')
+                """,
+                (corrida_id, status_anterior),
+            )
+
+        conexao.commit()
+        flash(f"Corrida #{corrida_id} cancelada.", "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao cancelar a corrida %s.", corrida_id)
+        flash("Não foi possível cancelar a corrida. Tente novamente.", "error")
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("motoristas.corridas_disponiveis"))
+
+
 @motoristas.route("/corridas/<int:corrida_id>/finalizar", methods=["POST"])
 @login_required
 def finalizar_corrida(corrida_id):
