@@ -71,9 +71,12 @@ DB_HOST=localhost
 DB_NAME=uber2_v2
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
+SECRET_KEY=chave_forte_gerada_localmente
 ```
 
-A função criar_conexao(), em conexao.py, utiliza essas quatro variáveis para abrir a conexão com PostgreSQL por meio de psycopg2.
+A função `criar_conexao()`, em `conexao.py`, utiliza as quatro variáveis do banco para abrir a conexão com PostgreSQL por meio de psycopg2. `app.py` carrega `SECRET_KEY` do mesmo `.env`; a chave deve ser forte, privada e estável para manter a validade das sessões entre reinicializações. Gere-a localmente com `python -c "import secrets; print(secrets.token_hex(32))"`.
+
+O arquivo `.env` está no `.gitignore` e não deve ser compartilhado nem enviado ao Git.
 
 O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em sql/ e devem ser revisados antes da execução. Em especial, insert-date.sql contém comandos de limpeza e não deve ser executado em um banco com dados que precisem ser preservados. Para bancos já criados, adicionar-distancia-corridas.sql inclui a coluna de distância sem remover os registros existentes.
 
@@ -82,7 +85,7 @@ O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scrip
 1. Instale Python 3 e PostgreSQL.
 2. Crie e ative um ambiente virtual na pasta do projeto.
 3. Instale as dependências listadas em requirements.txt.
-4. Configure DB_HOST, DB_NAME, DB_USER e DB_PASSWORD em um arquivo local .env.
+4. Configure DB_HOST, DB_NAME, DB_USER, DB_PASSWORD e SECRET_KEY em um arquivo local `.env`. Gere `SECRET_KEY` localmente com o comando Python documentado acima.
 5. Crie o banco configurado no PostgreSQL.
 6. Execute os scripts SQL necessários, após revisar seu conteúdo.
 7. Inicie a aplicação:

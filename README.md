@@ -96,16 +96,25 @@ A pasta python ainda possui código herdado da versão de terminal. O módulo py
 
 ## Banco de dados e configuração
 
-A aplicação utiliza PostgreSQL. A conexão é criada em conexao.py com psycopg2, lendo as seguintes variáveis de ambiente:
+A aplicação utiliza PostgreSQL. Crie um arquivo `.env` na raiz do projeto com as configurações do banco e uma chave secreta para as sessões Flask:
 
 ```env
 DB_HOST=localhost
 DB_NAME=uber2_v2
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
+SECRET_KEY=cole_aqui_a_chave_gerada
 ```
 
-Crie um arquivo local chamado .env na raiz do projeto e configure os valores de acordo com seu PostgreSQL. **Não compartilhe nem envie o arquivo .env ao Git**, pois ele contém credenciais.
+Gere uma chave forte localmente, sem compartilhá-la:
+
+```powershell
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Copie o valor exibido para `SECRET_KEY`. A chave deve permanecer estável entre reinicializações para preservar as sessões existentes. **Não use uma chave de exemplo, não compartilhe nem envie o arquivo `.env` ao Git**; ele contém credenciais e um segredo de sessão. O `.env` já está listado no `.gitignore`.
+
+A conexão é criada em `conexao.py` com psycopg2, lendo `DB_HOST`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`. `app.py` carrega o mesmo arquivo para ler `SECRET_KEY`.
 
 Os scripts de banco estão na pasta sql/:
 
@@ -142,7 +151,7 @@ Instale as dependências:
 pip install -r requirements.txt
 ```
 
-Depois de configurar o PostgreSQL e o arquivo .env, inicie a aplicação:
+Depois de configurar o PostgreSQL e todas as variáveis do arquivo `.env`, inicie a aplicação:
 
 ```bash
 python app.py

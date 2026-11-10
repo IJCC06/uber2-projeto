@@ -1,11 +1,12 @@
 from flask import Flask
 from flask_login import LoginManager
 import os
+from dotenv import load_dotenv
 
 from conexao import criar_conexao
 from python.usuario import Usuario
 
-# E-mail Admin Teste = admin.bdfb6e6958@example.test
+load_dotenv()
 
 
 uber2 = Flask(__name__)
