@@ -189,6 +189,83 @@ def corridas_disponiveis():
     )
 
 
+@motoristas.route("/historico", methods=["GET"])
+@login_required
+def historico_corridas():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) FILTER (WHERE status = 'Finalizada'),
+                    COALESCE(
+                        SUM(valor) FILTER (WHERE status = 'Finalizada'),
+                        0
+                    )
+                FROM corridas
+                WHERE id_motorista = %s
+                """,
+                (current_user.id,),
+            )
+            resumo = cursor.fetchone()
+
+            cursor.execute(
+                """
+                SELECT
+                    c.id,
+                    c.origem,
+                    c.destino,
+                    c.data_hora,
+                    c.status,
+                    c.distancia_km,
+                    c.valor,
+                    u.nome
+                FROM corridas AS c
+                JOIN usuarios AS u ON u.id = c.id_usuario
+                WHERE c.id_motorista = %s
+                  AND c.status IN ('Finalizada', 'Cancelada')
+                ORDER BY c.data_hora DESC, c.id DESC
+                """,
+                (current_user.id,),
+            )
+            corridas = [
+                {
+                    "id": linha[0],
+                    "origem": linha[1],
+                    "destino": linha[2],
+                    "data_hora": linha[3],
+                    "status": linha[4],
+                    "distancia_km": linha[5],
+                    "valor": linha[6],
+                    "usuario": linha[7],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao carregar o histórico do motorista %s.",
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "motoristas/historico_corridas.html",
+        corridas=corridas,
+        corridas_finalizadas=resumo[0],
+        total_recebido=resumo[1],
+    )
+
+
 @motoristas.route("/disponibilidade", methods=["POST"])
 @login_required
 def atualizar_disponibilidade():

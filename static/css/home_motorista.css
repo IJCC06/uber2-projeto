@@ -222,6 +222,53 @@ h1 {
     padding: 24px;
 }
 
+.driver-history-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.driver-history-summary .summary-card {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    padding: 22px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+}
+
+.driver-history-summary .summary-label {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.driver-history-summary strong {
+    font-size: 2rem;
+}
+
+.history-note {
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.driver-history-list {
+    display: grid;
+    gap: 14px;
+}
+
+.ride-status.status-finalizada {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.ride-status.status-cancelada {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
 .ratings-panel {
     margin-bottom: 24px;
 }
@@ -618,6 +665,10 @@ button:focus-visible {
     }
 
     .vehicle-form {
+        grid-template-columns: 1fr;
+    }
+
+    .driver-history-summary {
         grid-template-columns: 1fr;
     }
 

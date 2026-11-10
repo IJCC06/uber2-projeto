@@ -12,6 +12,10 @@
            {% if request.endpoint == 'motoristas.corridas_disponiveis' %}class="active" aria-current="page"{% endif %}>
             Corridas disponíveis
         </a>
+        <a href="{{ url_for('motoristas.historico_corridas') }}"
+           {% if request.endpoint == 'motoristas.historico_corridas' %}class="active" aria-current="page"{% endif %}>
+            Histórico
+        </a>
         <a href="{{ url_for('motoristas.meus_veiculos') }}"
            {% if request.endpoint == 'motoristas.meus_veiculos' %}class="active" aria-current="page"{% endif %}>
             Meus veículos
