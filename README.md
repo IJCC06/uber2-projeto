@@ -45,6 +45,7 @@ Até o momento, o repositório contém:
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional.
 
 Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos estados “Aceita” ou “Em andamento”. A transição fica registrada no histórico.
+Motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas solicitações, sem afetar as corridas que já aceitaram.
 
 Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
 

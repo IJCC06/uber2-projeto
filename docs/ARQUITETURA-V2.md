@@ -130,6 +130,7 @@ As regras funcionais da versão anterior servirão como referência para a migra
 
 - fluxo de corrida: Solicitada → Aceita → Em andamento → Finalizada, com possibilidade de cancelamento conforme as regras definidas;
 - motoristas podem cancelar suas corridas nos estados Aceita ou Em andamento; o cancelamento é registrado no histórico;
+- motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas solicitações, sem alterar as corridas já atribuídas;
 - valor da corrida calculado no protótipo por R$ 2,50 por quilômetro informado pelo motorista ao finalizar;
 - pagamentos associados a corridas finalizadas, com método escolhido pelo usuário e status inicial Pendente;
 - o registro de pagamento não processa nem confirma uma cobrança; integração com gateway permanece futura;

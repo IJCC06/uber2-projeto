@@ -41,9 +41,33 @@
                 {% else %}
                     <span class="availability-indicator unavailable" aria-hidden="true"></span>
                     <div>
-                        <h2>Você não está disponível para receber corridas</h2>
-                        <p>Sua conta precisa estar ativa e sua disponibilidade habilitada.</p>
+                        {% if not motorista_ativo %}
+                            <h2>Sua conta está inativa</h2>
+                            <p>Entre em contato com a administração para voltar a receber corridas.</p>
+                        {% else %}
+                            <h2>Você não está disponível para receber corridas</h2>
+                            <p>Ative sua disponibilidade quando quiser receber novas solicitações.</p>
+                        {% endif %}
                     </div>
+                {% endif %}
+
+                {% if disponivel or motorista_ativo %}
+                    <form
+                        class="availability-actions"
+                        action="{{ url_for('motoristas.atualizar_disponibilidade') }}"
+                        method="post"
+                    >
+                        <input
+                            type="hidden"
+                            name="disponivel"
+                            value="{{ '0' if disponivel else '1' }}"
+                        >
+                        {% if disponivel %}
+                            <button class="secondary-action" type="submit">Ficar indisponível</button>
+                        {% else %}
+                            <button class="primary-action" type="submit">Ficar disponível</button>
+                        {% endif %}
+                    </form>
                 {% endif %}
             </section>
         {% endif %}

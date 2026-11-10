@@ -55,7 +55,9 @@ def corridas_disponiveis():
             if motorista is None:
                 abort(403)
 
-            pode_receber = motorista[0] == "Ativo" and motorista[1]
+            motorista_ativo = motorista[0] == "Ativo"
+            disponivel = motorista[1]
+            pode_receber = motorista_ativo and disponivel
             corridas = []
 
             if pode_receber:
@@ -110,8 +112,67 @@ def corridas_disponiveis():
         "motoristas/home_motorista.html",
         corridas_disponiveis=corridas,
         corridas_ativas=corridas_ativas,
+        motorista_ativo=motorista_ativo,
+        disponivel=disponivel,
         pode_receber=pode_receber,
     )
+
+
+@motoristas.route("/disponibilidade", methods=["POST"])
+@login_required
+def atualizar_disponibilidade():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    valor_disponibilidade = request.form.get("disponivel")
+    if valor_disponibilidade not in {"0", "1"}:
+        flash("Solicitação de disponibilidade inválida.", "error")
+        return redirect(url_for("motoristas.corridas_disponiveis"))
+
+    disponivel = valor_disponibilidade == "1"
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE motoristas
+                SET disponivel = %s
+                WHERE id = %s
+                  AND (status = 'Ativo' OR %s = FALSE)
+                RETURNING disponivel
+                """,
+                (disponivel, current_user.id, disponivel),
+            )
+            resultado = cursor.fetchone()
+
+        if resultado is None:
+            conexao.rollback()
+            flash(
+                "Sua conta precisa estar ativa para habilitar o recebimento de corridas.",
+                "error",
+            )
+        else:
+            conexao.commit()
+            mensagem = (
+                "Você está disponível para receber corridas."
+                if resultado[0]
+                else "Você não receberá novas solicitações de corrida."
+            )
+            flash(mensagem, "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao atualizar a disponibilidade do motorista %s.",
+            current_user.id,
+        )
+        flash("Não foi possível atualizar sua disponibilidade. Tente novamente.", "error")
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("motoristas.corridas_disponiveis"))
 
 
 @motoristas.route("/corridas/<int:corrida_id>/aceitar", methods=["POST"])
