@@ -151,6 +151,60 @@ def minhas_corridas():
     return render_template("usuarios/minhas_corridas.html", corridas=corridas)
 
 
+@usuarios.route("/corridas/<int:corrida_id>/cancelar", methods=["POST"])
+@login_required
+def cancelar_corrida(corrida_id):
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE corridas
+                SET status = 'Cancelada'
+                WHERE id = %s
+                  AND id_usuario = %s
+                  AND status = 'Solicitada'
+                RETURNING id
+                """,
+                (corrida_id, current_user.id),
+            )
+            corrida = cursor.fetchone()
+
+            if corrida is None:
+                conexao.rollback()
+                flash(
+                    "Esta corrida não está mais disponível para cancelamento.",
+                    "error",
+                )
+                return redirect(url_for("usuarios.minhas_corridas"))
+
+            cursor.execute(
+                """
+                INSERT INTO historico_corridas
+                    (id_corrida, status_anterior, novo_status)
+                VALUES (%s, 'Solicitada', 'Cancelada')
+                """,
+                (corrida_id,),
+            )
+
+        conexao.commit()
+        flash(f"Corrida #{corrida_id} cancelada.", "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao cancelar a corrida %s.", corrida_id)
+        flash("Não foi possível cancelar a corrida. Tente novamente.", "error")
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("usuarios.minhas_corridas"))
+
+
 @usuarios.route("/corridas/<int:corrida_id>/avaliar", methods=["POST"])
 @login_required
 def avaliar_corrida(corrida_id):

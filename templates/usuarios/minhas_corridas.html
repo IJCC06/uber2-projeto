@@ -71,6 +71,17 @@
                             </div>
                         </dl>
 
+                        {% if corrida.status == "Solicitada" %}
+                            <form
+                                class="cancel-ride-form"
+                                action="{{ url_for('usuarios.cancelar_corrida', corrida_id=corrida.id) }}"
+                                method="post"
+                                onsubmit="return confirm('Deseja cancelar esta solicitação de corrida?');"
+                            >
+                                <button class="cancel-action" type="submit">Cancelar solicitação</button>
+                            </form>
+                        {% endif %}
+
                         {% if corrida.status == "Finalizada" %}
                             <a class="history-link" href="{{ url_for('usuarios.pagamentos') }}">
                                 Ver pagamento

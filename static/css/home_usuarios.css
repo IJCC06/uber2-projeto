@@ -130,6 +130,28 @@ h1 {
     background: #333333;
 }
 
+.cancel-ride-form {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.cancel-action {
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid #a32121;
+    border-radius: 8px;
+    background: var(--white);
+    color: #a32121;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.cancel-action:hover {
+    background: #fff0f0;
+}
+
 .summary {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
