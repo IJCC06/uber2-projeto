@@ -46,6 +46,7 @@ Até o momento, o repositório contém:
 - edição dos dados pessoais e alteração de senha pelo próprio motorista;
 - edição dos dados pessoais e alteração de senha pelo próprio administrador;
 - consulta administrativa de usuários e ativação/desativação de contas;
+- consulta administrativa de motoristas e ativação/desativação de contas, preservando corridas já atribuídas;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
@@ -56,6 +57,7 @@ Motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas
 
 Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
 Contas de usuário desativadas pela administração não podem iniciar uma sessão nem continuar usando uma sessão existente.
+Contas de motorista desativadas também perdem o acesso; a desativação é bloqueada enquanto houver corridas aceitas ou em andamento.
 
 ## Estrutura atual
 

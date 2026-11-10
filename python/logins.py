@@ -72,7 +72,7 @@ def realizar_login_motorista(cpf, senha):
     sql = '''
         SELECT id, nome, senha
         FROM motoristas
-        WHERE cpf = %s
+        WHERE cpf = %s AND status = 'Ativo'
     '''
     
     con = criar_conexao()

@@ -112,6 +112,7 @@ Já estão presentes:
 - edição dos dados pessoais e alteração de senha pelo motorista autenticado;
 - edição dos dados pessoais e alteração de senha pelo administrador autenticado;
 - consulta administrativa de usuários e ativação/desativação de contas;
+- consulta administrativa de motoristas e ativação/desativação de contas, bloqueada enquanto houver corridas atribuídas em andamento;
 - histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
@@ -144,6 +145,7 @@ As regras funcionais da versão anterior servirão como referência para a migra
 - registro do histórico de mudanças de status;
 - separação entre situação da conta do motorista e disponibilidade para receber corridas;
 - contas de usuário desativadas pela administração não podem iniciar sessão nem continuar usando sessão existente;
+- motoristas desativados não podem iniciar sessão nem continuar usando sessão existente;
 - autorização adequada para operações administrativas e para acesso aos dados de cada usuário.
 
 As regras devem ser garantidas no backend e, quando aplicável, também por constraints no banco de dados.

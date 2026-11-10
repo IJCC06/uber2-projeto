@@ -244,6 +244,134 @@ def atualizar_status_usuario(usuario_id):
     return redirect(url_for("admins.usuarios"))
 
 
+@admins.route("/motoristas", methods=["GET"])
+@login_required
+def motoristas():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT id, nome, cpf, telefone, cnh, status, disponivel
+                FROM motoristas
+                ORDER BY nome, id
+                """
+            )
+            motoristas_cadastrados = [
+                {
+                    "id": linha[0],
+                    "nome": linha[1],
+                    "cpf": linha[2],
+                    "telefone": linha[3],
+                    "cnh": linha[4],
+                    "ativo": linha[5] == "Ativo",
+                    "disponivel": linha[6],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar a lista de motoristas.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "admins/motoristas.html",
+        motoristas=motoristas_cadastrados,
+    )
+
+
+@admins.route("/motoristas/<int:motorista_id>/status", methods=["POST"])
+@login_required
+def atualizar_status_motorista(motorista_id):
+    if current_user.tipo != "admin":
+        abort(403)
+
+    status = request.form.get("status", "")
+    if status not in ("Ativo", "Inativo"):
+        abort(400)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT status
+                FROM motoristas
+                WHERE id = %s
+                FOR UPDATE
+                """,
+                (motorista_id,),
+            )
+            motorista = cursor.fetchone()
+            if motorista is None:
+                conexao.rollback()
+                abort(404)
+
+            if status == "Inativo":
+                cursor.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM corridas
+                    WHERE id_motorista = %s
+                      AND status IN ('Aceita', 'Em andamento')
+                    """,
+                    (motorista_id,),
+                )
+                if cursor.fetchone()[0]:
+                    conexao.rollback()
+                    flash(
+                        "Não é possível desativar um motorista com corridas aceitas "
+                        "ou em andamento. Aguarde a conclusão ou o cancelamento.",
+                        "error",
+                    )
+                    return redirect(url_for("admins.motoristas"))
+
+            cursor.execute(
+                """
+                UPDATE motoristas
+                SET status = %s::status_motorista,
+                    disponivel = CASE
+                        WHEN %s = 'Inativo' THEN FALSE
+                        ELSE disponivel
+                    END
+                WHERE id = %s
+                RETURNING id
+                """,
+                (status, status, motorista_id),
+            )
+            motorista = cursor.fetchone()
+
+        if motorista is None:
+            conexao.rollback()
+            abort(404)
+
+        conexao.commit()
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao atualizar o status do motorista %s.",
+            motorista_id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    acao = "ativada" if status == "Ativo" else "desativada"
+    flash(f"Conta do motorista #{motorista_id} {acao}.", "success")
+    return redirect(url_for("admins.motoristas"))
+
+
 @admins.route("/home", methods=["GET"])
 @login_required
 def home():

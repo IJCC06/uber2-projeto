@@ -42,7 +42,7 @@ def carregar_usuario(user_id):
 
         elif tipo == "motorista":
             cursor.execute(
-                "SELECT id, nome FROM motoristas WHERE id = %s",
+                "SELECT id, nome FROM motoristas WHERE id = %s AND status = 'Ativo'",
                 (id_usuario,)
             )
 
