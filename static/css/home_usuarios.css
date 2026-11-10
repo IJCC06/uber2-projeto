@@ -339,6 +339,81 @@ h1 {
     font-size: 0.9rem;
 }
 
+.ride-history {
+    display: grid;
+    gap: 18px;
+}
+
+.ride-history-card {
+    padding: 24px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+}
+
+.ride-history-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.ride-history-header .eyebrow {
+    margin-bottom: 6px;
+}
+
+.ride-history-header h2 {
+    margin-bottom: 0;
+    font-size: 1.15rem;
+    overflow-wrap: anywhere;
+}
+
+.ride-status {
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-finalizada {
+    background: #edf8f0;
+    color: #176b3a;
+}
+
+.status-cancelada {
+    background: #fff0f0;
+    color: #a32121;
+}
+
+.ride-history-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 28px;
+    margin: 0;
+}
+
+.ride-history-details dt {
+    margin-bottom: 6px;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+}
+
+.ride-history-details dd {
+    margin: 0;
+    font-weight: 700;
+}
+
+.history-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--gray-900);
+    font-weight: 700;
+}
+
 a:focus-visible,
 button:focus-visible {
     outline: 3px solid var(--focus);
@@ -394,6 +469,14 @@ button:focus-visible {
     }
 
     .payment-card-header {
+        display: grid;
+    }
+
+    .ride-history-card {
+        padding: 20px;
+    }
+
+    .ride-history-header {
         display: grid;
     }
 }

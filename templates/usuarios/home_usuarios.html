@@ -8,11 +8,11 @@
 </head>
 <body>
     <header class="topbar">
-        <a class="brand" href="#" aria-label="Uber 2: início">U2 <span>Uber 2</span></a>
+        <a class="brand" href="{{ url_for('usuarios.home') }}" aria-label="Uber 2: início">U2 <span>Uber 2</span></a>
 
         <nav aria-label="Navegação principal">
-            <a class="active" href="#">Início</a>
-            <a href="#">Minhas corridas</a>
+        <a class="active" href="{{ url_for('usuarios.home') }}">Início</a>
+        <a href="{{ url_for('usuarios.minhas_corridas') }}">Minhas corridas</a>
             <a href="{{ url_for('usuarios.pagamentos') }}">Pagamentos</a>
             <a href="#">Minha conta</a>
         </nav>
@@ -51,7 +51,7 @@
             <section class="panel" aria-labelledby="recent-rides-title">
                 <div class="panel-header">
                     <h2 id="recent-rides-title">Corridas recentes</h2>
-                    <a href="#">Ver todas</a>
+                    <a href="{{ url_for('usuarios.minhas_corridas') }}">Ver todas</a>
                 </div>
 
                 <div class="empty-state">

@@ -26,6 +26,61 @@ def home():
     return render_template("usuarios/home_usuarios.html")
 
 
+@usuarios.route("/corridas", methods=["GET"])
+@login_required
+def minhas_corridas():
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    c.id,
+                    c.origem,
+                    c.destino,
+                    c.data_hora,
+                    c.status,
+                    c.distancia_km,
+                    c.valor,
+                    m.nome
+                FROM corridas AS c
+                LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                WHERE c.id_usuario = %s
+                ORDER BY c.data_hora DESC, c.id DESC
+                """,
+                (current_user.id,),
+            )
+            corridas = [
+                {
+                    "id": linha[0],
+                    "origem": linha[1],
+                    "destino": linha[2],
+                    "data_hora": linha[3],
+                    "status": linha[4],
+                    "distancia_km": linha[5],
+                    "valor": linha[6],
+                    "motorista": linha[7],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao carregar o histórico de corridas do usuário."
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template("usuarios/minhas_corridas.html", corridas=corridas)
+
+
 @usuarios.route("/corridas/solicitar", methods=["GET", "POST"])
 @login_required
 def solicitar_corrida():

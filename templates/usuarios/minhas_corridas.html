@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minhas corridas | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="{{ url_for('usuarios.home') }}" aria-label="Uber 2: início">
+            U2 <span>Uber 2</span>
+        </a>
+
+        <nav aria-label="Navegação principal">
+            <a href="{{ url_for('usuarios.home') }}">Início</a>
+            <a class="active" href="{{ url_for('usuarios.minhas_corridas') }}">Minhas corridas</a>
+            <a href="{{ url_for('usuarios.pagamentos') }}">Pagamentos</a>
+        </nav>
+
+        <form action="{{ url_for('auth.logout') }}" method="POST">
+            <button class="logout" type="submit">Sair</button>
+        </form>
+    </header>
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="rides-title">
+            <div>
+                <p class="eyebrow">Área do usuário</p>
+                <h1 id="rides-title">Minhas corridas</h1>
+                <p>Acompanhe o status e os detalhes das suas solicitações.</p>
+            </div>
+            <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
+                Solicitar corrida
+            </a>
+        </section>
+
+        {% if corridas %}
+            <section class="ride-history" aria-label="Histórico de corridas">
+                {% for corrida in corridas %}
+                    <article class="ride-history-card">
+                        <header class="ride-history-header">
+                            <div>
+                                <p class="eyebrow">Corrida #{{ corrida.id }}</p>
+                                <h2>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h2>
+                            </div>
+                            <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                                {{ corrida.status }}
+                            </span>
+                        </header>
+
+                        <dl class="ride-history-details">
+                            <div>
+                                <dt>Solicitada em</dt>
+                                <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                            </div>
+                            <div>
+                                <dt>Motorista</dt>
+                                <dd>{{ corrida.motorista or "Aguardando motorista" }}</dd>
+                            </div>
+                            {% if corrida.distancia_km is not none %}
+                                <div>
+                                    <dt>Distância</dt>
+                                    <dd>{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <dt>Valor</dt>
+                                <dd>
+                                    {% if corrida.valor is not none %}
+                                        R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                    {% else %}
+                                        Ainda não definido
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </dl>
+
+                        {% if corrida.status == "Finalizada" %}
+                            <a class="history-link" href="{{ url_for('usuarios.pagamentos') }}">
+                                Ver pagamento
+                            </a>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="panel empty-state">
+                <h2>Você ainda não tem corridas</h2>
+                <p>Quando solicitar uma corrida, ela aparecerá nesta página.</p>
+                <a class="secondary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
+                    Solicitar sua primeira corrida
+                </a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>
