@@ -23,6 +23,34 @@ motoristas = Blueprint(
 TARIFA_POR_KM = Decimal("2.50")
 
 
+def _ler_dados_veiculo():
+    modelo = request.form.get("modelo", "").strip()
+    marca = request.form.get("marca", "").strip()
+    placa = request.form.get("placa", "").strip().upper()
+    ano_texto = request.form.get("ano", "").strip()
+    cor = request.form.get("cor", "").strip() or None
+
+    erros = []
+    if not modelo or len(modelo) > 50:
+        erros.append("Informe um modelo com até 50 caracteres.")
+    if not marca or len(marca) > 50:
+        erros.append("Informe uma marca com até 50 caracteres.")
+    if not placa or len(placa) > 10:
+        erros.append("Informe uma placa com até 10 caracteres.")
+    if cor is not None and len(cor) > 30:
+        erros.append("A cor deve ter até 30 caracteres.")
+
+    try:
+        ano = int(ano_texto)
+        if ano <= 0:
+            raise ValueError
+    except ValueError:
+        ano = None
+        erros.append("Informe um ano válido.")
+
+    return (modelo, marca, placa, ano, cor), erros
+
+
 @motoristas.route("/home", methods=["GET"])
 @login_required
 def home():
@@ -182,35 +210,13 @@ def meus_veiculos():
         abort(403)
 
     if request.method == "POST":
-        modelo = request.form.get("modelo", "").strip()
-        marca = request.form.get("marca", "").strip()
-        placa = request.form.get("placa", "").strip().upper()
-        ano_texto = request.form.get("ano", "").strip()
-        cor = request.form.get("cor", "").strip() or None
-
-        erros = []
-        if not modelo or len(modelo) > 50:
-            erros.append("Informe um modelo com até 50 caracteres.")
-        if not marca or len(marca) > 50:
-            erros.append("Informe uma marca com até 50 caracteres.")
-        if not placa or len(placa) > 10:
-            erros.append("Informe uma placa com até 10 caracteres.")
-        if cor is not None and len(cor) > 30:
-            erros.append("A cor deve ter até 30 caracteres.")
-
-        try:
-            ano = int(ano_texto)
-            if ano <= 0:
-                raise ValueError
-        except ValueError:
-            ano = None
-            erros.append("Informe um ano válido.")
-
+        dados_veiculo, erros = _ler_dados_veiculo()
         if erros:
             for erro in erros:
                 flash(erro, "error")
             return redirect(url_for("motoristas.meus_veiculos"))
 
+        modelo, marca, placa, ano, cor = dados_veiculo
         conexao = None
         try:
             conexao = criar_conexao()
@@ -281,6 +287,107 @@ def meus_veiculos():
             conexao.close()
 
     return render_template("motoristas/meus_veiculos.html", veiculos=veiculos)
+
+
+@motoristas.route("/veiculos/<int:veiculo_id>/editar", methods=["POST"])
+@login_required
+def editar_veiculo(veiculo_id):
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    dados_veiculo, erros = _ler_dados_veiculo()
+    if erros:
+        for erro in erros:
+            flash(erro, "error")
+        return redirect(url_for("motoristas.meus_veiculos"))
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE veiculos
+                SET modelo = %s,
+                    marca = %s,
+                    placa = %s,
+                    ano = %s,
+                    cor = %s
+                WHERE id = %s
+                  AND id_motorista = %s
+                RETURNING id
+                """,
+                (*dados_veiculo, veiculo_id, current_user.id),
+            )
+            veiculo = cursor.fetchone()
+
+        if veiculo is None:
+            conexao.rollback()
+            flash("Veículo não encontrado na sua conta.", "error")
+        else:
+            conexao.commit()
+            flash("Veículo atualizado com sucesso.", "success")
+    except psycopg2.errors.UniqueViolation:
+        if conexao is not None:
+            conexao.rollback()
+        flash("Já existe um veículo cadastrado com essa placa.", "error")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao atualizar o veículo %s do motorista %s.",
+            veiculo_id,
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("motoristas.meus_veiculos"))
+
+
+@motoristas.route("/veiculos/<int:veiculo_id>/excluir", methods=["POST"])
+@login_required
+def excluir_veiculo(veiculo_id):
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                DELETE FROM veiculos
+                WHERE id = %s
+                  AND id_motorista = %s
+                RETURNING id
+                """,
+                (veiculo_id, current_user.id),
+            )
+            veiculo = cursor.fetchone()
+
+        if veiculo is None:
+            conexao.rollback()
+            flash("Veículo não encontrado na sua conta.", "error")
+        else:
+            conexao.commit()
+            flash("Veículo excluído com sucesso.", "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao excluir o veículo %s do motorista %s.",
+            veiculo_id,
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("motoristas.meus_veiculos"))
 
 
 @motoristas.route("/corridas/<int:corrida_id>/aceitar", methods=["POST"])

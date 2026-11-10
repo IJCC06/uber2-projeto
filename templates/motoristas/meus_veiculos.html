@@ -66,6 +66,36 @@
                             <div>
                                 <p class="eyebrow">{{ veiculo.marca }} {{ veiculo.modelo }}</p>
                                 <h3>{{ veiculo.placa }}</h3>
+                                <details class="vehicle-edit">
+                                    <summary>Editar dados</summary>
+                                    <form
+                                        class="vehicle-form vehicle-edit-form"
+                                        action="{{ url_for('motoristas.editar_veiculo', veiculo_id=veiculo.id) }}"
+                                        method="post"
+                                    >
+                                        <div class="vehicle-field">
+                                            <label for="marca-{{ veiculo.id }}">Marca</label>
+                                            <input id="marca-{{ veiculo.id }}" name="marca" maxlength="50" value="{{ veiculo.marca }}" required>
+                                        </div>
+                                        <div class="vehicle-field">
+                                            <label for="modelo-{{ veiculo.id }}">Modelo</label>
+                                            <input id="modelo-{{ veiculo.id }}" name="modelo" maxlength="50" value="{{ veiculo.modelo }}" required>
+                                        </div>
+                                        <div class="vehicle-field">
+                                            <label for="placa-{{ veiculo.id }}">Placa</label>
+                                            <input id="placa-{{ veiculo.id }}" name="placa" maxlength="10" value="{{ veiculo.placa }}" required>
+                                        </div>
+                                        <div class="vehicle-field">
+                                            <label for="ano-{{ veiculo.id }}">Ano</label>
+                                            <input id="ano-{{ veiculo.id }}" name="ano" type="number" min="1" step="1" value="{{ veiculo.ano }}" required>
+                                        </div>
+                                        <div class="vehicle-field">
+                                            <label for="cor-{{ veiculo.id }}">Cor (opcional)</label>
+                                            <input id="cor-{{ veiculo.id }}" name="cor" maxlength="30" value="{{ veiculo.cor or '' }}">
+                                        </div>
+                                        <button class="primary-action" type="submit">Salvar alterações</button>
+                                    </form>
+                                </details>
                             </div>
                             <dl class="vehicle-details">
                                 <div>
@@ -79,6 +109,14 @@
                                     </div>
                                 {% endif %}
                             </dl>
+                            <form
+                                class="vehicle-delete-form"
+                                action="{{ url_for('motoristas.excluir_veiculo', veiculo_id=veiculo.id) }}"
+                                method="post"
+                                onsubmit="return confirm('Deseja excluir este veículo?');"
+                            >
+                                <button class="vehicle-delete-action" type="submit">Excluir</button>
+                            </form>
                         </article>
                     {% endfor %}
                 </div>

@@ -294,6 +294,45 @@ h1 {
     margin-bottom: 0;
 }
 
+.vehicle-edit {
+    margin-top: 14px;
+}
+
+.vehicle-edit summary {
+    color: var(--gray-900);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.vehicle-edit-form {
+    min-width: min(100%, 620px);
+    margin-top: 14px;
+}
+
+.vehicle-edit-form .primary-action {
+    grid-column: 1 / -1;
+}
+
+.vehicle-delete-form {
+    margin-left: auto;
+}
+
+.vehicle-delete-action {
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--red);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.vehicle-delete-action:hover {
+    background: var(--red-bg);
+}
+
 .vehicle-details {
     display: flex;
     gap: 28px;
@@ -511,6 +550,14 @@ button:focus-visible {
     .vehicle-card {
         align-items: start;
         flex-direction: column;
+    }
+
+    .vehicle-delete-form {
+        margin-left: 0;
+    }
+
+    .vehicle-edit-form {
+        min-width: 0;
     }
 }
 
