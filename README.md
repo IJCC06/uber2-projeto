@@ -1,604 +1,225 @@
-# 🚗 Uber 2
+# Uber 2 — Versão 2.0.0
 
-Sistema de gerenciamento de corridas desenvolvido em **Python** utilizando **SQLite**.
+Projeto acadêmico de gerenciamento de corridas. A versão 2.0.0 está em desenvolvimento e tem como objetivo transformar a aplicação original de terminal em uma aplicação web.
 
-O projeto simula o funcionamento básico de uma plataforma de transporte, permitindo o gerenciamento de usuários, motoristas, veículos, corridas, pagamentos e avaliações.
+- **Branch desta versão:** v2.0.0
+- **Versão anterior:** preservada na branch v1.0.0
+- **Backend:** Python + Flask
+- **Banco de dados:** PostgreSQL
+- **Interface:** HTML, CSS e JavaScript
 
----
+## Sobre o projeto
 
-## 📌 Sobre o projeto
+O Uber 2 começou como um sistema de terminal em Python e SQLite, com funcionalidades relacionadas a usuários, motoristas, veículos, corridas, pagamentos, avaliações e histórico.
 
-O **Uber 2** foi desenvolvido como um projeto acadêmico com o objetivo de aplicar conceitos de:
+Na versão 2.0.0, a aplicação web usa Flask e PostgreSQL para oferecer o fluxo principal de contas, corridas, pagamentos pendentes, avaliações e gestão administrativa. Ela é um protótipo acadêmico; nem todas as funcionalidades da antiga aplicação de terminal fazem parte do escopo web.
 
-* Python;
-* Programação modular;
-* Banco de dados relacional;
-* SQLite;
-* Chaves primárias e estrangeiras;
-* Validações;
-* Consultas SQL;
-* Relacionamentos entre tabelas;
-* Menus interativos no terminal.
+## Tecnologias escolhidas
 
-O sistema possui três tipos de acesso:
+- **Python 3**
+- **Flask** — servidor web e rotas
+- **PostgreSQL** — banco de dados
+- **psycopg2-binary** — driver de conexão com PostgreSQL
+- **python-dotenv** — carregamento das configurações locais
+- **Flask-Login** — autenticação e gerenciamento de sessões
+- **HTML, CSS e JavaScript** — frontend
 
-* 👤 Usuário;
-* 🚗 Motorista;
-* 🔐 Administrador.
+## O que já foi desenvolvido na v2
 
----
+Até o momento, o repositório contém:
 
-## 🛠️ Tecnologias utilizadas
+- estrutura inicial de uma aplicação Flask;
+- conexão com PostgreSQL centralizada em conexao.py;
+- leitura de configurações por variáveis de ambiente;
+- tela de login renderizada pelo Flask;
+- rotas para tentativa de login de usuário, motorista e administrador;
+- cadastro público de motoristas, com contas inicialmente inativas até ativação administrativa;
+- rota para exibir a página inicial do usuário;
+- templates HTML e diretórios de arquivos estáticos;
+- scripts SQL para criação das tabelas, dados de exemplo e consultas;
+- módulo de funções de login em python/logins.py, utilizado pelo app.py;
+- solicitação de corridas por usuários e fluxo de aceite, início, cancelamento e finalização por motoristas;
+- cadastro, consulta, edição e remoção dos veículos vinculados à conta do motorista;
+- cálculo de tarifa de teste de R$ 2,50 por quilômetro informado pelo motorista;
+- registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente;
+- avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
+- edição dos dados pessoais e alteração de senha da própria conta de usuário;
+- edição dos dados pessoais e alteração de senha pelo próprio motorista;
+- edição dos dados pessoais e alteração de senha pelo próprio administrador;
+- consulta administrativa de usuários e ativação/desativação de contas;
+- consulta administrativa de motoristas e ativação/desativação de contas, preservando corridas já atribuídas;
+- histórico administrativo completo de corridas, com filtro por status, pagamentos, avaliações e linha do tempo;
+- consulta administrativa de pagamentos, com filtros por status e forma e resumo dos valores registrados;
+- consulta administrativa de avaliações, com nota média, filtro por nota e comentários;
+- exibição da média e das avaliações recentes recebidas pelo motorista;
+- histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
+- painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
 
-* **Python 3**
-* **SQLite**
-* Biblioteca `sqlite3`
-* Módulos
-* SQL
+Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos estados “Aceita” ou “Em andamento”. A transição fica registrada no histórico.
+Usuários podem cancelar suas próprias solicitações enquanto o status ainda for “Solicitada”; o cancelamento também fica registrado no histórico.
+Motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas solicitações, sem afetar as corridas que já aceitaram.
 
-Não são necessárias bibliotecas externas para executar o projeto.
+Essas funcionalidades compõem o escopo web implementado até aqui. Recursos de produção, como processamento real de pagamentos, mapas/geolocalização e implantação endurecida, não fazem parte deste protótipo.
+Contas de usuário desativadas pela administração não podem iniciar uma sessão nem continuar usando uma sessão existente.
+Contas de motorista desativadas também perdem o acesso; a desativação é bloqueada enquanto houver corridas aceitas ou em andamento.
 
----
-
-## 📁 Estrutura do projeto
+## Estrutura atual
 
 ```text
 uber2-projeto/
-│
-├── der/
-|   └── der.png
-│
+├── app.py
+├── conexao.py
+├── blueprints/
+│   ├── auth.py
+│   ├── usuarios.py
+│   ├── motoristas.py
+│   └── admins.py
+├── requirements.txt
+├── README.md
+├── .gitignore
+├── docs/
+│   └── ARQUITETURA-V2.md
+├── sql/
+│   ├── create-table.sql
+│   ├── adicionar-distancia-corridas.sql
+│   ├── gerar_dados_ficticios.py
+│   ├── insert-date.sql
+│   └── query.sql
 ├── python/
-|   ├── principal.py
-|   |
-|   ├── banco/
-│   |   ├── conexao.py
-│   |   └── criar_banco.py
-│   |
-|   ├── usuarios/
-│   |   └── usuarios.py
-│   |
-|   ├── motoristas/
-│   |   └── motoristas.py
-│   |
-|   ├── veiculos/
-│   |   └── veiculos.py
-│   |
-|   ├── corridas/
-│   |   └── corridas.py
-│   |
-|   ├── pagamentos/
-│   |   └── pagamentos.py
-│   |
-|   ├── avaliacoes/
-│   |   └── avaliacoes.py
-│   |
-|   ├── historico/
-│   |   └── historico.py
-│   |
-|   └── consultas/
-|       └── consultas.py
-|
-└── sql/
-    ├── create-table.sql
-    ├── insert-data.sql
-    └── query.sql
+│   └── logins.py
+├── tests/
+│   └── test_postgres_acceptance.py
+├── templates/
+│   ├── admins/
+│   ├── logins/
+│   ├── motoristas/
+│   └── usuarios/
+└── static/
+    ├── css/
+    └── js/
 ```
 
-O banco de dados `uber2.db` é criado na pasta principal do projeto.
+A pasta python ainda possui código herdado da versão de terminal. O módulo python/logins.py é utilizado pela aplicação atual; os demais módulos antigos serão avaliados durante a reorganização, sem apagar a versão anterior preservada na branch v1.0.0.
 
----
+## Banco de dados e configuração
 
-## 🗄️ Banco de dados
+A aplicação utiliza PostgreSQL. Crie um arquivo `.env` na raiz do projeto com as configurações do banco e uma chave secreta para as sessões Flask:
 
-O sistema utiliza **7 tabelas**:
-
-### `usuarios`
-
-Armazena os dados dos usuários.
-
-Principais informações:
-
-* ID;
-* Nome;
-* E-mail;
-* Telefone;
-* Senha;
-* Data de cadastro.
-
-### `motoristas`
-
-Armazena os dados dos motoristas.
-
-Principais informações:
-
-* ID;
-* Nome;
-* CPF;
-* Telefone;
-* CNH;
-* Status.
-
-O status pode ser:
-
-* `Ativo`
-* `Inativo`
-
-### `veiculos`
-
-Armazena os veículos associados aos motoristas.
-
-Informações:
-
-* ID;
-* Motorista;
-* Modelo;
-* Marca;
-* Placa;
-* Ano;
-* Cor.
-
-### `corridas`
-
-Armazena as corridas realizadas no sistema.
-
-Informações:
-
-* ID;
-* Usuário;
-* Motorista;
-* Origem;
-* Destino;
-* Data e hora;
-* Valor;
-* Status.
-
-Os status possíveis são:
-
-* `Solicitada`
-* `Aceita`
-* `Em andamento`
-* `Finalizada`
-* `Cancelada`
-
-### `pagamentos`
-
-Armazena os pagamentos das corridas.
-
-Formas de pagamento:
-
-* `Pix`
-* `Dinheiro`
-* `Cartão`
-
-Status:
-
-* `Pendente`
-* `Pago`
-* `Cancelado`
-
-No fluxo atual do sistema, quando o usuário cadastra um pagamento, ele é registrado automaticamente como **Pago**.
-
-### `avaliacoes`
-
-Armazena as avaliações das corridas.
-
-Cada avaliação possui:
-
-* ID;
-* Corrida;
-* Nota;
-* Comentário;
-* Data da avaliação.
-
-A nota deve estar entre **1 e 5**.
-
-### `historico_corridas`
-
-Registra as alterações de status das corridas.
-
-São armazenados:
-
-* ID do registro;
-* ID da corrida;
-* Status anterior;
-* Novo status;
-* Data da alteração.
-
----
-
-## 👤 Funcionalidades do usuário
-
-O usuário pode:
-
-### Cadastro
-
-* Criar uma conta;
-* Informar nome, e-mail, telefone e senha.
-
-### Login
-
-O acesso é realizado utilizando:
-
-* E-mail;
-* Senha.
-
-### Corridas
-
-O usuário pode:
-
-* Solicitar uma corrida;
-* Informar origem e destino;
-* Visualizar suas próprias corridas.
-
-O sistema não permite que origem e destino sejam iguais.
-
-### Pagamentos
-
-O usuário pode:
-
-* Cadastrar pagamento de uma corrida finalizada;
-* Escolher entre Pix, dinheiro ou cartão;
-* Consultar seus pagamentos.
-
-O sistema impede o cadastro de mais de um pagamento para a mesma corrida.
-
-### Avaliações
-
-Após uma corrida ser finalizada, o usuário pode:
-
-* Avaliar a corrida;
-* Informar uma nota de 1 a 5;
-* Adicionar um comentário.
-
-Uma corrida não pode receber mais de uma avaliação do mesmo sistema.
-
-### Dados da conta
-
-O usuário pode:
-
-* Editar seus dados;
-* Excluir sua própria conta.
-
----
-
-## 🚗 Funcionalidades do motorista
-
-O motorista realiza login utilizando seu **CPF**.
-
-Para entrar no sistema, o motorista precisa estar com status `Ativo`.
-
-### Corridas
-
-O motorista pode:
-
-* Visualizar corridas disponíveis;
-* Aceitar uma corrida;
-* Atualizar o status de uma corrida.
-
-O fluxo de status é:
-
-```text
-Solicitada
-     ↓
-Aceita
-     ↓
-Em andamento
-     ↓
-Finalizada
+```env
+DB_HOST=localhost
+DB_NAME=uber2_v2
+DB_USER=seu_usuario
+DB_PASSWORD=sua_senha
+SECRET_KEY=cole_aqui_a_chave_gerada
 ```
 
-Também é possível cancelar uma corrida em determinadas etapas do fluxo.
+Gere uma chave forte localmente, sem compartilhá-la:
 
-### Veículos
-
-O motorista pode:
-
-* Cadastrar veículo;
-* Listar seus veículos;
-* Editar seus veículos;
-* Excluir seus veículos.
-
-### Histórico
-
-O motorista pode consultar o histórico das alterações de status das corridas associadas a ele.
-
-### Dados pessoais
-
-O motorista pode editar seus próprios dados.
-
----
-
-## 🔐 Funcionalidades do administrador
-
-O administrador possui acesso às áreas de gerenciamento do sistema.
-
-### Gerenciamento de usuários
-
-Pode:
-
-* Listar usuários;
-* Editar usuários;
-* Excluir usuários.
-
-### Gerenciamento de motoristas
-
-Pode:
-
-* Cadastrar motoristas;
-* Listar motoristas;
-* Editar motoristas;
-* Alterar status;
-* Excluir motoristas.
-
-### Gerenciamento de veículos
-
-Pode:
-
-* Listar todos os veículos;
-* Editar veículos;
-* Excluir veículos.
-
-### Gerenciamento de corridas
-
-Pode:
-
-* Listar todas as corridas;
-* Editar corridas;
-* Excluir corridas;
-* Consultar o histórico de uma corrida.
-
-### Gerenciamento de pagamentos
-
-Pode:
-
-* Listar pagamentos;
-* Editar pagamentos;
-* Excluir pagamentos.
-
-### Gerenciamento de avaliações
-
-Pode:
-
-* Listar avaliações;
-* Editar avaliações;
-* Excluir avaliações.
-
----
-
-## 📊 Consultas e relatórios
-
-O sistema possui **9 consultas SQL**:
-
-### 1. Cinco corridas mais caras
-
-Exibe as cinco corridas com maior valor.
-
-### 2. Motorista com mais corridas
-
-Identifica os motoristas com maior quantidade de corridas.
-
-### 3. Forma de pagamento mais utilizada
-
-Mostra a forma de pagamento mais utilizada pelos usuários.
-
-### 4. Usuários com mais corridas
-
-Exibe os usuários que possuem maior quantidade de corridas.
-
-### 5. Motoristas disponíveis
-
-Lista os motoristas que estão com status `Ativo`.
-
-### 6. Histórico de determinada corrida
-
-Permite consultar todas as alterações de status de uma corrida específica.
-
-### 7. Arrecadação por período
-
-Permite informar uma data inicial e uma data final para consultar:
-
-* Quantidade de pagamentos;
-* Valor total arrecadado.
-
-São considerados os pagamentos com status `Pago`.
-
-### 8. Média de avaliação dos motoristas
-
-Apresenta a quantidade de avaliações e a média de notas recebidas por cada motorista.
-
-### 9. Média geral dos motoristas
-
-Apresenta a média geral das avaliações dos motoristas.
-
----
-
-## 🔄 Fluxo principal do sistema
-
-Um exemplo de utilização do sistema:
-
-```text
-Cadastro do usuário
-        ↓
-Login
-        ↓
-Solicitação de corrida
-        ↓
-Motorista visualiza corrida
-        ↓
-Motorista aceita
-        ↓
-Corrida em andamento
-        ↓
-Corrida finalizada
-        ↓
-Pagamento
-        ↓
-Avaliação
-        ↓
-Histórico e consultas
+```powershell
+python -c "import secrets; print(secrets.token_hex(32))"
 ```
 
----
+Copie o valor exibido para `SECRET_KEY`. A chave deve permanecer estável entre reinicializações para preservar as sessões existentes. **Não use uma chave de exemplo, não compartilhe nem envie o arquivo `.env` ao Git**; ele contém credenciais e um segredo de sessão. O `.env` já está listado no `.gitignore`.
 
-## 📝 Regras importantes
+A conexão é criada em `conexao.py` com psycopg2, lendo `DB_HOST`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`. `app.py` carrega o mesmo arquivo para ler `SECRET_KEY`.
 
-O sistema possui diversas validações para manter a integridade dos dados.
+Os scripts de banco estão na pasta sql/:
 
-Entre elas:
+- create-table.sql — cria as tabelas em um banco novo;
+- adicionar-distancia-corridas.sql — adiciona a coluna de distância a um banco já criado, preservando os registros;
+- gerar_dados_ficticios.py — insere dados de teste usando Faker;
+- query.sql — consultas SQL.
 
-* E-mail de usuário não pode ser duplicado;
-* CPF de motorista não pode ser duplicado;
-* CNH não pode ser duplicada;
-* Placa de veículo não pode ser duplicada;
-* Origem e destino de uma corrida não podem ser iguais;
-* Valor da corrida não pode ser negativo;
-* Nota de avaliação deve estar entre 1 e 5;
-* Uma corrida não pode possuir mais de um pagamento;
-* Uma corrida não pode possuir mais de uma avaliação;
-* Pagamento só pode ser cadastrado para corrida finalizada;
-* Avaliação só pode ser realizada para corrida finalizada;
-* Motorista precisa estar ativo para realizar login;
-* O motorista só pode gerenciar seus próprios veículos;
-* O motorista só pode atualizar corridas associadas a ele;
-* O usuário só pode visualizar suas próprias corridas e pagamentos.
+Para um banco que já existe, execute `sql/adicionar-distancia-corridas.sql` uma vez antes de usar a finalização de corridas. O script `insert-date.sql` é legado: revise-o antes de executar, pois contém comandos que limpam tabelas e reiniciam identificadores.
 
----
+## Como preparar o ambiente
 
-## ▶️ Como executar
-
-### 1. Clone ou baixe o projeto
-
-Coloque o projeto em uma pasta de sua preferência.
-
-### 2. Abra o terminal na pasta do projeto
-
-Exemplo:
+Na raiz do projeto, crie e ative um ambiente virtual:
 
 ```bash
-cd uber2-projeto
+python -m venv .venv
 ```
 
-### 3. Crie o banco de dados
+No Windows (PowerShell):
 
-Execute:
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+No Linux ou macOS:
 
 ```bash
-python python/banco/criar_banco.py
+source .venv/bin/activate
 ```
 
-Isso criará o arquivo:
-
-```text
-uber2.db
-```
-
-### 4. Execute o sistema
+Instale as dependências:
 
 ```bash
-python python/principal.py
+pip install -r requirements.txt
 ```
 
-O menu principal será exibido:
+Depois de configurar o PostgreSQL e todas as variáveis do arquivo `.env`, inicie a aplicação:
 
-```text
-===================================
-             UBER 2
-===================================
-1 - Login
-2 - Cadastrar usuário
-0 - Sair
+```bash
+python app.py
 ```
 
----
+O servidor Flask será iniciado em modo de depuração para desenvolvimento local.
 
-## 🔑 Acessos
+## Verificação do protótipo
 
-### Usuário
+Execute a descoberta dos testes. O teste de aceitação é ignorado, a menos que seja habilitado explicitamente:
 
-O usuário deve primeiro realizar o cadastro e depois entrar utilizando:
-
-```text
-E-mail
-Senha
+```powershell
+python -m unittest discover -s tests -v
 ```
 
-### Motorista
+O teste de aceitação com banco real cria um schema temporário isolado no PostgreSQL configurado pelo `.env`, percorre o cadastro, aprovação e ciclo completo de uma corrida, e remove somente esse schema ao final. Habilite-o explicitamente no PowerShell:
 
-O motorista é cadastrado pelo administrador e realiza login utilizando:
-
-```text
-CPF
+```powershell
+$env:UBER2_TEST_POSTGRES = "1"
+python -m unittest discover -s tests -v
 ```
 
-O motorista precisa estar com status `Ativo`.
+O teste requer permissão para criar e remover schemas no banco configurado. Ele não modifica as tabelas ou os dados existentes fora do schema temporário.
 
-### Administrador
+Além do fluxo de sucesso, a aceitação verifica endereços inválidos, ações fora da ordem permitida, disponibilidade inválida, distâncias malformadas ou fora dos limites, métodos de pagamento inválidos, notas fora do intervalo, operações duplicadas e tentativas não autorizadas. Para comparar a documentação com o comportamento do sistema, confira esses testes junto das rotas em `blueprints/`.
 
-O acesso administrativo utiliza uma senha definida no arquivo `principal.py`.
+## Funcionalidades previstas para a aplicação web
 
-```python
-SENHA_ADMIN = "OInimigoEoTransito"
-```
+A migração contempla os principais recursos do sistema original em diferentes estágios de implementação:
 
-> Para um sistema real, a senha administrativa não deveria ficar diretamente no código. Neste projeto, ela é utilizada dessa forma para fins acadêmicos.
+- cadastro e gerenciamento de usuários;
+- autenticação e sessões para os diferentes perfis;
+- cadastro e gerenciamento de motoristas e veículos;
+- solicitação, aceite, atualização e cancelamento de corridas;
+- pagamentos associados às corridas;
+- gerenciamento e consulta de avaliações;
+- histórico de alterações;
+- área administrativa e consultas.
 
----
+Alguns recursos dessa lista já estão disponíveis; outros ainda serão implementados ou ampliados.
 
-## 🧪 Testes realizados
+## Regras de negócio de referência
 
-Durante o desenvolvimento, foram testados os principais fluxos do sistema:
+A versão anterior já trabalha com regras como:
 
-* Cadastro de usuário;
-* Login de usuário;
-* Login de administrador;
-* Cadastro de motorista;
-* Login de motorista;
-* Cadastro de veículo;
-* Solicitação de corrida;
-* Aceite de corrida;
-* Alteração de status;
-* Finalização de corrida;
-* Cadastro de pagamento;
-* Cadastro de avaliação;
-* Registro de histórico;
-* Consultas e relatórios.
+- origem e destino de uma corrida não podem ser iguais;
+- valor de corrida não pode ser negativo;
+- nota de avaliação deve estar entre 1 e 5;
+- pagamento e avaliação dependem da finalização da corrida;
+- no protótipo, o valor é calculado em R$ 2,50 por quilômetro informado pelo motorista ao finalizar a corrida;
+- o registro de Pix, dinheiro ou cartão cria um pagamento pendente; não há integração com gateway nem confirmação real de cobrança;
+- uma corrida não deve ter mais de um pagamento ou avaliação;
+- motoristas precisam atender às condições de situação e disponibilidade;
+- usuários e motoristas devem acessar somente os dados e operações permitidos para seus perfis.
 
-Também foi testado o fluxo completo de uma corrida:
+As regras restantes serão reimplementadas e testadas no backend web durante a migração.
 
-```text
-Solicitada → Aceita → Em andamento → Finalizada
-```
+## Documentação
 
-E o histórico registrou corretamente cada alteração.
+Para detalhes sobre a organização técnica, configuração e decisões de arquitetura, consulte [docs/ARQUITETURA-V2.md](docs/ARQUITETURA-V2.md).
 
----
+## Projeto acadêmico
 
-## 📚 Objetivos acadêmicos
-
-O projeto busca demonstrar conhecimentos de:
-
-* Desenvolvimento em Python;
-* Organização de projetos em módulos;
-* Funções;
-* Estruturas condicionais;
-* Laços de repetição;
-* Entrada e saída de dados;
-* Tratamento de informações;
-* SQL;
-* SQLite;
-* CRUD;
-* Relacionamentos entre tabelas;
-* Chaves estrangeiras;
-* Integridade de dados;
-* Consultas com `JOIN`;
-* Agregações como `COUNT`, `SUM` e `AVG`.
-
----
-
-## 👨‍💻 Projeto acadêmico
-
-* **Projeto:** Uber 2
-* **Tecnologia principal:** Python
-* **Banco de dados:** SQLite
-* **Tipo:** Sistema de gerenciamento de corridas
+O projeto tem como objetivo praticar desenvolvimento web com Python, organização de aplicações, integração com banco de dados relacional, SQL, operações CRUD, autenticação e implementação de regras de negócio.

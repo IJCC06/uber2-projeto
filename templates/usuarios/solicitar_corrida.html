@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solicitar corrida | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/solicitar_corrida.css') }}">
+</head>
+<body>
+    {% include "includes/header_usuario.html" %}
+
+    <main class="page-content">
+        <a class="back-link" href="{{ url_for('usuarios.home') }}">
+            &larr; Voltar ao início
+        </a>
+
+        <section class="form-card" aria-labelledby="form-title">
+            <header class="form-header">
+                <p class="eyebrow">Nova solicitação</p>
+                <h1 id="form-title">Para onde vamos?</h1>
+                <p>Informe os endereços de origem e destino da sua corrida.</p>
+            </header>
+
+            {% if erro %}
+                <p class="form-message error-message" role="alert">{{ erro }}</p>
+            {% endif %}
+
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+                {% for categoria, mensagem in mensagens %}
+                    <p class="form-message {{ categoria }}-message"
+                       role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                        {{ mensagem }}
+                    </p>
+                {% endfor %}
+            {% endwith %}
+
+            <form class="ride-form" action="{{ url_for('usuarios.solicitar_corrida') }}" method="post">
+                <div class="form-field">
+                    <label for="origem">Local de partida</label>
+                    <input
+                        id="origem"
+                        name="origem"
+                        type="text"
+                        maxlength="100"
+                        autocomplete="street-address"
+                        placeholder="Ex.: Rua das Flores, 123"
+                        value="{{ request.form.get('origem', '') }}"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="destino">Destino</label>
+                    <input
+                        id="destino"
+                        name="destino"
+                        type="text"
+                        maxlength="100"
+                        placeholder="Ex.: Avenida Central, 456"
+                        value="{{ request.form.get('destino', '') }}"
+                        required
+                    >
+                </div>
+
+                <button class="primary-action" type="submit">Solicitar corrida</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

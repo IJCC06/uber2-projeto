@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Corridas | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="rides-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="rides-title">Corridas</h1>
+                <p>Consulte todas as corridas, seus pagamentos, avaliações e mudanças de status.</p>
+            </div>
+        </section>
+
+        <section class="panel admin-rides-panel" aria-labelledby="rides-list-title">
+            <div class="panel-header">
+                <h2 id="rides-list-title">Histórico de corridas</h2>
+                <span class="ride-count">{{ corridas|length }}</span>
+            </div>
+
+            <form class="admin-ride-filter" action="{{ url_for('admins.corridas') }}" method="get">
+                <label for="status">Filtrar por status</label>
+                <select id="status" name="status">
+                    <option value="" {% if not status_filtro %}selected{% endif %}>Todos os status</option>
+                    {% for status in status_validos %}
+                        <option value="{{ status }}" {% if status_filtro == status %}selected{% endif %}>
+                            {{ status }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <button class="primary-action" type="submit">Filtrar</button>
+                {% if status_filtro %}
+                    <a class="admin-filter-reset" href="{{ url_for('admins.corridas') }}">Limpar filtro</a>
+                {% endif %}
+            </form>
+
+            {% if corridas %}
+                <div class="admin-ride-list">
+                    {% for corrida in corridas %}
+                        <article class="ride-history-card admin-ride-card">
+                            <header class="ride-history-header">
+                                <div>
+                                    <p class="eyebrow">Corrida #{{ corrida.id }}</p>
+                                    <h3>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h3>
+                                </div>
+                                <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                                    {{ corrida.status }}
+                                </span>
+                            </header>
+
+                            <dl class="ride-history-details">
+                                <div>
+                                    <dt>Usuário</dt>
+                                    <dd>{{ corrida.usuario }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Motorista</dt>
+                                    <dd>{{ corrida.motorista or "Aguardando motorista" }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Solicitada em</dt>
+                                    <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                </div>
+                                {% if corrida.distancia_km is not none %}
+                                    <div>
+                                        <dt>Distância</dt>
+                                        <dd>{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <dt>Valor da corrida</dt>
+                                    <dd>
+                                        {% if corrida.valor is not none %}
+                                            R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                        {% else %}
+                                            Ainda não definido
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Pagamento</dt>
+                                    <dd>
+                                        {% if corrida.pagamento %}
+                                            {{ corrida.pagamento.forma }} · {{ corrida.pagamento.status }}
+                                            (R$ {{ "%.2f"|format(corrida.pagamento.valor)|replace(".", ",") }})
+                                        {% else %}
+                                            Não registrado
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                {% if corrida.avaliacao %}
+                                    <div>
+                                        <dt>Avaliação</dt>
+                                        <dd>
+                                            {{ corrida.avaliacao.nota }}/5
+                                            {% if corrida.avaliacao.comentario %}
+                                                · {{ corrida.avaliacao.comentario }}
+                                            {% endif %}
+                                        </dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+
+                            {% if corrida.historico %}
+                                <details class="admin-ride-timeline">
+                                    <summary>Histórico de status ({{ corrida.historico|length }})</summary>
+                                    <ol>
+                                        {% for evento in corrida.historico %}
+                                            <li>
+                                                {% if evento.status_anterior %}
+                                                    {{ evento.status_anterior }} &rarr;
+                                                {% endif %}
+                                                {{ evento.novo_status }}
+                                                <time datetime="{{ evento.data_alteracao.isoformat() }}">
+                                                    {{ evento.data_alteracao.strftime("%d/%m/%Y às %H:%M") }}
+                                                </time>
+                                            </li>
+                                        {% endfor %}
+                                    </ol>
+                                </details>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhuma corrida encontrada</h3>
+                    <p>
+                        {% if status_filtro %}
+                            Não há corridas com o status selecionado.
+                        {% else %}
+                            As corridas do sistema aparecerão aqui.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

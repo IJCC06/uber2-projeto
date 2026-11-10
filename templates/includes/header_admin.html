@@ -1,0 +1,40 @@
+<header class="topbar">
+    <a class="brand" href="{{ url_for('admins.home') }}" aria-label="Uber 2: início">
+        U2 <span>Uber 2</span>
+    </a>
+
+    <nav aria-label="Navegação principal">
+        <a href="{{ url_for('admins.home') }}"
+           {% if request.endpoint == 'admins.home' %}class="active" aria-current="page"{% endif %}>
+            Painel administrativo
+        </a>
+        <a href="{{ url_for('admins.usuarios') }}"
+           {% if request.endpoint in ('admins.usuarios', 'admins.atualizar_status_usuario') %}class="active" aria-current="page"{% endif %}>
+            Usuários
+        </a>
+        <a href="{{ url_for('admins.motoristas') }}"
+           {% if request.endpoint in ('admins.motoristas', 'admins.atualizar_status_motorista') %}class="active" aria-current="page"{% endif %}>
+            Motoristas
+        </a>
+        <a href="{{ url_for('admins.corridas') }}"
+           {% if request.endpoint == 'admins.corridas' %}class="active" aria-current="page"{% endif %}>
+            Corridas
+        </a>
+        <a href="{{ url_for('admins.pagamentos') }}"
+           {% if request.endpoint == 'admins.pagamentos' %}class="active" aria-current="page"{% endif %}>
+            Pagamentos
+        </a>
+        <a href="{{ url_for('admins.avaliacoes') }}"
+           {% if request.endpoint == 'admins.avaliacoes' %}class="active" aria-current="page"{% endif %}>
+            Avaliações
+        </a>
+        <a href="{{ url_for('admins.conta') }}"
+           {% if request.endpoint == 'admins.conta' %}class="active" aria-current="page"{% endif %}>
+            Minha conta
+        </a>
+    </nav>
+
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="logout" type="submit">Sair</button>
+    </form>
+</header>

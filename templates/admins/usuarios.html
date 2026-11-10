@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Usuários | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="users-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="users-title">Usuários</h1>
+                <p>Consulte as contas cadastradas e controle o acesso ao sistema.</p>
+            </div>
+        </section>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="payment-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="panel admin-users-panel" aria-labelledby="users-list-title">
+            <div class="panel-header">
+                <h2 id="users-list-title">Contas cadastradas</h2>
+                <span class="ride-count">{{ usuarios|length }}</span>
+            </div>
+
+            {% if usuarios %}
+                <div class="admin-user-list">
+                    {% for usuario in usuarios %}
+                        <article class="admin-user-card">
+                            <div class="admin-user-info">
+                                <h3>{{ usuario.nome }}</h3>
+                                <dl>
+                                    <div>
+                                        <dt>E-mail</dt>
+                                        <dd>{{ usuario.email }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ usuario.telefone }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Cadastro</dt>
+                                        <dd>{{ usuario.data_cadastro.strftime("%d/%m/%Y") }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            <div class="admin-user-actions">
+                                <span class="account-status {{ 'account-active' if usuario.ativo else 'account-inactive' }}">
+                                    {{ "Ativa" if usuario.ativo else "Inativa" }}
+                                </span>
+                                <form
+                                    action="{{ url_for('admins.atualizar_status_usuario', usuario_id=usuario.id) }}"
+                                    method="post"
+                                >
+                                    <input type="hidden" name="ativo" value="{{ '0' if usuario.ativo else '1' }}">
+                                    <button
+                                        class="{{ 'danger-action' if usuario.ativo else 'primary-action' }}"
+                                        type="submit"
+                                    >
+                                        {{ "Desativar conta" if usuario.ativo else "Ativar conta" }}
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhum usuário cadastrado</h3>
+                    <p>As contas criadas aparecerão nesta lista.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

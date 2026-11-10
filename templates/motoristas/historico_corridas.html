@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Histórico de corridas | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
+</head>
+<body>
+    {% include "includes/header_motorista.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="history-title">
+            <div>
+                <p class="eyebrow">Área do motorista</p>
+                <h1 id="history-title">Histórico de corridas</h1>
+                <p>Consulte suas corridas finalizadas e canceladas.</p>
+            </div>
+        </section>
+
+        <section class="driver-history-summary" aria-label="Resumo das corridas">
+            <article class="summary-card">
+                <span class="summary-label">Corridas finalizadas</span>
+                <strong>{{ corridas_finalizadas }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Total bruto das corridas</span>
+                <strong>R$ {{ "%.2f"|format(total_recebido)|replace(".", ",") }}</strong>
+                <span class="history-note">Soma dos valores das corridas finalizadas; não representa repasse líquido.</span>
+            </article>
+        </section>
+
+        {% if corridas %}
+            <section class="driver-history-list" aria-label="Corridas anteriores">
+                {% for corrida in corridas %}
+                    <article class="ride-card">
+                        <div class="ride-card-header">
+                            <h2>Corrida #{{ corrida.id }}</h2>
+                            <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                                {{ corrida.status }}
+                            </span>
+                        </div>
+
+                        <dl class="ride-details">
+                            <div>
+                                <dt>Passageiro</dt>
+                                <dd>{{ corrida.usuario }}</dd>
+                            </div>
+                            <div>
+                                <dt>Origem</dt>
+                                <dd>{{ corrida.origem }}</dd>
+                            </div>
+                            <div>
+                                <dt>Destino</dt>
+                                <dd>{{ corrida.destino }}</dd>
+                            </div>
+                            <div>
+                                <dt>Data</dt>
+                                <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                            </div>
+                            {% if corrida.distancia_km is not none %}
+                                <div>
+                                    <dt>Distância</dt>
+                                    <dd>{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <dt>Valor</dt>
+                                <dd>
+                                    {% if corrida.valor is not none %}
+                                        R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                    {% else %}
+                                        Não definido
+                                    {% endif %}
+                                </dd>
+                            </div>
+                        </dl>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="panel empty-state">
+                <h2>Nenhuma corrida anterior</h2>
+                <p>As corridas finalizadas ou canceladas aparecerão aqui.</p>
+                <a class="secondary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+                    Consultar corridas disponíveis
+                </a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>

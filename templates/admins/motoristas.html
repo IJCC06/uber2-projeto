@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Motoristas | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="drivers-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="drivers-title">Motoristas</h1>
+                <p>Consulte as contas e gerencie a situação dos motoristas.</p>
+            </div>
+        </section>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="payment-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="panel admin-users-panel" aria-labelledby="drivers-list-title">
+            <div class="panel-header">
+                <h2 id="drivers-list-title">Contas cadastradas</h2>
+                <span class="ride-count">{{ motoristas|length }}</span>
+            </div>
+
+            {% if motoristas %}
+                <div class="admin-user-list">
+                    {% for motorista in motoristas %}
+                        <article class="admin-user-card">
+                            <div class="admin-user-info">
+                                <h3>{{ motorista.nome }}</h3>
+                                <dl>
+                                    <div>
+                                        <dt>CPF (login)</dt>
+                                        <dd>{{ motorista.cpf }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ motorista.telefone }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>CNH</dt>
+                                        <dd>{{ motorista.cnh }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Disponibilidade</dt>
+                                        <dd>{{ "Disponível" if motorista.disponivel else "Indisponível" }}</dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            <div class="admin-user-actions">
+                                <span class="account-status {{ 'account-active' if motorista.ativo else 'account-inactive' }}">
+                                    {{ "Ativa" if motorista.ativo else "Inativa" }}
+                                </span>
+                                <form
+                                    action="{{ url_for('admins.atualizar_status_motorista', motorista_id=motorista.id) }}"
+                                    method="post"
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="status"
+                                        value="{{ 'Inativo' if motorista.ativo else 'Ativo' }}"
+                                    >
+                                    <button
+                                        class="{{ 'danger-action' if motorista.ativo else 'primary-action' }}"
+                                        type="submit"
+                                    >
+                                        {{ "Desativar conta" if motorista.ativo else "Ativar conta" }}
+                                    </button>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhum motorista cadastrado</h3>
+                    <p>As contas de motoristas aparecerão nesta lista.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Minha conta | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="account-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="account-title">Minha conta</h1>
+                <p>Atualize seus dados pessoais e, se desejar, altere sua senha.</p>
+            </div>
+        </section>
+
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="payment-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="panel account-panel" aria-labelledby="account-form-title">
+            <h2 id="account-form-title">Dados da conta</h2>
+            <form class="account-form" action="{{ url_for('admins.conta') }}" method="post">
+                <div class="account-field">
+                    <label for="nome">Nome</label>
+                    <input
+                        id="nome"
+                        name="nome"
+                        type="text"
+                        maxlength="100"
+                        autocomplete="name"
+                        value="{{ administrador.nome }}"
+                        required
+                    >
+                </div>
+                <div class="account-field">
+                    <label for="email">E-mail</label>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        maxlength="255"
+                        autocomplete="email"
+                        value="{{ administrador.email }}"
+                        required
+                    >
+                </div>
+
+                <fieldset class="password-fieldset">
+                    <legend>Alterar senha (opcional)</legend>
+                    <p>Deixe os campos de senha vazios para manter sua senha atual.</p>
+                    <div class="account-field">
+                        <label for="senha_atual">Senha atual</label>
+                        <input
+                            id="senha_atual"
+                            name="senha_atual"
+                            type="password"
+                            autocomplete="current-password"
+                        >
+                    </div>
+                    <div class="account-field">
+                        <label for="nova_senha">Nova senha</label>
+                        <input
+                            id="nova_senha"
+                            name="nova_senha"
+                            type="password"
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+                    </div>
+                    <div class="account-field">
+                        <label for="confirmar_senha">Confirmar nova senha</label>
+                        <input
+                            id="confirmar_senha"
+                            name="confirmar_senha"
+                            type="password"
+                            minlength="8"
+                            autocomplete="new-password"
+                        >
+                    </div>
+                </fieldset>
+
+                <button class="primary-action" type="submit">Salvar alterações</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>

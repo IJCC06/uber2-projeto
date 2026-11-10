@@ -1,0 +1,785 @@
+:root {
+    --black: #111111;
+    --gray-900: #242424;
+    --gray-600: #606060;
+    --gray-200: #e6e6e6;
+    --gray-100: #f5f5f5;
+    --white: #ffffff;
+    --focus: #2a68ff;
+    --green: #176b3a;
+    --green-bg: #edf8f0;
+    --red: #a32121;
+    --red-bg: #fff0f0;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+    color: inherit;
+}
+
+.topbar {
+    display: flex;
+    min-height: 72px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 12px max(24px, calc((100% - 1180px) / 2));
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.brand {
+    color: var(--black);
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.brand span {
+    margin-left: 8px;
+}
+
+nav {
+    display: flex;
+    gap: 20px;
+}
+
+nav a,
+.logout {
+    border: 0;
+    background: transparent;
+    color: var(--gray-600);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+nav a:hover,
+nav .active,
+.logout:hover {
+    color: var(--black);
+}
+
+.logout {
+    cursor: pointer;
+}
+
+.page-content {
+    width: min(100% - 48px, 1180px);
+    margin: 0 auto;
+    padding: 48px 0;
+}
+
+.welcome {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 8px;
+    color: var(--black);
+    font-size: clamp(2rem, 4vw, 2.75rem);
+}
+
+.welcome p:not(.eyebrow) {
+    margin-bottom: 0;
+    color: var(--gray-600);
+}
+
+.primary-action,
+.secondary-action,
+.danger-action {
+    display: inline-flex;
+    min-height: 46px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--black);
+    color: var(--white);
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.danger-action {
+    border: 1px solid var(--red);
+    background: var(--white);
+    color: var(--red);
+    cursor: pointer;
+}
+
+.primary-action:hover,
+.secondary-action:hover {
+    background: #333333;
+}
+
+.danger-action:hover {
+    background: var(--red-bg);
+}
+
+.availability-card,
+.panel {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+}
+
+.form-message {
+    margin: 0 0 20px;
+    padding: 12px 14px;
+    border-radius: 8px;
+    line-height: 1.45;
+}
+
+.success-message {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.error-message {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
+.availability-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding: 18px 22px;
+}
+
+.availability-card > div {
+    flex: 1;
+}
+
+.availability-actions {
+    margin-left: auto;
+}
+
+.availability-card h2 {
+    margin-bottom: 4px;
+    font-size: 1rem;
+}
+
+.availability-card p {
+    margin-bottom: 0;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.availability-indicator {
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    border-radius: 50%;
+}
+
+.available {
+    background: var(--green);
+    box-shadow: 0 0 0 5px var(--green-bg);
+}
+
+.unavailable {
+    background: var(--red);
+    box-shadow: 0 0 0 5px var(--red-bg);
+}
+
+.panel {
+    padding: 24px;
+}
+
+.account-panel {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.account-panel h2 {
+    margin-bottom: 22px;
+}
+
+.account-form {
+    display: grid;
+    gap: 18px;
+}
+
+.account-field {
+    display: grid;
+    gap: 7px;
+}
+
+.account-field label {
+    color: var(--gray-900);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.account-field input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--gray-900);
+    font: inherit;
+}
+
+.account-field input:focus {
+    border-color: var(--focus);
+    outline: 2px solid rgb(42 104 255 / 18%);
+}
+
+.password-fieldset {
+    display: grid;
+    gap: 16px;
+    margin: 4px 0 0;
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+}
+
+.password-fieldset legend {
+    padding: 0 8px;
+    font-weight: 700;
+}
+
+.password-fieldset > p {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.account-form > .primary-action {
+    justify-self: start;
+}
+
+.driver-history-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.driver-history-summary .summary-card {
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    padding: 22px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+}
+
+.driver-history-summary .summary-label {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.driver-history-summary strong {
+    font-size: 2rem;
+}
+
+.history-note {
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.driver-history-list {
+    display: grid;
+    gap: 14px;
+}
+
+.ride-status.status-finalizada {
+    background: var(--green-bg);
+    color: var(--green);
+}
+
+.ride-status.status-cancelada {
+    background: var(--red-bg);
+    color: var(--red);
+}
+
+.ratings-panel {
+    margin-bottom: 24px;
+}
+
+.ratings-panel .panel-header {
+    margin-bottom: 12px;
+}
+
+.ratings-panel .panel-header .eyebrow {
+    margin-bottom: 6px;
+}
+
+.ratings-summary {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.ratings-summary strong {
+    color: var(--black);
+    font-size: 1.8rem;
+}
+
+.ratings-summary span,
+.rating-author,
+.rating-card time {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+.rating-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.rating-card {
+    padding: 18px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+}
+
+.rating-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.rating-card-header h3 {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.rating-card time {
+    white-space: nowrap;
+}
+
+.rating-author {
+    margin-bottom: 8px;
+}
+
+.rating-comment {
+    margin-bottom: 0;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.ratings-empty-state {
+    padding: 24px 12px 8px;
+}
+
+.ratings-empty-state p {
+    margin-bottom: 0;
+}
+
+.vehicle-form-panel,
+.vehicle-list-panel {
+    margin-bottom: 24px;
+}
+
+.vehicle-form-panel h2,
+.vehicle-list-panel h2 {
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+.vehicle-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: end;
+}
+
+.vehicle-field {
+    display: grid;
+    gap: 7px;
+}
+
+.vehicle-field label {
+    color: var(--gray-900);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.vehicle-field input {
+    width: 100%;
+    min-height: 46px;
+    padding: 0 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--gray-900);
+    font: inherit;
+}
+
+.vehicle-field input:focus {
+    border-color: var(--focus);
+    outline: 2px solid rgb(42 104 255 / 18%);
+}
+
+.vehicle-form .primary-action {
+    justify-self: start;
+}
+
+.vehicle-list {
+    display: grid;
+    gap: 14px;
+}
+
+.vehicle-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+}
+
+.vehicle-card .eyebrow {
+    margin-bottom: 6px;
+}
+
+.vehicle-card h3 {
+    margin-bottom: 0;
+}
+
+.vehicle-edit {
+    margin-top: 14px;
+}
+
+.vehicle-edit summary {
+    color: var(--gray-900);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.vehicle-edit-form {
+    min-width: min(100%, 620px);
+    margin-top: 14px;
+}
+
+.vehicle-edit-form .primary-action {
+    grid-column: 1 / -1;
+}
+
+.vehicle-delete-form {
+    margin-left: auto;
+}
+
+.vehicle-delete-action {
+    min-height: 42px;
+    padding: 0 14px;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--red);
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+}
+
+.vehicle-delete-action:hover {
+    background: var(--red-bg);
+}
+
+.vehicle-details {
+    display: flex;
+    gap: 28px;
+    margin: 0;
+}
+
+.vehicle-details dt {
+    margin-bottom: 6px;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+}
+
+.vehicle-details dd {
+    margin: 0;
+    font-weight: 700;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.panel-header .eyebrow {
+    margin-bottom: 6px;
+}
+
+.panel h2 {
+    margin-bottom: 0;
+    font-size: 1.2rem;
+}
+
+.ride-count {
+    display: inline-grid;
+    min-width: 36px;
+    min-height: 36px;
+    place-items: center;
+    padding: 0 8px;
+    border-radius: 18px;
+    background: var(--gray-100);
+    font-weight: 700;
+}
+
+.ride-list {
+    display: grid;
+    gap: 14px;
+}
+
+.ride-card {
+    padding: 20px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+}
+
+.ride-card-header {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.ride-card-header h3 {
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
+.ride-card-header time {
+    color: var(--gray-600);
+    font-size: 0.85rem;
+}
+
+.ride-status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.ride-details {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 0;
+}
+
+.ride-details dt {
+    margin-bottom: 6px;
+    color: var(--gray-600);
+    font-size: 0.8rem;
+}
+
+.ride-details dd {
+    margin: 0;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.ride-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: end;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+.distance-field {
+    display: grid;
+    flex: 1;
+    gap: 7px;
+    max-width: 260px;
+    color: var(--gray-600);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.distance-field input {
+    min-height: 46px;
+    padding: 0 12px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    color: var(--gray-900);
+    font: inherit;
+}
+
+.distance-field input:focus {
+    border-color: var(--focus);
+    outline: 2px solid rgb(42 104 255 / 18%);
+}
+
+.distance-field small {
+    font-size: 0.8rem;
+    font-weight: 400;
+}
+
+.empty-state {
+    padding: 36px 20px;
+    text-align: center;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+}
+
+.empty-state p,
+.intro-panel p {
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.empty-state p {
+    margin-bottom: 0;
+}
+
+.intro-panel h2 {
+    margin-bottom: 10px;
+}
+
+.intro-panel p {
+    margin-bottom: 18px;
+}
+
+a:focus-visible,
+button:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+    .topbar {
+        flex-wrap: wrap;
+    }
+
+    nav {
+        width: 100%;
+        order: 3;
+        overflow-x: auto;
+    }
+
+    .welcome {
+        display: grid;
+        align-items: start;
+    }
+
+    .availability-card {
+        flex-wrap: wrap;
+    }
+
+    .availability-actions {
+        width: 100%;
+        margin-left: 26px;
+    }
+
+    .primary-action {
+        width: 100%;
+    }
+
+    .ride-details {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .vehicle-form {
+        grid-template-columns: 1fr;
+    }
+
+    .driver-history-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .vehicle-form .primary-action {
+        width: 100%;
+    }
+
+    .account-form > .primary-action {
+        width: 100%;
+    }
+
+    .vehicle-card {
+        align-items: start;
+        flex-direction: column;
+    }
+
+    .vehicle-delete-form {
+        margin-left: 0;
+    }
+
+    .vehicle-edit-form {
+        min-width: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .page-content {
+        width: min(100% - 32px, 1180px);
+        padding: 32px 0;
+    }
+
+    .panel {
+        padding: 20px;
+    }
+
+    .ride-card-header {
+        display: grid;
+        gap: 8px;
+    }
+
+    .ride-actions {
+        display: grid;
+    }
+
+    .distance-field {
+        max-width: none;
+    }
+}

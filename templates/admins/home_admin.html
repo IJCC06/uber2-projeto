@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Painel administrativo | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="admin-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="admin-title">Olá, {{ current_user.nome }}!</h1>
+                <p>Acompanhe os principais indicadores e as corridas mais recentes.</p>
+            </div>
+        </section>
+
+        <section class="admin-summary" aria-label="Indicadores do sistema">
+            <article class="summary-card">
+                <span class="summary-label">Usuários ativos</span>
+                <strong>{{ usuarios_ativos }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Motoristas ativos</span>
+                <strong>{{ motoristas_ativos }}</strong>
+                <span class="admin-card-detail">{{ motoristas_disponiveis }} disponíveis</span>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Corridas solicitadas</span>
+                <strong>{{ corridas_solicitadas }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Corridas ativas</span>
+                <strong>{{ corridas_ativas }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Pagamentos pendentes</span>
+                <strong>{{ pagamentos_pendentes }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Média das avaliações</span>
+                <strong>
+                    {% if media_avaliacoes is not none %}
+                        {{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </strong>
+            </article>
+        </section>
+
+        <section class="panel admin-rides-panel" aria-labelledby="recent-rides-title">
+            <div class="panel-header">
+                <h2 id="recent-rides-title">Corridas recentes</h2>
+                <span class="ride-count">{{ corridas_recentes|length }}</span>
+            </div>
+
+            {% if corridas_recentes %}
+                <div class="admin-ride-list">
+                    {% for corrida in corridas_recentes %}
+                        <article class="ride-history-card">
+                            <header class="ride-history-header">
+                                <div>
+                                    <p class="eyebrow">Corrida #{{ corrida.id }}</p>
+                                    <h3>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h3>
+                                </div>
+                                <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                                    {{ corrida.status }}
+                                </span>
+                            </header>
+                            <dl class="ride-history-details">
+                                <div>
+                                    <dt>Solicitada por</dt>
+                                    <dd>{{ corrida.usuario }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Motorista</dt>
+                                    <dd>{{ corrida.motorista or "Aguardando motorista" }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Data</dt>
+                                    <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Valor</dt>
+                                    <dd>
+                                        {% if corrida.valor is not none %}
+                                            R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                        {% else %}
+                                            Ainda não definido
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhuma corrida encontrada</h3>
+                    <p>As corridas do sistema aparecerão aqui.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
