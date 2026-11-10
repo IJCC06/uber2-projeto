@@ -33,6 +33,7 @@ Até o momento, o repositório contém:
 - leitura de configurações por variáveis de ambiente;
 - tela de login renderizada pelo Flask;
 - rotas para tentativa de login de usuário, motorista e administrador;
+- cadastro público de motoristas, com contas inicialmente inativas até ativação administrativa;
 - rota para exibir a página inicial do usuário;
 - templates HTML e diretórios de arquivos estáticos;
 - scripts SQL para criação das tabelas, dados de exemplo e consultas;

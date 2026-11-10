@@ -1,5 +1,6 @@
 from flask import (
     Blueprint,
+    current_app,
     render_template,
     redirect,
     url_for,
@@ -112,6 +113,83 @@ def cadastro():
     finally:
         cursor.close()
         con.close()
+
+
+@auth.route("/cadastro/motorista", methods=["GET", "POST"])
+def cadastro_motorista():
+    if request.method == "GET":
+        return render_template("logins/cadastro_motorista.html")
+
+    nome = request.form.get("nome", "").strip()
+    cpf = request.form.get("cpf", "").strip()
+    telefone = request.form.get("telefone", "").strip()
+    cnh = request.form.get("cnh", "").strip()
+    senha = request.form.get("senha", "")
+    confirmar_senha = request.form.get("confirmar_senha", "")
+
+    if not all([nome, cpf, telefone, cnh, senha, confirmar_senha]):
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="Preencha todos os campos.",
+        )
+
+    if len(nome) > 100 or len(cpf) > 14 or len(telefone) > 20 or len(cnh) > 20:
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="Um ou mais campos ultrapassaram o limite permitido.",
+        )
+
+    if len(senha) < 8:
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="A senha deve possuir pelo menos 8 caracteres.",
+        )
+
+    if senha != confirmar_senha:
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="As senhas não coincidem.",
+        )
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO motoristas
+                    (nome, cpf, telefone, cnh, senha, status, disponivel)
+                VALUES (%s, %s, %s, %s, %s, 'Inativo', FALSE)
+                """,
+                (nome, cpf, telefone, cnh, criar_hash_senha(senha)),
+            )
+        conexao.commit()
+    except psycopg2.errors.UniqueViolation:
+        if conexao is not None:
+            conexao.rollback()
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="Este CPF ou CNH já está cadastrado.",
+        )
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao cadastrar um motorista.")
+        return render_template(
+            "logins/cadastro_motorista.html",
+            erro="Não foi possível realizar o cadastro. Tente novamente.",
+        )
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "logins/cadastro_motorista.html",
+        sucesso=(
+            "Cadastro recebido. Sua conta ficará inativa até a aprovação "
+            "de um administrador."
+        ),
+    )
 
 
 # Login de Usuário

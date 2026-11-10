@@ -103,6 +103,7 @@ Já estão presentes:
 - rotas iniciais para exibir a tela de login;
 - rotas POST para tentativa de login de usuário e motorista;
 - rota de login administrativo;
+- cadastro público de motoristas, com ativação administrativa antes do acesso;
 - rota para exibir a página inicial do usuário;
 - painel administrativo com indicadores agregados e lista das corridas recentes;
 - cadastro, consulta, edição e remoção de veículos, sempre vinculados ao motorista autenticado;

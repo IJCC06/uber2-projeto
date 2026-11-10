@@ -65,7 +65,11 @@
                 </section>
             </div>
 
-            <p class="login-footer">Ainda não tem uma conta? <a href="{{ url_for('auth.cadastro') }}">Cadastre-se como usuário</a></p>
+            <p class="login-footer">
+                Ainda não tem uma conta?
+                <a href="{{ url_for('auth.cadastro') }}">Cadastre-se como usuário</a>
+                ou <a href="{{ url_for('auth.cadastro_motorista') }}">como motorista</a>.
+            </p>
         </section>
     </main>
 </body>
