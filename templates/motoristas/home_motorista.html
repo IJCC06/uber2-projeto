@@ -72,6 +72,55 @@
             </section>
         {% endif %}
 
+        {% if avaliacoes_recentes is defined %}
+            <section class="panel ratings-panel" aria-labelledby="ratings-title">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Opinião dos passageiros</p>
+                        <h2 id="ratings-title">Suas avaliações</h2>
+                    </div>
+                    <span class="ride-count">{{ quantidade_avaliacoes }}</span>
+                </div>
+
+                <div class="ratings-summary">
+                    <strong>
+                        {% if media_avaliacoes is not none %}
+                            {{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+                    <span>Média das notas</span>
+                </div>
+
+                {% if avaliacoes_recentes %}
+                    <div class="rating-list">
+                        {% for avaliacao in avaliacoes_recentes %}
+                            <article class="rating-card">
+                                <div class="rating-card-header">
+                                    <h3>{{ avaliacao.nota }} de 5</h3>
+                                    <time datetime="{{ avaliacao.data.isoformat() }}">
+                                        {{ avaliacao.data.strftime("%d/%m/%Y") }}
+                                    </time>
+                                </div>
+                                <p class="rating-author">
+                                    {{ avaliacao.usuario }} · Corrida #{{ avaliacao.corrida_id }}
+                                </p>
+                                <p class="rating-comment">
+                                    {{ avaliacao.comentario or "O passageiro não deixou um comentário." }}
+                                </p>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state ratings-empty-state">
+                        <h3>Você ainda não recebeu avaliações</h3>
+                        <p>As avaliações aparecerão aqui após os passageiros concluírem suas corridas.</p>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+
         {% if corridas_ativas is defined %}
             <section class="panel rides-panel" aria-labelledby="active-rides-title">
                 <div class="panel-header">

@@ -86,6 +86,46 @@ def corridas_disponiveis():
             motorista_ativo = motorista[0] == "Ativo"
             disponivel = motorista[1]
             pode_receber = motorista_ativo and disponivel
+
+            cursor.execute(
+                """
+                SELECT COUNT(a.id), ROUND(AVG(a.nota)::numeric, 2)
+                FROM avaliacoes AS a
+                JOIN corridas AS c ON c.id = a.id_corrida
+                WHERE c.id_motorista = %s
+                """,
+                (current_user.id,),
+            )
+            resumo_avaliacoes = cursor.fetchone()
+
+            cursor.execute(
+                """
+                SELECT
+                    a.nota,
+                    a.comentario,
+                    a.data_avaliacao,
+                    c.id,
+                    u.nome
+                FROM avaliacoes AS a
+                JOIN corridas AS c ON c.id = a.id_corrida
+                JOIN usuarios AS u ON u.id = c.id_usuario
+                WHERE c.id_motorista = %s
+                ORDER BY a.data_avaliacao DESC, a.id DESC
+                LIMIT 5
+                """,
+                (current_user.id,),
+            )
+            avaliacoes_recentes = [
+                {
+                    "nota": linha[0],
+                    "comentario": linha[1],
+                    "data": linha[2],
+                    "corrida_id": linha[3],
+                    "usuario": linha[4],
+                }
+                for linha in cursor.fetchall()
+            ]
+
             corridas = []
 
             if pode_receber:
@@ -143,6 +183,9 @@ def corridas_disponiveis():
         motorista_ativo=motorista_ativo,
         disponivel=disponivel,
         pode_receber=pode_receber,
+        quantidade_avaliacoes=resumo_avaliacoes[0],
+        media_avaliacoes=resumo_avaliacoes[1],
+        avaliacoes_recentes=avaliacoes_recentes,
     )
 
 

@@ -44,6 +44,7 @@ Até o momento, o repositório contém:
 - cálculo de tarifa de teste de R$ 2,50 por quilômetro informado pelo motorista;
 - registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente;
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
+- exibição da média e das avaliações recentes recebidas pelo motorista;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
 
 Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos estados “Aceita” ou “Em andamento”. A transição fica registrada no histórico.

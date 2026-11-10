@@ -109,6 +109,7 @@ Já estão presentes:
 - painel administrativo com indicadores agregados e lista das corridas recentes;
 - cadastro, consulta, edição e remoção de veículos, sempre vinculados ao motorista autenticado;
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
+- consulta pelo motorista da própria média e das avaliações recentes recebidas;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
 
