@@ -96,6 +96,10 @@ python app.py
 
 O arquivo app.py inicia o servidor Flask em modo de depuração quando executado diretamente. O modo de depuração é destinado ao desenvolvimento local, não à produção.
 
+## Testes e aceitação
+
+A suíte usa `unittest` da biblioteca padrão e pode ser executada com `python -m unittest discover -s tests -v`. O teste de aceitação do PostgreSQL é opt-in com `UBER2_TEST_POSTGRES=1`; ele cria um schema temporário, valida o fluxo ponta a ponta e remove o schema ao final, sem alterar tabelas existentes.
+
 ## Estado atual da versão 2
 
 Já estão presentes:

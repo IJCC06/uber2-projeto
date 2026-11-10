@@ -159,6 +159,23 @@ python app.py
 
 O servidor Flask será iniciado em modo de depuração para desenvolvimento local.
 
+## Verificação do protótipo
+
+Execute a descoberta dos testes. O teste de aceitação é ignorado, a menos que seja habilitado explicitamente:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+O teste de aceitação com banco real cria um schema temporário isolado no PostgreSQL configurado pelo `.env`, percorre o cadastro, aprovação e ciclo completo de uma corrida, e remove somente esse schema ao final. Habilite-o explicitamente no PowerShell:
+
+```powershell
+$env:UBER2_TEST_POSTGRES = "1"
+python -m unittest discover -s tests -v
+```
+
+O teste requer permissão para criar e remover schemas no banco configurado. Ele não modifica as tabelas ou os dados existentes fora do schema temporário.
+
 ## Funcionalidades previstas para a aplicação web
 
 A migração contempla os principais recursos do sistema original em diferentes estágios de implementação:
