@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pagamentos | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="payments-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="payments-title">Pagamentos</h1>
+                <p>Consulte os pagamentos registrados. Esta versão não processa nem confirma cobranças.</p>
+            </div>
+        </section>
+
+        <section class="admin-payment-summary" aria-label="Resumo de pagamentos">
+            <article class="summary-card">
+                <span class="summary-label">Pagamentos pendentes</span>
+                <strong>{{ total_pendentes }}</strong>
+                <span class="admin-card-detail">
+                    R$ {{ "%.2f"|format(valor_pendente)|replace(".", ",") }} registrados
+                </span>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Pagamentos marcados como pagos</span>
+                <strong>{{ total_pagos }}</strong>
+                <span class="admin-card-detail">
+                    R$ {{ "%.2f"|format(valor_pago)|replace(".", ",") }} registrados
+                </span>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Total de registros</span>
+                <strong>{{ total_pagamentos }}</strong>
+                <span class="admin-card-detail">Registros de forma de pagamento</span>
+            </article>
+        </section>
+
+        <section class="panel admin-rides-panel" aria-labelledby="payments-list-title">
+            <div class="panel-header">
+                <h2 id="payments-list-title">Registros de pagamento</h2>
+                <span class="ride-count">{{ pagamentos|length }}</span>
+            </div>
+
+            <form class="admin-ride-filter" action="{{ url_for('admins.pagamentos') }}" method="get">
+                <label for="status">
+                    Status
+                    <select id="status" name="status">
+                        <option value="" {% if not status_filtro %}selected{% endif %}>Todos</option>
+                        {% for status in status_validos %}
+                            <option value="{{ status }}" {% if status_filtro == status %}selected{% endif %}>
+                                {{ status }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label for="forma">
+                    Forma
+                    <select id="forma" name="forma">
+                        <option value="" {% if not forma_filtro %}selected{% endif %}>Todas</option>
+                        {% for forma in formas_validas %}
+                            <option value="{{ forma }}" {% if forma_filtro == forma %}selected{% endif %}>
+                                {{ forma }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button class="primary-action" type="submit">Filtrar</button>
+                {% if status_filtro or forma_filtro %}
+                    <a class="admin-filter-reset" href="{{ url_for('admins.pagamentos') }}">Limpar filtros</a>
+                {% endif %}
+            </form>
+
+            {% if pagamentos %}
+                <div class="admin-ride-list">
+                    {% for pagamento in pagamentos %}
+                        <article class="ride-history-card admin-payment-card">
+                            <header class="ride-history-header">
+                                <div>
+                                    <p class="eyebrow">
+                                        Pagamento #{{ pagamento.id }} · Corrida #{{ pagamento.corrida_id }}
+                                    </p>
+                                    <h3>{{ pagamento.origem }} <span aria-hidden="true">&rarr;</span> {{ pagamento.destino }}</h3>
+                                </div>
+                                <span class="payment-status {{ 'unpaid' if pagamento.status == 'Pendente' else '' }}">
+                                    {{ pagamento.status }}
+                                </span>
+                            </header>
+
+                            <dl class="ride-history-details">
+                                <div>
+                                    <dt>Usuário</dt>
+                                    <dd>{{ pagamento.usuario }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Motorista</dt>
+                                    <dd>{{ pagamento.motorista or "Não atribuído" }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Forma registrada</dt>
+                                    <dd>{{ pagamento.forma }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Valor registrado</dt>
+                                    <dd>R$ {{ "%.2f"|format(pagamento.valor)|replace(".", ",") }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Status da corrida</dt>
+                                    <dd>{{ pagamento.status_corrida }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Registro criado em</dt>
+                                    <dd>{{ pagamento.data_registro.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                </div>
+                            </dl>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhum pagamento encontrado</h3>
+                    <p>Os pagamentos registrados aparecerão nesta lista.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

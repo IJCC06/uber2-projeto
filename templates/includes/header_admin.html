@@ -20,6 +20,10 @@
            {% if request.endpoint == 'admins.corridas' %}class="active" aria-current="page"{% endif %}>
             Corridas
         </a>
+        <a href="{{ url_for('admins.pagamentos') }}"
+           {% if request.endpoint == 'admins.pagamentos' %}class="active" aria-current="page"{% endif %}>
+            Pagamentos
+        </a>
         <a href="{{ url_for('admins.conta') }}"
            {% if request.endpoint == 'admins.conta' %}class="active" aria-current="page"{% endif %}>
             Minha conta

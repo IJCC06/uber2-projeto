@@ -484,6 +484,105 @@ def corridas():
     )
 
 
+@admins.route("/pagamentos", methods=["GET"])
+@login_required
+def pagamentos():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    status_filtro = request.args.get("status", "").strip()
+    forma_filtro = request.args.get("forma", "").strip()
+    status_validos = ("Pendente", "Pago", "Cancelado")
+    formas_validas = ("Pix", "Dinheiro", "Cartão")
+
+    if status_filtro and status_filtro not in status_validos:
+        abort(400)
+    if forma_filtro and forma_filtro not in formas_validas:
+        abort(400)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) FILTER (WHERE status = 'Pendente'),
+                    COALESCE(SUM(valor) FILTER (WHERE status = 'Pendente'), 0),
+                    COUNT(*) FILTER (WHERE status = 'Pago'),
+                    COALESCE(SUM(valor) FILTER (WHERE status = 'Pago'), 0),
+                    COUNT(*)
+                FROM pagamentos
+                """
+            )
+            resumo = cursor.fetchone()
+
+            cursor.execute(
+                """
+                SELECT
+                    p.id,
+                    p.id_corrida,
+                    p.forma_pagamento,
+                    p.valor,
+                    p.status,
+                    p.data_pagamento,
+                    c.origem,
+                    c.destino,
+                    c.data_hora,
+                    c.status,
+                    u.nome,
+                    m.nome
+                FROM pagamentos AS p
+                JOIN corridas AS c ON c.id = p.id_corrida
+                JOIN usuarios AS u ON u.id = c.id_usuario
+                LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                WHERE (%s = '' OR p.status::text = %s)
+                  AND (%s = '' OR p.forma_pagamento::text = %s)
+                ORDER BY p.data_pagamento DESC, p.id DESC
+                """,
+                (status_filtro, status_filtro, forma_filtro, forma_filtro),
+            )
+            pagamentos_registrados = [
+                {
+                    "id": linha[0],
+                    "corrida_id": linha[1],
+                    "forma": linha[2],
+                    "valor": linha[3],
+                    "status": linha[4],
+                    "data_registro": linha[5],
+                    "origem": linha[6],
+                    "destino": linha[7],
+                    "data_corrida": linha[8],
+                    "status_corrida": linha[9],
+                    "usuario": linha[10],
+                    "motorista": linha[11],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar o painel administrativo de pagamentos.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "admins/pagamentos.html",
+        pagamentos=pagamentos_registrados,
+        total_pendentes=resumo[0],
+        valor_pendente=resumo[1],
+        total_pagos=resumo[2],
+        valor_pago=resumo[3],
+        total_pagamentos=resumo[4],
+        status_filtro=status_filtro,
+        forma_filtro=forma_filtro,
+        status_validos=status_validos,
+        formas_validas=formas_validas,
+    )
+
+
 @admins.route("/home", methods=["GET"])
 @login_required
 def home():

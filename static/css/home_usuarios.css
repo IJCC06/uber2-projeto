@@ -251,6 +251,22 @@ h1 {
     gap: 18px;
 }
 
+.admin-payment-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.admin-payment-summary .summary-card {
+    align-content: start;
+}
+
+.admin-payment-card {
+    display: grid;
+    gap: 18px;
+}
+
 .admin-ride-filter {
     display: flex;
     flex-wrap: wrap;
@@ -782,6 +798,10 @@ button:focus-visible {
     .admin-user-card {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .admin-payment-summary {
+        grid-template-columns: 1fr;
     }
 
     .admin-user-actions {
