@@ -1,4 +1,3 @@
--- Active: 1788283797601@@127.0.0.1@5432@uber2
 -- Exibir todos os Dados
 SELECT * FROM usuarios;
 SELECT * FROM motoristas;
@@ -79,8 +78,7 @@ JOIN corridas c
 JOIN avaliacoes a
     ON a.id_corrida = c.id
 GROUP BY m.id, m.nome
-ORDER BY media_avaliacao DESC
-LIMIT 10;
+ORDER BY media_avaliacao DESC;
 
 -- 8. Média Geral dos Motoristas
 SELECT
