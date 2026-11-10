@@ -61,6 +61,65 @@
             </section>
         {% endif %}
 
+        {% if corridas_ativas is defined %}
+            <section class="panel rides-panel" aria-labelledby="active-rides-title">
+                <div class="panel-header">
+                    <div>
+                        <p class="eyebrow">Suas viagens</p>
+                        <h2 id="active-rides-title">Corridas atribuídas a você</h2>
+                    </div>
+                    <span class="ride-count">{{ corridas_ativas|length }}</span>
+                </div>
+
+                {% if corridas_ativas %}
+                    <div class="ride-list">
+                        {% for corrida in corridas_ativas %}
+                            <article class="ride-card">
+                                <div class="ride-card-header">
+                                    <h3>Corrida #{{ corrida.id }}</h3>
+                                    <span class="ride-status">{{ corrida.status }}</span>
+                                </div>
+
+                                <dl class="ride-details">
+                                    <div>
+                                        <dt>Passageiro</dt>
+                                        <dd>{{ corrida.usuario }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Origem</dt>
+                                        <dd>{{ corrida.origem }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Destino</dt>
+                                        <dd>{{ corrida.destino }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Solicitada em</dt>
+                                        <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                    </div>
+                                </dl>
+
+                                {% if corrida.status == "Aceita" %}
+                                    <form
+                                        class="ride-actions"
+                                        action="{{ url_for('motoristas.iniciar_corrida', corrida_id=corrida.id) }}"
+                                        method="post"
+                                    >
+                                        <button class="primary-action" type="submit">Iniciar corrida</button>
+                                    </form>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <h3>Nenhuma corrida atribuída</h3>
+                        <p>As corridas que você aceitar aparecerão aqui.</p>
+                    </div>
+                {% endif %}
+            </section>
+        {% endif %}
+
         {% if corridas_disponiveis is defined %}
             <section class="panel rides-panel" aria-labelledby="rides-title">
                 <div class="panel-header">

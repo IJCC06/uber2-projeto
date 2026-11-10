@@ -259,6 +259,15 @@ h1 {
     font-size: 0.85rem;
 }
 
+.ride-status {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-900);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
 .ride-details {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
