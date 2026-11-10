@@ -115,6 +115,7 @@ Já estão presentes:
 - consulta administrativa de motoristas e ativação/desativação de contas, bloqueada enquanto houver corridas atribuídas em andamento;
 - histórico administrativo de corridas com filtro por status, informações de pagamento e avaliação, e linha do tempo de mudanças;
 - consulta administrativa de pagamentos com filtros por status e forma, sem alteração ou processamento de cobranças;
+- consulta administrativa de avaliações com nota média, filtro por nota e comentários;
 - histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.

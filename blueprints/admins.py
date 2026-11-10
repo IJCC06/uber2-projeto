@@ -583,6 +583,85 @@ def pagamentos():
     )
 
 
+@admins.route("/avaliacoes", methods=["GET"])
+@login_required
+def avaliacoes():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    nota_texto = request.args.get("nota", "").strip()
+    if nota_texto and nota_texto not in {"1", "2", "3", "4", "5"}:
+        abort(400)
+
+    nota_filtro = int(nota_texto) if nota_texto else None
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT COUNT(*), ROUND(AVG(nota)::numeric, 2)
+                FROM avaliacoes
+                """
+            )
+            resumo = cursor.fetchone()
+
+            cursor.execute(
+                """
+                SELECT
+                    a.id,
+                    a.id_corrida,
+                    a.nota,
+                    a.comentario,
+                    a.data_avaliacao,
+                    u.nome,
+                    m.nome,
+                    c.origem,
+                    c.destino,
+                    c.status
+                FROM avaliacoes AS a
+                JOIN corridas AS c ON c.id = a.id_corrida
+                JOIN usuarios AS u ON u.id = c.id_usuario
+                LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                WHERE (%s IS NULL OR a.nota = %s)
+                ORDER BY a.data_avaliacao DESC, a.id DESC
+                """,
+                (nota_filtro, nota_filtro),
+            )
+            avaliacoes_registradas = [
+                {
+                    "id": linha[0],
+                    "corrida_id": linha[1],
+                    "nota": linha[2],
+                    "comentario": linha[3],
+                    "data_avaliacao": linha[4],
+                    "usuario": linha[5],
+                    "motorista": linha[6],
+                    "origem": linha[7],
+                    "destino": linha[8],
+                    "status_corrida": linha[9],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar as avaliações administrativas.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template(
+        "admins/avaliacoes.html",
+        avaliacoes=avaliacoes_registradas,
+        total_avaliacoes=resumo[0],
+        media_avaliacoes=resumo[1],
+        nota_filtro=nota_texto,
+        notas_validas=range(1, 6),
+    )
+
+
 @admins.route("/home", methods=["GET"])
 @login_required
 def home():

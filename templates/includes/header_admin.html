@@ -24,6 +24,10 @@
            {% if request.endpoint == 'admins.pagamentos' %}class="active" aria-current="page"{% endif %}>
             Pagamentos
         </a>
+        <a href="{{ url_for('admins.avaliacoes') }}"
+           {% if request.endpoint == 'admins.avaliacoes' %}class="active" aria-current="page"{% endif %}>
+            Avaliações
+        </a>
         <a href="{{ url_for('admins.conta') }}"
            {% if request.endpoint == 'admins.conta' %}class="active" aria-current="page"{% endif %}>
             Minha conta

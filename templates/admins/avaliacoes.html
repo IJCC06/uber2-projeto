@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Avaliações | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
+</head>
+<body>
+    {% include "includes/header_admin.html" %}
+
+    <main class="page-content">
+        <section class="welcome" aria-labelledby="ratings-title">
+            <div>
+                <p class="eyebrow">Administração</p>
+                <h1 id="ratings-title">Avaliações</h1>
+                <p>Consulte as notas e os comentários enviados pelos usuários.</p>
+            </div>
+        </section>
+
+        <section class="admin-payment-summary" aria-label="Resumo das avaliações">
+            <article class="summary-card">
+                <span class="summary-label">Avaliações registradas</span>
+                <strong>{{ total_avaliacoes }}</strong>
+            </article>
+            <article class="summary-card">
+                <span class="summary-label">Nota média</span>
+                <strong>
+                    {% if media_avaliacoes is not none %}
+                        {{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </strong>
+                <span class="admin-card-detail">Escala de 1 a 5</span>
+            </article>
+        </section>
+
+        <section class="panel admin-rides-panel" aria-labelledby="ratings-list-title">
+            <div class="panel-header">
+                <h2 id="ratings-list-title">Avaliações recebidas</h2>
+                <span class="ride-count">{{ avaliacoes|length }}</span>
+            </div>
+
+            <form class="admin-ride-filter" action="{{ url_for('admins.avaliacoes') }}" method="get">
+                <label for="nota">
+                    Filtrar por nota
+                    <select id="nota" name="nota">
+                        <option value="" {% if not nota_filtro %}selected{% endif %}>Todas as notas</option>
+                        {% for nota in notas_validas %}
+                            <option value="{{ nota }}" {% if nota_filtro == nota|string %}selected{% endif %}>
+                                {{ nota }} de 5
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <button class="primary-action" type="submit">Filtrar</button>
+                {% if nota_filtro %}
+                    <a class="admin-filter-reset" href="{{ url_for('admins.avaliacoes') }}">Limpar filtro</a>
+                {% endif %}
+            </form>
+
+            {% if avaliacoes %}
+                <div class="admin-ride-list">
+                    {% for avaliacao in avaliacoes %}
+                        <article class="ride-history-card admin-payment-card">
+                            <header class="ride-history-header">
+                                <div>
+                                    <p class="eyebrow">
+                                        Avaliação #{{ avaliacao.id }} · Corrida #{{ avaliacao.corrida_id }}
+                                    </p>
+                                    <h3>{{ avaliacao.origem }} <span aria-hidden="true">&rarr;</span> {{ avaliacao.destino }}</h3>
+                                </div>
+                                <span class="rating-score" aria-label="Nota {{ avaliacao.nota }} de 5">
+                                    {{ avaliacao.nota }} / 5
+                                </span>
+                            </header>
+
+                            <dl class="ride-history-details">
+                                <div>
+                                    <dt>Usuário</dt>
+                                    <dd>{{ avaliacao.usuario }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Motorista avaliado</dt>
+                                    <dd>{{ avaliacao.motorista or "Não atribuído" }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Status da corrida</dt>
+                                    <dd>{{ avaliacao.status_corrida }}</dd>
+                                </div>
+                                <div>
+                                    <dt>Data da avaliação</dt>
+                                    <dd>{{ avaliacao.data_avaliacao.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                </div>
+                            </dl>
+
+                            {% if avaliacao.comentario %}
+                                <blockquote class="admin-rating-comment">
+                                    {{ avaliacao.comentario }}
+                                </blockquote>
+                            {% else %}
+                                <p class="payment-note">Avaliação sem comentário.</p>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhuma avaliação encontrada</h3>
+                    <p>
+                        {% if nota_filtro %}
+                            Não há avaliações com a nota selecionada.
+                        {% else %}
+                            As avaliações dos usuários aparecerão aqui.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>
