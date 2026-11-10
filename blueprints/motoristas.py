@@ -225,3 +225,55 @@ def iniciar_corrida(corrida_id):
             conexao.close()
 
     return redirect(url_for("motoristas.corridas_disponiveis"))
+
+
+@motoristas.route("/corridas/<int:corrida_id>/finalizar", methods=["POST"])
+@login_required
+def finalizar_corrida(corrida_id):
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE corridas
+                SET status = 'Finalizada'
+                WHERE id = %s
+                  AND id_motorista = %s
+                  AND status = 'Em andamento'
+                """,
+                (corrida_id, current_user.id),
+            )
+
+            if cursor.rowcount == 0:
+                conexao.rollback()
+                flash(
+                    "Esta corrida não está mais disponível para finalizar.",
+                    "error",
+                )
+                return redirect(url_for("motoristas.corridas_disponiveis"))
+
+            cursor.execute(
+                """
+                INSERT INTO historico_corridas
+                    (id_corrida, status_anterior, novo_status)
+                VALUES (%s, 'Em andamento', 'Finalizada')
+                """,
+                (corrida_id,),
+            )
+
+        conexao.commit()
+        flash(f"Corrida #{corrida_id} finalizada.", "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao finalizar a corrida %s.", corrida_id)
+        flash("Não foi possível finalizar a corrida. Tente novamente.", "error")
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("motoristas.corridas_disponiveis"))
