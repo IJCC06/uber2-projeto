@@ -3,10 +3,11 @@
 import os
 import string
 import uuid
+from contextlib import closing
 from datetime import timedelta
 from decimal import Decimal
 
-import psycopg
+import psycopg2
 from dotenv import load_dotenv
 from faker import Faker
 from werkzeug.security import generate_password_hash
@@ -76,12 +77,12 @@ def main():
         )
 
     senha_hash = generate_password_hash(SENHA_TESTE)
-    with psycopg.connect(
+    with closing(psycopg2.connect(
         host=configuracao["DB_HOST"],
         dbname=configuracao["DB_NAME"],
         user=configuracao["DB_USER"],
         password=configuracao["DB_PASSWORD"],
-    ) as conexao:
+    )) as conexao, conexao:
         with conexao.cursor() as cursor:
             cursor.execute("SELECT email FROM usuarios")
             emails_existentes = {linha[0] for linha in cursor.fetchall()}

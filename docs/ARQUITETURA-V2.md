@@ -126,7 +126,6 @@ A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não signif
 ## Próximas etapas previstas
 
 - revisar e alinhar a estrutura de diretórios;
-- atualizar as dependências para refletir a escolha de Psycopg2;
 - migrar gradualmente as funcionalidades da versão de terminal para rotas web;
 - revisar os scripts SQL, constraints e integridade das operações;
 - criar testes automatizados para rotas e regras de negócio;
