@@ -32,11 +32,13 @@ uber2-projeto/
 ├── README.md
 ├── .gitignore
 ├── docs/
-│   ├── ARQUITETURA-V2.md
-│   └── sql/
-│       ├── create-table.sql
-│       ├── insert-date.sql
-│       └── query.sql
+│   └── ARQUITETURA-V2.md
+├── sql/
+│   ├── create-table.sql
+│   ├── adicionar-distancia-corridas.sql
+│   ├── gerar_dados_ficticios.py
+│   ├── insert-date.sql
+│   └── query.sql
 ├── python/
 │   └── logins.py
 ├── templates/
@@ -58,7 +60,7 @@ A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O 
 - python/logins.py: contém as funções de validação de login chamadas atualmente pelas rotas.
 - templates/: reúne os arquivos HTML renderizados pelo Flask.
 - static/: reúne os arquivos estáticos, como CSS e JavaScript.
-- docs/sql/: contém os scripts SQL versionados para criação, inserção de dados e consultas.
+- sql/: contém os scripts SQL e utilitários de dados de teste versionados.
 
 ## Configuração do banco de dados
 
@@ -75,7 +77,7 @@ DB_PASSWORD=sua_senha
 
 A função criar_conexao(), em conexao.py, utiliza essas quatro variáveis para abrir a conexão com PostgreSQL por meio de psycopg2.
 
-O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em docs/sql/ e devem ser revisados antes da execução. Em especial, o script de dados de exemplo contém comandos de limpeza de tabelas e não deve ser executado em um banco com dados que precisem ser preservados.
+O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em sql/ e devem ser revisados antes da execução. Em especial, insert-date.sql contém comandos de limpeza e não deve ser executado em um banco com dados que precisem ser preservados. Para bancos já criados, adicionar-distancia-corridas.sql inclui a coluna de distância sem remover os registros existentes.
 
 ## Instalação e execução
 
@@ -126,7 +128,9 @@ A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não signif
 As regras funcionais da versão anterior servirão como referência para a migração, com validação e ajustes durante a implementação web. Entre elas:
 
 - fluxo de corrida: Solicitada → Aceita → Em andamento → Finalizada, com possibilidade de cancelamento conforme as regras definidas;
-- pagamentos associados a corridas finalizadas;
+- valor da corrida calculado no protótipo por R$ 2,50 por quilômetro informado pelo motorista ao finalizar;
+- pagamentos associados a corridas finalizadas, com método escolhido pelo usuário e status inicial Pendente;
+- o registro de pagamento não processa nem confirma uma cobrança; integração com gateway permanece futura;
 - no máximo um pagamento por corrida;
 - no máximo uma avaliação por corrida, com nota de 1 a 5;
 - registro do histórico de mudanças de status;

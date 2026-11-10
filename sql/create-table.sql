@@ -90,6 +90,7 @@ CREATE TABLE corridas (
     origem VARCHAR(100) NOT NULL,
     destino VARCHAR(100) NOT NULL,
     data_hora TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    distancia_km NUMERIC(8, 2) CHECK (distancia_km > 0),
     valor DECIMAL(10, 2) CHECK (valor >= 0),
     status status_corrida NOT NULL DEFAULT 'Solicitada',
 

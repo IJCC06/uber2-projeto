@@ -85,3 +85,108 @@ def solicitar_corrida():
 
     flash(f"Corrida #{corrida_id} solicitada com sucesso.", "success")
     return redirect(url_for("usuarios.solicitar_corrida"))
+
+
+@usuarios.route("/pagamentos", methods=["GET", "POST"])
+@login_required
+def pagamentos():
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+
+        if request.method == "POST":
+            forma_pagamento = request.form.get("forma_pagamento", "")
+            corrida_id_texto = request.form.get("corrida_id", "")
+            formas_validas = {"Pix", "Dinheiro", "Cartão"}
+
+            if forma_pagamento not in formas_validas:
+                flash("Selecione uma forma de pagamento válida.", "error")
+            else:
+                try:
+                    corrida_id = int(corrida_id_texto)
+                    if corrida_id <= 0:
+                        raise ValueError
+                except ValueError:
+                    flash("Corrida inválida.", "error")
+                else:
+                    with conexao.cursor() as cursor:
+                        cursor.execute(
+                            """
+                            INSERT INTO pagamentos
+                                (id_corrida, forma_pagamento, valor, status)
+                            SELECT c.id, %s, c.valor, 'Pendente'
+                            FROM corridas AS c
+                            WHERE c.id = %s
+                              AND c.id_usuario = %s
+                              AND c.status = 'Finalizada'
+                              AND c.valor IS NOT NULL
+                            ON CONFLICT (id_corrida) DO NOTHING
+                            RETURNING id
+                            """,
+                            (forma_pagamento, corrida_id, current_user.id),
+                        )
+                        pagamento = cursor.fetchone()
+
+                    if pagamento is None:
+                        conexao.rollback()
+                        flash(
+                            "Não foi possível registrar. A corrida precisa ser sua, "
+                            "estar finalizada e ainda não ter pagamento.",
+                            "error",
+                        )
+                    else:
+                        conexao.commit()
+                        flash(
+                            "Forma de pagamento registrada como pendente. "
+                            "A cobrança ainda não foi processada.",
+                            "success",
+                        )
+
+            return redirect(url_for("usuarios.pagamentos"))
+
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT
+                    c.id,
+                    c.origem,
+                    c.destino,
+                    c.distancia_km,
+                    c.valor,
+                    p.forma_pagamento,
+                    p.status,
+                    p.data_pagamento
+                FROM corridas AS c
+                LEFT JOIN pagamentos AS p ON p.id_corrida = c.id
+                WHERE c.id_usuario = %s
+                  AND c.status = 'Finalizada'
+                ORDER BY c.data_hora DESC
+                """,
+                (current_user.id,),
+            )
+            corridas = [
+                {
+                    "id": linha[0],
+                    "origem": linha[1],
+                    "destino": linha[2],
+                    "distancia_km": linha[3],
+                    "valor": linha[4],
+                    "forma_pagamento": linha[5],
+                    "status_pagamento": linha[6],
+                    "data_pagamento": linha[7],
+                }
+                for linha in cursor.fetchall()
+            ]
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception("Falha ao carregar ou registrar pagamentos do usuário.")
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return render_template("usuarios/pagamentos.html", corridas=corridas)

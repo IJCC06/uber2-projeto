@@ -39,6 +39,9 @@ Até o momento, o repositório contém:
 - templates HTML e diretórios de arquivos estáticos;
 - scripts SQL para criação das tabelas, dados de exemplo e consultas;
 - módulo de funções de login em python/logins.py, utilizado pelo app.py.
+- solicitação de corridas por usuários e fluxo de aceite, início e finalização por motoristas;
+- cálculo de tarifa de teste de R$ 2,50 por quilômetro informado pelo motorista;
+- registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente.
 
 Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
 
@@ -52,11 +55,13 @@ uber2-projeto/
 ├── README.md
 ├── .gitignore
 ├── docs/
-│   ├── ARQUITETURA-V2.md
-│   └── sql/
-│       ├── create-table.sql
-│       ├── insert-date.sql
-│       └── query.sql
+│   └── ARQUITETURA-V2.md
+├── sql/
+│   ├── create-table.sql
+│   ├── adicionar-distancia-corridas.sql
+│   ├── gerar_dados_ficticios.py
+│   ├── insert-date.sql
+│   └── query.sql
 ├── python/
 │   └── logins.py
 ├── templates/
@@ -84,13 +89,14 @@ DB_PASSWORD=sua_senha
 
 Crie um arquivo local chamado .env na raiz do projeto e configure os valores de acordo com seu PostgreSQL. **Não compartilhe nem envie o arquivo .env ao Git**, pois ele contém credenciais.
 
-Os scripts SQL estão em docs/sql/:
+Os scripts de banco estão na pasta sql/:
 
-- create-table.sql — criação das tabelas e estruturas do banco;
-- insert-date.sql — dados de exemplo;
+- create-table.sql — cria as tabelas em um banco novo;
+- adicionar-distancia-corridas.sql — adiciona a coluna de distância a um banco já criado, preservando os registros;
+- gerar_dados_ficticios.py — insere dados de teste usando Faker;
 - query.sql — consultas SQL.
 
-> Atenção: revise insert-date.sql antes de executá-lo. Ele contém comandos que limpam tabelas e reiniciam identificadores, podendo apagar dados existentes.
+Para um banco que já existe, execute `sql/adicionar-distancia-corridas.sql` uma vez antes de usar a finalização de corridas. O script `insert-date.sql` é legado: revise-o antes de executar, pois contém comandos que limpam tabelas e reiniciam identificadores.
 
 ## Como preparar o ambiente
 
@@ -149,6 +155,8 @@ A versão anterior já trabalha com regras como:
 - valor de corrida não pode ser negativo;
 - nota de avaliação deve estar entre 1 e 5;
 - pagamento e avaliação dependem da finalização da corrida;
+- no protótipo, o valor é calculado em R$ 2,50 por quilômetro informado pelo motorista ao finalizar a corrida;
+- o registro de Pix, dinheiro ou cartão cria um pagamento pendente; não há integração com gateway nem confirmação real de cobrança;
 - uma corrida não deve ter mais de um pagamento ou avaliação;
 - motoristas precisam atender às condições de situação e disponibilidade;
 - usuários e motoristas devem acessar somente os dados e operações permitidos para seus perfis.

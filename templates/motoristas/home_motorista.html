@@ -113,6 +113,20 @@
                                         action="{{ url_for('motoristas.finalizar_corrida', corrida_id=corrida.id) }}"
                                         method="post"
                                     >
+                                        <label class="distance-field" for="distancia-{{ corrida.id }}">
+                                            <span>Distância percorrida (km)</span>
+                                            <input
+                                                id="distancia-{{ corrida.id }}"
+                                                name="distancia_km"
+                                                type="number"
+                                                min="0.01"
+                                                max="999999.99"
+                                                step="0.01"
+                                                placeholder="Ex.: 8.5"
+                                                required
+                                            >
+                                            <small>Tarifa de teste: R$ 2,50 por km.</small>
+                                        </label>
                                         <button class="primary-action" type="submit">Finalizar corrida</button>
                                     </form>
                                 {% endif %}

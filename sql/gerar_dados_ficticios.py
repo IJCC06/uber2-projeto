@@ -4,6 +4,7 @@ import os
 import string
 import uuid
 from datetime import timedelta
+from decimal import Decimal
 
 import psycopg
 from dotenv import load_dotenv
@@ -196,14 +197,33 @@ def main():
                     motorista_id = fake.random_element(opcoes)
 
                 data_hora = fake.date_time_between(start_date="-120d", end_date="now")
-                valor = fake.pydecimal(left_digits=2, right_digits=2, positive=True)
+                distancia_km = None
+                valor = None
+                if status == "Finalizada":
+                    distancia_km = fake.pydecimal(
+                        left_digits=2,
+                        right_digits=2,
+                        positive=True,
+                    )
+                    valor = (distancia_km * Decimal("2.50")).quantize(
+                        Decimal("0.01")
+                    )
                 usuario_id = usuarios_ids[indice % len(usuarios_ids)]
 
                 cursor.execute(
                     """
                     INSERT INTO corridas
-                        (id_usuario, id_motorista, origem, destino, data_hora, valor, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        (
+                            id_usuario,
+                            id_motorista,
+                            origem,
+                            destino,
+                            data_hora,
+                            distancia_km,
+                            valor,
+                            status
+                        )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING id
                     """,
                     (
@@ -212,6 +232,7 @@ def main():
                         origem,
                         destino,
                         data_hora,
+                        distancia_km,
                         valor,
                         status,
                     ),

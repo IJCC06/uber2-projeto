@@ -1,3 +1,5 @@
+from decimal import Decimal, InvalidOperation
+
 import psycopg2
 from flask import (
     Blueprint,
@@ -6,6 +8,7 @@ from flask import (
     flash,
     redirect,
     render_template,
+    request,
     url_for,
 )
 from flask_login import login_required, current_user
@@ -16,6 +19,8 @@ motoristas = Blueprint(
     __name__,
     url_prefix="/motorista"
 )
+
+TARIFA_POR_KM = Decimal("2.50")
 
 
 @motoristas.route("/home", methods=["GET"])
@@ -233,6 +238,26 @@ def finalizar_corrida(corrida_id):
     if current_user.tipo != "motorista":
         abort(403)
 
+    distancia_texto = request.form.get("distancia_km", "").strip().replace(",", ".")
+    try:
+        distancia_km = Decimal(distancia_texto)
+    except InvalidOperation:
+        flash("Informe uma distância válida em quilômetros.", "error")
+        return redirect(url_for("motoristas.corridas_disponiveis"))
+
+    if (
+        not distancia_km.is_finite()
+        or distancia_km <= 0
+        or distancia_km > Decimal("999999.99")
+        or distancia_km != distancia_km.quantize(Decimal("0.01"))
+    ):
+        flash(
+            "A distância deve ser positiva e ter no máximo duas casas decimais.",
+            "error",
+        )
+        return redirect(url_for("motoristas.corridas_disponiveis"))
+
+    valor = (distancia_km * TARIFA_POR_KM).quantize(Decimal("0.01"))
     conexao = None
     try:
         conexao = criar_conexao()
@@ -240,12 +265,14 @@ def finalizar_corrida(corrida_id):
             cursor.execute(
                 """
                 UPDATE corridas
-                SET status = 'Finalizada'
+                SET status = 'Finalizada',
+                    distancia_km = %s,
+                    valor = %s
                 WHERE id = %s
                   AND id_motorista = %s
                   AND status = 'Em andamento'
                 """,
-                (corrida_id, current_user.id),
+                (distancia_km, valor, corrida_id, current_user.id),
             )
 
             if cursor.rowcount == 0:
@@ -266,7 +293,11 @@ def finalizar_corrida(corrida_id):
             )
 
         conexao.commit()
-        flash(f"Corrida #{corrida_id} finalizada.", "success")
+        flash(
+            f"Corrida #{corrida_id} finalizada. Distância: {distancia_km:.2f} km; "
+            f"valor: R$ {valor:.2f}.",
+            "success",
+        )
     except psycopg2.Error:
         if conexao is not None:
             conexao.rollback()
