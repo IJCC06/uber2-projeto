@@ -26,6 +26,11 @@ A estrutura abaixo representa os diretórios e arquivos relevantes já existente
 uber2-projeto/
 ├── app.py
 ├── conexao.py
+├── blueprints/
+│   ├── auth.py
+│   ├── usuarios.py
+│   ├── motoristas.py
+│   └── admins.py
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
@@ -39,6 +44,8 @@ uber2-projeto/
 │   └── query.sql
 ├── python/
 │   └── logins.py
+├── tests/
+│   └── test_postgres_acceptance.py
 ├── templates/
 │   ├── admins/
 │   ├── logins/
@@ -53,9 +60,11 @@ A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O 
 
 ## Responsabilidade dos arquivos principais
 
-- app.py: instancia a aplicação Flask, define as rotas e encaminha as requisições.
+- app.py: instancia a aplicação Flask, configura Flask-Login e registra os Blueprints.
+- blueprints/: separa autenticação, operações de usuários, motoristas e administração.
 - conexao.py: centraliza a criação de conexões com o PostgreSQL usando Psycopg2.
 - python/logins.py: contém as funções de validação de login chamadas atualmente pelas rotas.
+- tests/: contém o teste de aceitação com banco PostgreSQL isolado.
 - templates/: reúne os arquivos HTML renderizados pelo Flask.
 - static/: reúne os arquivos estáticos, como CSS e JavaScript.
 - sql/: contém os scripts SQL e utilitários de dados de teste versionados.
@@ -102,45 +111,13 @@ A suíte usa `unittest` da biblioteca padrão e pode ser executada com `python -
 
 ## Estado atual da versão 2
 
-Já estão presentes:
+O fluxo web principal está implementado: cadastro e autenticação por perfil, aprovação e disponibilidade de motoristas, gestão de veículos, solicitação e ciclo de vida de corridas, pagamentos registrados como pendentes, avaliações, históricos, gerenciamento de contas e consultas administrativas. O teste de aceitação executa o fluxo completo em PostgreSQL isolado e verifica também entradas inválidas, transições recusadas, duplicatas e autorização por perfil.
 
-- aplicação Flask inicializada em app.py;
-- conexão PostgreSQL centralizada em conexao.py, utilizando Psycopg2;
-- carregamento de variáveis de ambiente com python-dotenv;
-- rotas iniciais para exibir a tela de login;
-- rotas POST para tentativa de login de usuário e motorista;
-- rota de login administrativo;
-- cadastro público de motoristas, com ativação administrativa antes do acesso;
-- rota para exibir a página inicial do usuário;
-- painel administrativo com indicadores agregados e lista das corridas recentes;
-- cadastro, consulta, edição e remoção de veículos, sempre vinculados ao motorista autenticado;
-- avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
-- consulta pelo motorista da própria média e das avaliações recentes recebidas;
-- edição dos dados pessoais e alteração de senha pelo usuário autenticado;
-- edição dos dados pessoais e alteração de senha pelo motorista autenticado;
-- edição dos dados pessoais e alteração de senha pelo administrador autenticado;
-- consulta administrativa de usuários e ativação/desativação de contas;
-- consulta administrativa de motoristas e ativação/desativação de contas, bloqueada enquanto houver corridas atribuídas em andamento;
-- histórico administrativo de corridas com filtro por status, informações de pagamento e avaliação, e linha do tempo de mudanças;
-- consulta administrativa de pagamentos com filtros por status e forma, sem alteração ou processamento de cobranças;
-- consulta administrativa de avaliações com nota média, filtro por nota e comentários;
-- histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
-- integração das rotas com funções existentes em python/logins.py;
-- templates HTML, arquivos estáticos e scripts SQL no repositório.
+O projeto continua sendo um protótipo acadêmico. Integração com gateway de pagamento, mapas/geolocalização e implantação de produção estão fora do escopo atual; a aplicação não deve ser tratada como pronta para uso comercial.
 
-A v2 ainda está em desenvolvimento. A presença de uma rota ou tela não significa que todos os fluxos de negócio da versão anterior já foram migrados para a aplicação web.
+## Regras de negócio implementadas
 
-## Próximas etapas previstas
-
-- revisar e alinhar a estrutura de diretórios;
-- migrar gradualmente as funcionalidades da versão de terminal para rotas web;
-- revisar os scripts SQL, constraints e integridade das operações;
-- criar testes automatizados para rotas e regras de negócio;
-- atualizar a documentação conforme cada funcionalidade for concluída.
-
-## Regras de negócio previstas
-
-As regras funcionais da versão anterior servirão como referência para a migração, com validação e ajustes durante a implementação web. Entre elas:
+As principais regras implementadas no backend incluem:
 
 - fluxo de corrida: Solicitada → Aceita → Em andamento → Finalizada, com possibilidade de cancelamento conforme as regras definidas;
 - motoristas podem cancelar suas corridas nos estados Aceita ou Em andamento; o cancelamento é registrado no histórico;

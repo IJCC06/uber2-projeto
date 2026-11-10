@@ -258,6 +258,18 @@ class PostgresAcceptanceTests(unittest.TestCase):
             data={"origem": "Rua Um, 10", "destino": "Rua Um, 10"},
         )
         self.assertEqual(response.status_code, 400)
+        invalid_requests = (
+            {"origem": "", "destino": "Avenida Dois, 20"},
+            {"origem": "x" * 101, "destino": "Avenida Dois, 20"},
+            {"origem": " Rua Um, 10 ", "destino": "rua um, 10"},
+        )
+        for request_data in invalid_requests:
+            with self.subTest(invalid_ride_request=request_data):
+                response = user_client.post(
+                    "/usuario/corridas/solicitar",
+                    data=request_data,
+                )
+                self.assertEqual(response.status_code, 400)
 
         response = user_client.post(
             "/usuario/corridas/solicitar",
@@ -269,10 +281,47 @@ class PostgresAcceptanceTests(unittest.TestCase):
         try:
             with connection.cursor() as cursor:
                 cursor.execute(
+                    "SELECT COUNT(*) FROM corridas WHERE id_usuario = %s",
+                    (user_id,),
+                )
+                self.assertEqual(cursor.fetchone()[0], 1)
+                cursor.execute(
                     "SELECT id FROM corridas WHERE id_usuario = %s",
                     (user_id,),
                 )
                 ride_id = cursor.fetchone()[0]
+        finally:
+            connection.close()
+
+        response = driver_client.post(
+            f"/motorista/corridas/{ride_id}/iniciar"
+        )
+        self.assertEqual(response.status_code, 302)
+        response = driver_client.post(
+            f"/motorista/corridas/{ride_id}/finalizar",
+            data={"distancia_km": "1.00"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        response = driver_client.post(
+            "/motorista/disponibilidade",
+            data={"disponivel": "sim"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        connection = self.database_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT status, id_motorista FROM corridas WHERE id = %s",
+                    (ride_id,),
+                )
+                self.assertEqual(cursor.fetchone(), ("Solicitada", None))
+                cursor.execute(
+                    "SELECT disponivel FROM motoristas WHERE id = %s",
+                    (driver_id,),
+                )
+                self.assertFalse(cursor.fetchone()[0])
         finally:
             connection.close()
 
@@ -286,6 +335,14 @@ class PostgresAcceptanceTests(unittest.TestCase):
             f"/motorista/corridas/{ride_id}/aceitar"
         )
         self.assertEqual(response.status_code, 302)
+        response = driver_client.post(
+            f"/motorista/corridas/{ride_id}/aceitar"
+        )
+        self.assertEqual(response.status_code, 302)
+        response = user_client.post(
+            f"/usuario/corridas/{ride_id}/cancelar"
+        )
+        self.assertEqual(response.status_code, 302)
 
         response = admin_client.post(
             f"/admin/motoristas/{driver_id}/status",
@@ -296,13 +353,67 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertIn(b"N\xc3\xa3o \xc3\xa9 poss\xc3\xadvel desativar", response.data)
 
         response = driver_client.post(
+            f"/motorista/corridas/{ride_id}/finalizar",
+            data={"distancia_km": "1.00"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        response = driver_client.post(
             f"/motorista/corridas/{ride_id}/iniciar"
         )
         self.assertEqual(response.status_code, 302)
 
         response = driver_client.post(
+            f"/motorista/corridas/{ride_id}/iniciar"
+        )
+        self.assertEqual(response.status_code, 302)
+
+        for invalid_distance in ("abc", "0", "-1", "1.234", "NaN", "1000000"):
+            with self.subTest(invalid_distance=invalid_distance):
+                response = driver_client.post(
+                    f"/motorista/corridas/{ride_id}/finalizar",
+                    data={"distancia_km": invalid_distance},
+                )
+                self.assertEqual(response.status_code, 302)
+
+        connection = self.database_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    SELECT status, distancia_km, valor
+                    FROM corridas
+                    WHERE id = %s
+                    """,
+                    (ride_id,),
+                )
+                self.assertEqual(
+                    cursor.fetchone(),
+                    ("Em andamento", None, None),
+                )
+        finally:
+            connection.close()
+
+        response = driver_client.post(
             f"/motorista/corridas/{ride_id}/finalizar",
             data={"distancia_km": "4,20"},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        for payment_data in (
+            {"corrida_id": str(ride_id), "forma_pagamento": "Criptomoeda"},
+            {"corrida_id": "inválida", "forma_pagamento": "Pix"},
+        ):
+            with self.subTest(invalid_payment=payment_data):
+                response = user_client.post(
+                    "/usuario/pagamentos",
+                    data=payment_data,
+                )
+                self.assertEqual(response.status_code, 302)
+
+        response = user_client.post(
+            "/usuario/pagamentos",
+            data={"corrida_id": str(ride_id), "forma_pagamento": "Pix"},
         )
         self.assertEqual(response.status_code, 302)
 
@@ -312,9 +423,23 @@ class PostgresAcceptanceTests(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 302)
 
+        for invalid_rating in ("0", "6", "texto"):
+            with self.subTest(invalid_rating=invalid_rating):
+                response = user_client.post(
+                    f"/usuario/corridas/{ride_id}/avaliar",
+                    data={"nota": invalid_rating, "comentario": ""},
+                )
+                self.assertEqual(response.status_code, 302)
+
         response = user_client.post(
             f"/usuario/corridas/{ride_id}/avaliar",
             data={"nota": "5", "comentario": "Viagem concluída com sucesso."},
+        )
+        self.assertEqual(response.status_code, 302)
+
+        response = user_client.post(
+            f"/usuario/corridas/{ride_id}/avaliar",
+            data={"nota": "4", "comentario": "Avaliação duplicada."},
         )
         self.assertEqual(response.status_code, 302)
 

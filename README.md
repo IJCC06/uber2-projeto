@@ -12,7 +12,7 @@ Projeto acadêmico de gerenciamento de corridas. A versão 2.0.0 está em desenv
 
 O Uber 2 começou como um sistema de terminal em Python e SQLite, com funcionalidades relacionadas a usuários, motoristas, veículos, corridas, pagamentos, avaliações e histórico.
 
-Na versão 2.0.0, a proposta é disponibilizar essas funcionalidades por uma interface web, utilizando Flask no backend e PostgreSQL como banco de dados. A migração está sendo feita gradualmente; portanto, nem todas as funcionalidades da versão anterior estão disponíveis na aplicação web ainda.
+Na versão 2.0.0, a aplicação web usa Flask e PostgreSQL para oferecer o fluxo principal de contas, corridas, pagamentos pendentes, avaliações e gestão administrativa. Ela é um protótipo acadêmico; nem todas as funcionalidades da antiga aplicação de terminal fazem parte do escopo web.
 
 ## Tecnologias escolhidas
 
@@ -59,7 +59,7 @@ Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos est
 Usuários podem cancelar suas próprias solicitações enquanto o status ainda for “Solicitada”; o cancelamento também fica registrado no histórico.
 Motoristas com conta ativa podem habilitar ou desabilitar o recebimento de novas solicitações, sem afetar as corridas que já aceitaram.
 
-Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
+Essas funcionalidades compõem o escopo web implementado até aqui. Recursos de produção, como processamento real de pagamentos, mapas/geolocalização e implantação endurecida, não fazem parte deste protótipo.
 Contas de usuário desativadas pela administração não podem iniciar uma sessão nem continuar usando uma sessão existente.
 Contas de motorista desativadas também perdem o acesso; a desativação é bloqueada enquanto houver corridas aceitas ou em andamento.
 
@@ -69,6 +69,11 @@ Contas de motorista desativadas também perdem o acesso; a desativação é bloq
 uber2-projeto/
 ├── app.py
 ├── conexao.py
+├── blueprints/
+│   ├── auth.py
+│   ├── usuarios.py
+│   ├── motoristas.py
+│   └── admins.py
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
@@ -82,6 +87,8 @@ uber2-projeto/
 │   └── query.sql
 ├── python/
 │   └── logins.py
+├── tests/
+│   └── test_postgres_acceptance.py
 ├── templates/
 │   ├── admins/
 │   ├── logins/
@@ -175,6 +182,8 @@ python -m unittest discover -s tests -v
 ```
 
 O teste requer permissão para criar e remover schemas no banco configurado. Ele não modifica as tabelas ou os dados existentes fora do schema temporário.
+
+Além do fluxo de sucesso, a aceitação verifica endereços inválidos, ações fora da ordem permitida, disponibilidade inválida, distâncias malformadas ou fora dos limites, métodos de pagamento inválidos, notas fora do intervalo, operações duplicadas e tentativas não autorizadas. Para comparar a documentação com o comportamento do sistema, confira esses testes junto das rotas em `blueprints/`.
 
 ## Funcionalidades previstas para a aplicação web
 
