@@ -7,20 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/solicitar_corrida.css') }}">
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="{{ url_for('usuarios.home') }}" aria-label="Uber 2: início">
-            U2 <span>Uber 2</span>
-        </a>
-
-        <nav aria-label="Navegação principal">
-            <a href="{{ url_for('usuarios.home') }}">Início</a>
-            <a class="active" href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar corrida</a>
-        </nav>
-
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button class="logout" type="submit">Sair</button>
-        </form>
-    </header>
+    {% include "includes/header_usuario.html" %}
 
     <main class="page-content">
         <a class="back-link" href="{{ url_for('usuarios.home') }}">

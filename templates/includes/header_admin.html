@@ -1,0 +1,16 @@
+<header class="topbar">
+    <a class="brand" href="{{ url_for('admins.home') }}" aria-label="Uber 2: início">
+        U2 <span>Uber 2</span>
+    </a>
+
+    <nav aria-label="Navegação principal">
+        <a href="{{ url_for('admins.home') }}"
+           class="active" aria-current="page">
+            Painel administrativo
+        </a>
+    </nav>
+
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="logout" type="submit">Sair</button>
+    </form>
+</header>

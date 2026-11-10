@@ -1,0 +1,28 @@
+<header class="topbar">
+    <a class="brand" href="{{ url_for('usuarios.home') }}" aria-label="Uber 2: início">
+        U2 <span>Uber 2</span>
+    </a>
+
+    <nav aria-label="Navegação principal">
+        <a href="{{ url_for('usuarios.home') }}"
+           {% if request.endpoint == 'usuarios.home' %}class="active" aria-current="page"{% endif %}>
+            Início
+        </a>
+        <a href="{{ url_for('usuarios.solicitar_corrida') }}"
+           {% if request.endpoint == 'usuarios.solicitar_corrida' %}class="active" aria-current="page"{% endif %}>
+            Solicitar corrida
+        </a>
+        <a href="{{ url_for('usuarios.minhas_corridas') }}"
+           {% if request.endpoint == 'usuarios.minhas_corridas' %}class="active" aria-current="page"{% endif %}>
+            Minhas corridas
+        </a>
+        <a href="{{ url_for('usuarios.pagamentos') }}"
+           {% if request.endpoint == 'usuarios.pagamentos' %}class="active" aria-current="page"{% endif %}>
+            Pagamentos
+        </a>
+    </nav>
+
+    <form action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="logout" type="submit">Sair</button>
+    </form>
+</header>

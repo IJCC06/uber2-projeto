@@ -7,20 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="{{ url_for('usuarios.home') }}" aria-label="Uber 2: início">U2 <span>Uber 2</span></a>
-
-        <nav aria-label="Navegação principal">
-        <a class="active" href="{{ url_for('usuarios.home') }}">Início</a>
-        <a href="{{ url_for('usuarios.minhas_corridas') }}">Minhas corridas</a>
-            <a href="{{ url_for('usuarios.pagamentos') }}">Pagamentos</a>
-            <a href="#">Minha conta</a>
-        </nav>
-
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button class="logout" type="submit">Sair</button>
-        </form>
-    </header>
+    {% include "includes/header_usuario.html" %}
 
     <main class="page-content">
         <section class="welcome" aria-labelledby="welcome-title">
@@ -104,7 +91,6 @@
                 <h2 id="quick-actions-title">Ações rápidas</h2>
                 <a href="{{ url_for('usuarios.solicitar_corrida') }}">Solicitar corrida</a>
                 <a href="{{ url_for('usuarios.pagamentos') }}">Consultar pagamentos</a>
-                <a href="#">Editar meus dados</a>
             </aside>
         </section>
     </main>

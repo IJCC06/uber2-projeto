@@ -7,20 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
 </head>
 <body>
-    <header class="topbar">
-        <a class="brand" href="{{ url_for('motoristas.home') }}" aria-label="Uber 2: início">
-            U2 <span>Uber 2</span>
-        </a>
-
-        <nav aria-label="Navegação principal">
-            <a class="active" href="{{ url_for('motoristas.home') }}">Início</a>
-            <a href="{{ url_for('motoristas.corridas_disponiveis') }}">Corridas disponíveis</a>
-        </nav>
-
-        <form action="{{ url_for('auth.logout') }}" method="POST">
-            <button class="logout" type="submit">Sair</button>
-        </form>
-    </header>
+    {% include "includes/header_motorista.html" %}
 
     <main class="page-content">
         <section class="welcome" aria-labelledby="welcome-title">
