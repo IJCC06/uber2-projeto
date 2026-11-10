@@ -46,6 +46,7 @@ Até o momento, o repositório contém:
 - avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
 - edição dos dados pessoais e alteração de senha da própria conta de usuário;
 - edição dos dados pessoais e alteração de senha pelo próprio motorista;
+- edição dos dados pessoais e alteração de senha pelo próprio administrador;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.

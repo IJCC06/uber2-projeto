@@ -5,8 +5,12 @@
 
     <nav aria-label="Navegação principal">
         <a href="{{ url_for('admins.home') }}"
-           class="active" aria-current="page">
+           {% if request.endpoint == 'admins.home' %}class="active" aria-current="page"{% endif %}>
             Painel administrativo
+        </a>
+        <a href="{{ url_for('admins.conta') }}"
+           {% if request.endpoint == 'admins.conta' %}class="active" aria-current="page"{% endif %}>
+            Minha conta
         </a>
     </nav>
 

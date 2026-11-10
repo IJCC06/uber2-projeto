@@ -112,6 +112,7 @@ Já estão presentes:
 - consulta pelo motorista da própria média e das avaliações recentes recebidas;
 - edição dos dados pessoais e alteração de senha pelo usuário autenticado;
 - edição dos dados pessoais e alteração de senha pelo motorista autenticado;
+- edição dos dados pessoais e alteração de senha pelo administrador autenticado;
 - histórico do motorista com corridas finalizadas ou canceladas e soma bruta dos valores finalizados;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
