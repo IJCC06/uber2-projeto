@@ -13,6 +13,7 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from conexao import criar_conexao
+from python.seguranca import criar_hash_senha, verificar_senha
 
 motoristas = Blueprint(
     "motoristas",
@@ -58,6 +59,157 @@ def home():
         abort(403)
 
     return render_template("motoristas/home_motorista.html")
+
+
+@motoristas.route("/conta", methods=["GET", "POST"])
+@login_required
+def conta():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        cpf = request.form.get("cpf", "").strip()
+        telefone = request.form.get("telefone", "").strip()
+        cnh = request.form.get("cnh", "").strip()
+        senha_atual = request.form.get("senha_atual", "")
+        nova_senha = request.form.get("nova_senha", "")
+        confirmar_senha = request.form.get("confirmar_senha", "")
+        alterar_senha = bool(nova_senha or confirmar_senha)
+
+        if not nome or not cpf or not telefone or not cnh:
+            flash("Nome, CPF, telefone e CNH são obrigatórios.", "error")
+            return redirect(url_for("motoristas.conta"))
+
+        if (
+            len(nome) > 100
+            or len(cpf) > 14
+            or len(telefone) > 20
+            or len(cnh) > 20
+        ):
+            flash("Um ou mais campos ultrapassaram o limite permitido.", "error")
+            return redirect(url_for("motoristas.conta"))
+
+        if alterar_senha:
+            if not senha_atual:
+                flash("Informe sua senha atual para definir uma nova senha.", "error")
+                return redirect(url_for("motoristas.conta"))
+            if len(nova_senha) < 8:
+                flash("A nova senha deve possuir pelo menos 8 caracteres.", "error")
+                return redirect(url_for("motoristas.conta"))
+            if nova_senha != confirmar_senha:
+                flash("A nova senha e a confirmação não coincidem.", "error")
+                return redirect(url_for("motoristas.conta"))
+
+        conexao = None
+        try:
+            conexao = criar_conexao()
+            with conexao.cursor() as cursor:
+                if alterar_senha:
+                    cursor.execute(
+                        "SELECT senha FROM motoristas WHERE id = %s FOR UPDATE",
+                        (current_user.id,),
+                    )
+                    credenciais = cursor.fetchone()
+                    if credenciais is None:
+                        conexao.rollback()
+                        abort(404)
+                    if not verificar_senha(senha_atual, credenciais[0]):
+                        conexao.rollback()
+                        flash("A senha atual está incorreta.", "error")
+                        return redirect(url_for("motoristas.conta"))
+
+                    cursor.execute(
+                        """
+                        UPDATE motoristas
+                        SET nome = %s, cpf = %s, telefone = %s, cnh = %s, senha = %s
+                        WHERE id = %s
+                        RETURNING id
+                        """,
+                        (
+                            nome,
+                            cpf,
+                            telefone,
+                            cnh,
+                            criar_hash_senha(nova_senha),
+                            current_user.id,
+                        ),
+                    )
+                else:
+                    cursor.execute(
+                        """
+                        UPDATE motoristas
+                        SET nome = %s, cpf = %s, telefone = %s, cnh = %s
+                        WHERE id = %s
+                        RETURNING id
+                        """,
+                        (nome, cpf, telefone, cnh, current_user.id),
+                    )
+
+                motorista = cursor.fetchone()
+
+            if motorista is None:
+                conexao.rollback()
+                abort(404)
+
+            conexao.commit()
+        except psycopg2.errors.UniqueViolation:
+            if conexao is not None:
+                conexao.rollback()
+            flash("Esse CPF ou CNH já está cadastrado em outra conta.", "error")
+            return redirect(url_for("motoristas.conta"))
+        except psycopg2.Error:
+            if conexao is not None:
+                conexao.rollback()
+            current_app.logger.exception(
+                "Falha ao atualizar a conta do motorista %s.",
+                current_user.id,
+            )
+            abort(500)
+        finally:
+            if conexao is not None:
+                conexao.close()
+
+        flash("Seus dados foram atualizados com sucesso.", "success")
+        return redirect(url_for("motoristas.conta"))
+
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT nome, cpf, telefone, cnh
+                FROM motoristas
+                WHERE id = %s
+                """,
+                (current_user.id,),
+            )
+            motorista = cursor.fetchone()
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao carregar a conta do motorista %s.",
+            current_user.id,
+        )
+        abort(500)
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    if motorista is None:
+        abort(404)
+
+    return render_template(
+        "motoristas/conta.html",
+        motorista={
+            "nome": motorista[0],
+            "cpf": motorista[1],
+            "telefone": motorista[2],
+            "cnh": motorista[3],
+        },
+    )
 
 
 @motoristas.route("/corridas-disponiveis", methods=["GET"])
