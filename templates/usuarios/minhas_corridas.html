@@ -21,6 +21,15 @@
             </a>
         </section>
 
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensagem in mensagens %}
+                <p class="payment-message {{ categoria }}-message"
+                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                    {{ mensagem }}
+                </p>
+            {% endfor %}
+        {% endwith %}
+
         {% if corridas %}
             <section class="ride-history" aria-label="Histórico de corridas">
                 {% for corrida in corridas %}
@@ -66,6 +75,39 @@
                             <a class="history-link" href="{{ url_for('usuarios.pagamentos') }}">
                                 Ver pagamento
                             </a>
+                            {% if corrida.nota is none and corrida.motorista %}
+                                <form
+                                    class="rating-form"
+                                    action="{{ url_for('usuarios.avaliar_corrida', corrida_id=corrida.id) }}"
+                                    method="post"
+                                >
+                                    <div class="rating-field">
+                                        <label for="nota-{{ corrida.id }}">Avalie o motorista</label>
+                                        <select id="nota-{{ corrida.id }}" name="nota" required>
+                                            <option value="">Selecione uma nota</option>
+                                            <option value="5">5 — Excelente</option>
+                                            <option value="4">4 — Muito bom</option>
+                                            <option value="3">3 — Bom</option>
+                                            <option value="2">2 — Regular</option>
+                                            <option value="1">1 — Ruim</option>
+                                        </select>
+                                    </div>
+                                    <div class="rating-field">
+                                        <label for="comentario-{{ corrida.id }}">Comentário (opcional)</label>
+                                        <textarea
+                                            id="comentario-{{ corrida.id }}"
+                                            name="comentario"
+                                            rows="3"
+                                        ></textarea>
+                                    </div>
+                                    <button class="primary-action" type="submit">Enviar avaliação</button>
+                                </form>
+                            {% else %}
+                                <p class="rating-note">
+                                    Sua avaliação: {{ corrida.nota }} de 5
+                                    {% if corrida.comentario %}— {{ corrida.comentario }}{% endif %}
+                                </p>
+                            {% endif %}
                         {% endif %}
                     </article>
                 {% endfor %}

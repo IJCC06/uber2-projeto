@@ -106,6 +106,7 @@ Já estão presentes:
 - rotas POST para tentativa de login de usuário e motorista;
 - rota de login administrativo;
 - rota para exibir a página inicial do usuário;
+- avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional;
 - integração das rotas com funções existentes em python/logins.py;
 - templates HTML, arquivos estáticos e scripts SQL no repositório.
 
@@ -131,6 +132,7 @@ As regras funcionais da versão anterior servirão como referência para a migra
 - valor da corrida calculado no protótipo por R$ 2,50 por quilômetro informado pelo motorista ao finalizar;
 - pagamentos associados a corridas finalizadas, com método escolhido pelo usuário e status inicial Pendente;
 - o registro de pagamento não processa nem confirma uma cobrança; integração com gateway permanece futura;
+- avaliação de corridas finalizadas pelo usuário, com nota de 1 a 5, comentário opcional e limite de uma avaliação por corrida;
 - no máximo um pagamento por corrida;
 - no máximo uma avaliação por corrida, com nota de 1 a 5;
 - registro do histórico de mudanças de status;

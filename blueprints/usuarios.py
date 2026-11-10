@@ -111,9 +111,12 @@ def minhas_corridas():
                     c.status,
                     c.distancia_km,
                     c.valor,
-                    m.nome
+                    m.nome,
+                    a.nota,
+                    a.comentario
                 FROM corridas AS c
                 LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+                LEFT JOIN avaliacoes AS a ON a.id_corrida = c.id
                 WHERE c.id_usuario = %s
                 ORDER BY c.data_hora DESC, c.id DESC
                 """,
@@ -129,6 +132,8 @@ def minhas_corridas():
                     "distancia_km": linha[5],
                     "valor": linha[6],
                     "motorista": linha[7],
+                    "nota": linha[8],
+                    "comentario": linha[9],
                 }
                 for linha in cursor.fetchall()
             ]
@@ -144,6 +149,67 @@ def minhas_corridas():
             conexao.close()
 
     return render_template("usuarios/minhas_corridas.html", corridas=corridas)
+
+
+@usuarios.route("/corridas/<int:corrida_id>/avaliar", methods=["POST"])
+@login_required
+def avaliar_corrida(corrida_id):
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    try:
+        nota = int(request.form.get("nota", ""))
+    except ValueError:
+        flash("Selecione uma nota de 1 a 5.", "error")
+        return redirect(url_for("usuarios.minhas_corridas"))
+
+    if nota < 1 or nota > 5:
+        flash("A nota deve estar entre 1 e 5.", "error")
+        return redirect(url_for("usuarios.minhas_corridas"))
+
+    comentario = request.form.get("comentario", "").strip()
+    conexao = None
+    try:
+        conexao = criar_conexao()
+        with conexao.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO avaliacoes (id_corrida, nota, comentario)
+                SELECT c.id, %s, NULLIF(%s, '')
+                FROM corridas AS c
+                WHERE c.id = %s
+                  AND c.id_usuario = %s
+                  AND c.status = 'Finalizada'
+                  AND c.id_motorista IS NOT NULL
+                ON CONFLICT (id_corrida) DO NOTHING
+                RETURNING id
+                """,
+                (nota, comentario, corrida_id, current_user.id),
+            )
+            avaliacao = cursor.fetchone()
+
+        if avaliacao is None:
+            conexao.rollback()
+            flash(
+                "Não foi possível avaliar. A corrida precisa ser sua, "
+                "estar finalizada e ainda não ter avaliação.",
+                "error",
+            )
+        else:
+            conexao.commit()
+            flash("Avaliação registrada com sucesso.", "success")
+    except psycopg2.Error:
+        if conexao is not None:
+            conexao.rollback()
+        current_app.logger.exception(
+            "Falha ao registrar avaliação da corrida %s.", corrida_id
+        )
+        flash("Não foi possível registrar a avaliação. Tente novamente.", "error")
+    finally:
+        if conexao is not None:
+            conexao.close()
+
+    return redirect(url_for("usuarios.minhas_corridas"))
 
 
 @usuarios.route("/corridas/solicitar", methods=["GET", "POST"])

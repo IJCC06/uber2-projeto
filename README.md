@@ -38,10 +38,11 @@ Até o momento, o repositório contém:
 - rota para exibir a página inicial do usuário;
 - templates HTML e diretórios de arquivos estáticos;
 - scripts SQL para criação das tabelas, dados de exemplo e consultas;
-- módulo de funções de login em python/logins.py, utilizado pelo app.py.
+- módulo de funções de login em python/logins.py, utilizado pelo app.py;
 - solicitação de corridas por usuários e fluxo de aceite, início e finalização por motoristas;
 - cálculo de tarifa de teste de R$ 2,50 por quilômetro informado pelo motorista;
-- registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente.
+- registro da forma de pagamento pelo usuário após a finalização, com status inicial pendente;
+- avaliação de uma corrida finalizada pelo usuário, com nota de 1 a 5 e comentário opcional.
 
 Esses itens representam a base inicial da aplicação. As demais funcionalidades do sistema original ainda serão migradas e integradas progressivamente.
 
@@ -141,7 +142,7 @@ A migração pretende contemplar os principais recursos do sistema original:
 - cadastro e gerenciamento de motoristas e veículos;
 - solicitação, aceite, atualização e cancelamento de corridas;
 - pagamentos associados às corridas;
-- avaliações;
+- gerenciamento e consulta de avaliações;
 - histórico de alterações;
 - área administrativa e consultas.
 
@@ -161,7 +162,7 @@ A versão anterior já trabalha com regras como:
 - motoristas precisam atender às condições de situação e disponibilidade;
 - usuários e motoristas devem acessar somente os dados e operações permitidos para seus perfis.
 
-As regras serão reimplementadas e testadas no backend web durante a migração.
+As regras restantes serão reimplementadas e testadas no backend web durante a migração.
 
 ## Documentação
 
