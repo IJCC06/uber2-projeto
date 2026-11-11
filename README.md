@@ -80,6 +80,10 @@ uber2-projeto/
 ├── .gitignore
 ├── docs/
 │   └── ARQUITETURA-V2.md
+├── public/
+│   └── static/
+│       ├── css/
+│       └── js/
 ├── sql/
 │   ├── create-table.sql
 │   ├── adicionar-distancia-corridas.sql
@@ -90,15 +94,12 @@ uber2-projeto/
 │   └── logins.py
 ├── tests/
 │   └── test_postgres_acceptance.py
-├── templates/
-│   ├── admins/
-│   ├── errors/
-│   ├── logins/
-│   ├── motoristas/
-│   └── usuarios/
-└── static/
-    ├── css/
-    └── js/
+└── templates/
+    ├── admins/
+    ├── errors/
+    ├── logins/
+    ├── motoristas/
+    └── usuarios/
 ```
 
 A pasta python ainda possui código herdado da versão de terminal. O módulo python/logins.py é utilizado pela aplicação atual; os demais módulos antigos serão avaliados durante a reorganização, sem apagar a versão anterior preservada na branch v1.0.0.
@@ -123,7 +124,7 @@ python -c "import secrets; print(secrets.token_hex(32))"
 
 Copie o valor exibido para `SECRET_KEY`. A chave deve permanecer estável entre reinicializações para preservar as sessões existentes. **Não use uma chave de exemplo, não compartilhe nem envie o arquivo `.env` ao Git**; ele contém credenciais e um segredo de sessão. O `.env` já está listado no `.gitignore`.
 
-A conexão é criada em `conexao.py` com psycopg2, lendo `DB_HOST`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`. `app.py` carrega o mesmo arquivo para ler `SECRET_KEY`.
+A conexão é criada em `conexao.py` com psycopg2. Localmente, ela lê `DB_HOST`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`; se `DATABASE_URL` estiver definida, essa URL tem prioridade. `app.py` carrega o mesmo arquivo para ler `SECRET_KEY`.
 
 Os scripts de banco estão na pasta sql/:
 
@@ -167,6 +168,23 @@ python app.py
 ```
 
 O servidor Flask será iniciado em modo de depuração para desenvolvimento local.
+
+## Implantação na Vercel com Neon
+
+A aplicação pode ser executada como uma função Flask na Vercel, mantendo o PostgreSQL no Neon. O arquivo `app.py` exporta a instância Flask como `app`, e os arquivos estáticos publicados ficam em `public/static/`.
+
+1. Crie um projeto PostgreSQL no Neon. Na tela de conexão, copie a URL **pooled** (o host contém `-pooler`) para o ambiente da aplicação. Não compartilhe essa URL nem a salve no repositório.
+2. No SQL Editor do Neon, execute `sql/create-table.sql` uma única vez em um banco vazio. Esse script cria o esquema inicial; não o execute sobre um banco que já tenha tabelas.
+3. Importe este repositório na Vercel e selecione a branch `main`. O runtime Python detecta o Flask a partir de `requirements.txt` e `app.py`.
+4. Em **Project Settings → Environment Variables**, configure:
+   - `DATABASE_URL`: a URL pooled do Neon;
+   - `SECRET_KEY`: uma chave aleatória forte e estável, diferente da usada localmente.
+   Marque o ambiente **Production** (e **Preview** se também quiser testar previews). Não defina essas variáveis no código, no Git ou em mensagens.
+5. Faça o deploy e teste as páginas públicas e o acesso ao banco. Para gerar a chave localmente no Windows, use `.\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"` e cole o resultado diretamente nas configurações da Vercel.
+
+O projeto continua aceitando as quatro variáveis `DB_*` do `.env` local. Na Vercel, use `DATABASE_URL`; não é necessário criar nem enviar um arquivo `.env` para a plataforma. Para alterações de esquema, use o Neon SQL Editor com cuidado e mantenha os scripts SQL como referência versionada.
+
+O esquema inicial não cria uma conta administrativa. Não execute `sql/gerar_dados_ficticios.py` em produção: ele insere registros de teste e usa uma senha fixa de desenvolvimento. Provisione a conta administrativa com uma senha hash segura antes de testar o painel de administração.
 
 ## Verificação do protótipo
 
