@@ -33,6 +33,23 @@
                 <span class="ride-count">{{ usuarios|length }}</span>
             </div>
 
+            <form class="admin-ride-filter" action="{{ url_for('admins.usuarios') }}" method="get">
+                <label for="busca-usuario">
+                    Pesquisar por nome
+                    <input
+                        id="busca-usuario"
+                        name="busca"
+                        type="search"
+                        value="{{ busca }}"
+                        placeholder="Digite o nome do usuário"
+                    >
+                </label>
+                <button class="primary-action" type="submit">Pesquisar</button>
+                {% if busca %}
+                    <a class="admin-filter-reset" href="{{ url_for('admins.usuarios') }}">Limpar busca</a>
+                {% endif %}
+            </form>
+
             {% if usuarios %}
                 <div class="admin-user-list">
                     {% for usuario in usuarios %}
@@ -62,6 +79,7 @@
                                     action="{{ url_for('admins.atualizar_status_usuario', usuario_id=usuario.id) }}"
                                     method="post"
                                 >
+                                    <input type="hidden" name="busca" value="{{ busca }}">
                                     <input type="hidden" name="ativo" value="{{ '0' if usuario.ativo else '1' }}">
                                     <button
                                         class="{{ 'danger-action' if usuario.ativo else 'primary-action' }}"
@@ -76,8 +94,8 @@
                 </div>
             {% else %}
                 <div class="empty-state">
-                    <h3>Nenhum usuário cadastrado</h3>
-                    <p>As contas criadas aparecerão nesta lista.</p>
+                    <h3>{{ "Nenhum usuário encontrado" if busca else "Nenhum usuário cadastrado" }}</h3>
+                    <p>{{ "Tente pesquisar por outro nome." if busca else "As contas criadas aparecerão nesta lista." }}</p>
                 </div>
             {% endif %}
         </section>

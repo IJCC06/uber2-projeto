@@ -229,11 +229,43 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertIn(b"CPF ou senha inv\xc3\xa1lidos", response.data)
 
         admin_client = self.login_admin()
+        for path, search_term, included_name, excluded_name in (
+            (
+                "/admin/usuarios",
+                "USUÁRIA",
+                "Usuária de Teste",
+                "Motorista de Teste",
+            ),
+            (
+                "/admin/motoristas",
+                "motorista de",
+                "Motorista de Teste",
+                "Usuária de Teste",
+            ),
+        ):
+            with self.subTest(name_search=path):
+                response = admin_client.get(
+                    path,
+                    query_string={"busca": search_term},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(included_name.encode("utf-8"), response.data)
+                self.assertNotIn(excluded_name.encode("utf-8"), response.data)
+
+                response = admin_client.get(
+                    path,
+                    query_string={"busca": "nome inexistente"},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b"Nenhum ", response.data)
+                self.assertIn(b"encontrado", response.data)
+
         response = admin_client.post(
             f"/admin/motoristas/{driver_id}/status",
-            data={"status": "Ativo"},
+            data={"status": "Ativo", "busca": "motorista de"},
         )
         self.assertEqual(response.status_code, 302)
+        self.assertIn("busca=motorista+de", response.headers["Location"])
 
         driver_client = self.app.test_client()
         response = driver_client.post(
