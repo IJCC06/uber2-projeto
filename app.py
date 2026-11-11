@@ -10,7 +10,8 @@ from python.usuario import Usuario
 load_dotenv()
 
 
-uber2 = Flask(__name__)
+uber2 = Flask(__name__, static_folder="public/static")
+app = uber2
 
 uber2.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
