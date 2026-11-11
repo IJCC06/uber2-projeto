@@ -53,7 +53,8 @@ Até o momento, o repositório contém:
 - consulta administrativa de avaliações, com nota média, filtro por nota e comentários;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
-- painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes.
+- painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes;
+- páginas personalizadas para erros HTTP comuns, com opção para voltar ao início.
 
 Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos estados “Aceita” ou “Em andamento”. A transição fica registrada no histórico.
 Usuários podem cancelar suas próprias solicitações enquanto o status ainda for “Solicitada”; o cancelamento também fica registrado no histórico.
@@ -91,6 +92,7 @@ uber2-projeto/
 │   └── test_postgres_acceptance.py
 ├── templates/
 │   ├── admins/
+│   ├── errors/
 │   ├── logins/
 │   ├── motoristas/
 │   └── usuarios/
