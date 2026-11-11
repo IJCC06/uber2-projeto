@@ -111,7 +111,7 @@ A suíte usa `unittest` da biblioteca padrão e pode ser executada com `python -
 
 ## Estado atual da versão 2
 
-O fluxo web principal está implementado: cadastro e autenticação por perfil, aprovação e disponibilidade de motoristas, gestão de veículos, solicitação e ciclo de vida de corridas, pagamentos registrados como pendentes, avaliações, históricos, gerenciamento de contas e consultas administrativas. O teste de aceitação executa o fluxo completo em PostgreSQL isolado e verifica também entradas inválidas, transições recusadas, duplicatas e autorização por perfil.
+O fluxo web principal está implementado: cadastro e autenticação por perfil, aprovação e disponibilidade de motoristas, gestão de veículos, solicitação e ciclo de vida de corridas, pagamentos registrados como pendentes, avaliações, históricos, gerenciamento de contas e consultas administrativas. As listagens administrativas de usuários e motoristas permitem pesquisar por nome. Erros HTTP comuns usam páginas personalizadas mantendo o status original da resposta. O teste de aceitação executa o fluxo completo em PostgreSQL isolado e verifica também entradas inválidas, transições recusadas, duplicatas, autorização por perfil e páginas de erro.
 
 O projeto continua sendo um protótipo acadêmico. Integração com gateway de pagamento, mapas/geolocalização e implantação de produção estão fora do escopo atual; a aplicação não deve ser tratada como pronta para uso comercial.
 

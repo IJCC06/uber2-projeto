@@ -304,7 +304,8 @@ h1 {
     font-weight: 700;
 }
 
-.admin-ride-filter select {
+.admin-ride-filter select,
+.admin-ride-filter input[type="search"] {
     min-height: 44px;
     min-width: 190px;
     padding: 0 12px;
@@ -813,6 +814,7 @@ button:focus-visible {
     }
 
     .admin-ride-filter select,
+    .admin-ride-filter input[type="search"],
     .admin-ride-filter .primary-action {
         width: 100%;
     }

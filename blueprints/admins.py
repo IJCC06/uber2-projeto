@@ -159,6 +159,7 @@ def usuarios():
     if current_user.tipo != "admin":
         abort(403)
 
+    busca = request.args.get("busca", "").strip()
     conexao = None
     try:
         conexao = criar_conexao()
@@ -167,8 +168,10 @@ def usuarios():
                 """
                 SELECT id, nome, email, telefone, ativo, data_cadastro
                 FROM usuarios
+                WHERE (%s = '' OR nome ILIKE %s)
                 ORDER BY nome, id
-                """
+                """,
+                (busca, f"%{busca}%"),
             )
             usuarios_cadastrados = [
                 {
@@ -193,6 +196,7 @@ def usuarios():
     return render_template(
         "admins/usuarios.html",
         usuarios=usuarios_cadastrados,
+        busca=busca,
     )
 
 
@@ -241,7 +245,8 @@ def atualizar_status_usuario(usuario_id):
 
     acao = "ativada" if ativo else "desativada"
     flash(f"Conta do usuário #{usuario_id} {acao}.", "success")
-    return redirect(url_for("admins.usuarios"))
+    busca = request.form.get("busca", "").strip()
+    return redirect(url_for("admins.usuarios", busca=busca))
 
 
 @admins.route("/motoristas", methods=["GET"])
@@ -250,6 +255,7 @@ def motoristas():
     if current_user.tipo != "admin":
         abort(403)
 
+    busca = request.args.get("busca", "").strip()
     conexao = None
     try:
         conexao = criar_conexao()
@@ -258,8 +264,10 @@ def motoristas():
                 """
                 SELECT id, nome, cpf, telefone, cnh, status, disponivel
                 FROM motoristas
+                WHERE (%s = '' OR nome ILIKE %s)
                 ORDER BY nome, id
-                """
+                """,
+                (busca, f"%{busca}%"),
             )
             motoristas_cadastrados = [
                 {
@@ -285,6 +293,7 @@ def motoristas():
     return render_template(
         "admins/motoristas.html",
         motoristas=motoristas_cadastrados,
+        busca=busca,
     )
 
 
@@ -369,7 +378,8 @@ def atualizar_status_motorista(motorista_id):
 
     acao = "ativada" if status == "Ativo" else "desativada"
     flash(f"Conta do motorista #{motorista_id} {acao}.", "success")
-    return redirect(url_for("admins.motoristas"))
+    busca = request.form.get("busca", "").strip()
+    return redirect(url_for("admins.motoristas", busca=busca))
 
 
 @admins.route("/corridas", methods=["GET"])

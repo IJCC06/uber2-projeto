@@ -3,6 +3,7 @@ import unittest
 import uuid
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 import psycopg2
 from dotenv import load_dotenv
@@ -229,11 +230,43 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertIn(b"CPF ou senha inv\xc3\xa1lidos", response.data)
 
         admin_client = self.login_admin()
+        for path, search_term, included_name, excluded_name in (
+            (
+                "/admin/usuarios",
+                "USUÁRIA",
+                "Usuária de Teste",
+                "Motorista de Teste",
+            ),
+            (
+                "/admin/motoristas",
+                "motorista de",
+                "Motorista de Teste",
+                "Usuária de Teste",
+            ),
+        ):
+            with self.subTest(name_search=path):
+                response = admin_client.get(
+                    path,
+                    query_string={"busca": search_term},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(included_name.encode("utf-8"), response.data)
+                self.assertNotIn(excluded_name.encode("utf-8"), response.data)
+
+                response = admin_client.get(
+                    path,
+                    query_string={"busca": "nome inexistente"},
+                )
+                self.assertEqual(response.status_code, 200)
+                self.assertIn(b"Nenhum ", response.data)
+                self.assertIn(b"encontrado", response.data)
+
         response = admin_client.post(
             f"/admin/motoristas/{driver_id}/status",
-            data={"status": "Ativo"},
+            data={"status": "Ativo", "busca": "motorista de"},
         )
         self.assertEqual(response.status_code, 302)
+        self.assertIn("busca=motorista+de", response.headers["Location"])
 
         driver_client = self.app.test_client()
         response = driver_client.post(
@@ -541,6 +574,34 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertEqual(user_client.get("/admin/corridas").status_code, 403)
         self.assertEqual(driver_client.get("/admin/motoristas").status_code, 403)
         self.assertEqual(admin_client.get("/usuario/home").status_code, 403)
+        forbidden_response = user_client.get("/admin/corridas")
+        self.assertIn(b"Acesso n\xc3\xa3o autorizado", forbidden_response.data)
+
+        missing_response = self.app.test_client().get("/rota-inexistente")
+        self.assertEqual(missing_response.status_code, 404)
+        self.assertIn(b"P\xc3\xa1gina n\xc3\xa3o encontrada", missing_response.data)
+
+        method_not_allowed_response = admin_client.post("/admin/usuarios")
+        self.assertEqual(method_not_allowed_response.status_code, 405)
+        self.assertIn(b"M\xc3\xa9todo n\xc3\xa3o permitido", method_not_allowed_response.data)
+        self.assertIn("GET", method_not_allowed_response.headers["Allow"])
+
+        bad_request_response = admin_client.post(
+            f"/admin/motoristas/{driver_id}/status",
+            data={"status": "inválido"},
+        )
+        self.assertEqual(bad_request_response.status_code, 400)
+        self.assertIn(b"Requisi\xc3\xa7\xc3\xa3o inv\xc3\xa1lida", bad_request_response.data)
+
+        with patch.object(
+            admins_module,
+            "criar_conexao",
+            side_effect=psycopg2.OperationalError("Falha simulada de teste"),
+        ):
+            internal_error_response = admin_client.get("/admin/usuarios")
+        self.assertEqual(internal_error_response.status_code, 500)
+        self.assertIn(b"Erro interno", internal_error_response.data)
+        self.assertNotIn(b"Falha simulada de teste", internal_error_response.data)
 
 
 if __name__ == "__main__":

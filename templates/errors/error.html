@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ status_code }} | {{ titulo }} | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/errors.css') }}">
+</head>
+<body>
+    <main class="error-page" aria-labelledby="error-title">
+        <section class="error-card">
+            <a class="brand" href="{{ url_for('auth.login') }}">Uber 2</a>
+            <p class="error-code">Erro {{ status_code }}</p>
+            <h1 id="error-title">{{ titulo }}</h1>
+            <p class="error-message">{{ mensagem }}</p>
+            <a class="home-link" href="{{ url_for('auth.login') }}">Voltar ao início</a>
+        </section>
+    </main>
+</body>
+</html>

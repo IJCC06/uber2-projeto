@@ -1,7 +1,8 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import LoginManager
 import os
 from dotenv import load_dotenv
+from werkzeug.exceptions import HTTPException
 
 from conexao import criar_conexao
 from python.usuario import Usuario
@@ -84,6 +85,49 @@ uber2.register_blueprint(auth)
 uber2.register_blueprint(usuarios)
 uber2.register_blueprint(motoristas)
 uber2.register_blueprint(admins)
+
+_MENSAGENS_ERRO_HTTP = {
+    400: (
+        "Requisição inválida",
+        "Confira as informações enviadas e tente novamente.",
+    ),
+    403: (
+        "Acesso não autorizado",
+        "Você não tem permissão para acessar esta página.",
+    ),
+    404: (
+        "Página não encontrada",
+        "O endereço pode estar incorreto ou a página pode ter sido removida.",
+    ),
+    405: (
+        "Método não permitido",
+        "Esta ação não está disponível por esse tipo de solicitação.",
+    ),
+    500: (
+        "Erro interno",
+        "Ocorreu um problema inesperado. Tente novamente mais tarde.",
+    ),
+}
+
+
+@uber2.errorhandler(HTTPException)
+def tratar_erro_http(erro):
+    status_code = erro.code or 500
+    titulo, mensagem = _MENSAGENS_ERRO_HTTP.get(
+        status_code,
+        ("Não foi possível processar a solicitação", "Tente novamente."),
+    )
+    resposta = erro.get_response()
+    resposta.set_data(
+        render_template(
+            "errors/error.html",
+            status_code=status_code,
+            titulo=titulo,
+            mensagem=mensagem,
+        )
+    )
+    resposta.content_type = "text/html; charset=utf-8"
+    return resposta
 
 
 if __name__ == "__main__":
