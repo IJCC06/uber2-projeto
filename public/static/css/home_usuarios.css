@@ -84,6 +84,18 @@ nav .active,
     margin-bottom: 32px;
 }
 
+.welcome-actions,
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.welcome-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
 .eyebrow {
     margin: 0 0 8px;
     color: var(--gray-600);
@@ -802,6 +814,14 @@ button:focus-visible {
 
     .welcome .primary-action {
         width: 100%;
+    }
+
+    .welcome-actions {
+        width: 100%;
+    }
+
+    .welcome-actions a {
+        flex: 1 1 100%;
     }
 
     .payment-form {

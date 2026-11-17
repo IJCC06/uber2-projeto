@@ -79,7 +79,12 @@
                         <p class="eyebrow">Opinião dos passageiros</p>
                         <h2 id="ratings-title">Suas avaliações</h2>
                     </div>
-                    <span class="ride-count">{{ quantidade_avaliacoes }}</span>
+                    <div class="panel-actions">
+                        <span class="ride-count">{{ quantidade_avaliacoes }}</span>
+                        <a class="secondary-action" href="{{ url_for('motoristas.exportar_avaliacoes_pdf') }}">
+                            Baixar avaliações PDF
+                        </a>
+                    </div>
                 </div>
 
                 <div class="ratings-summary">

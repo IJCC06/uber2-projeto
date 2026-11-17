@@ -13,6 +13,12 @@ from flask import (
 from flask_login import login_required, current_user
 
 from conexao import criar_conexao
+from python.pdf_export import (
+    consultar_registros,
+    enviar_relatorio_pdf,
+    formatar_data,
+    formatar_moeda,
+)
 from python.seguranca import criar_hash_senha, verificar_senha
 
 usuarios = Blueprint("usuarios", __name__, url_prefix="/usuario")
@@ -150,6 +156,54 @@ def minhas_corridas():
             conexao.close()
 
     return render_template("usuarios/minhas_corridas.html", corridas=corridas)
+
+
+@usuarios.route("/corridas/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_corridas_pdf():
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            c.id,
+            c.origem,
+            c.destino,
+            c.data_hora,
+            c.status,
+            c.distancia_km,
+            c.valor,
+            m.nome
+        FROM corridas AS c
+        LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+        WHERE c.id_usuario = %s
+        ORDER BY c.data_hora DESC, c.id DESC
+        """,
+        (current_user.id,),
+        "Falha ao exportar o histórico de corridas do usuário.",
+    )
+    registros = [
+        (
+            f"Corrida #{linha[0]}",
+            (
+                ("Origem", linha[1]),
+                ("Destino", linha[2]),
+                ("Data", formatar_data(linha[3])),
+                ("Status", linha[4]),
+                ("Distância", f"{linha[5]} km" if linha[5] is not None else "Não informada"),
+                ("Valor", formatar_moeda(linha[6])),
+                ("Motorista", linha[7] or "Aguardando motorista"),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Histórico de corridas",
+        registros,
+        "historico-corridas.pdf",
+        (f"Passageiro: {current_user.nome}", f"Corridas: {len(registros)}"),
+    )
 
 
 @usuarios.route("/corridas/<int:corrida_id>/cancelar", methods=["POST"])
@@ -431,6 +485,55 @@ def pagamentos():
             conexao.close()
 
     return render_template("usuarios/pagamentos.html", corridas=corridas)
+
+
+@usuarios.route("/pagamentos/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_pagamentos_pdf():
+    if current_user.tipo != "usuario":
+        abort(403)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            c.id,
+            c.origem,
+            c.destino,
+            c.distancia_km,
+            c.valor,
+            p.forma_pagamento,
+            p.status,
+            p.data_pagamento
+        FROM corridas AS c
+        LEFT JOIN pagamentos AS p ON p.id_corrida = c.id
+        WHERE c.id_usuario = %s
+          AND c.status = 'Finalizada'
+        ORDER BY c.data_hora DESC, c.id DESC
+        """,
+        (current_user.id,),
+        "Falha ao exportar os pagamentos do usuário.",
+    )
+    registros = [
+        (
+            f"Corrida #{linha[0]}",
+            (
+                ("Origem", linha[1]),
+                ("Destino", linha[2]),
+                ("Distância", f"{linha[3]} km" if linha[3] is not None else "Não informada"),
+                ("Valor", formatar_moeda(linha[4])),
+                ("Forma", linha[5] or "Não registrada"),
+                ("Status do pagamento", linha[6] or "Sem pagamento registrado"),
+                ("Data do registro", formatar_data(linha[7])),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Extrato de pagamentos",
+        registros,
+        "extrato-pagamentos.pdf",
+        (f"Passageiro: {current_user.nome}", f"Corridas finalizadas: {len(registros)}"),
+    )
 
 
 @usuarios.route("/conta", methods=["GET", "POST"])

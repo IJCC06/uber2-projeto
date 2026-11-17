@@ -88,6 +88,12 @@ nav .active,
     margin-bottom: 28px;
 }
 
+.panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .eyebrow {
     margin: 0 0 8px;
     color: var(--gray-600);
@@ -723,6 +729,11 @@ button:focus-visible {
 
     .primary-action {
         width: 100%;
+    }
+
+    .panel-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
 
     .ride-details {

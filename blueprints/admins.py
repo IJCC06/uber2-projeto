@@ -12,6 +12,12 @@ from flask import (
 from flask_login import login_required, current_user
 
 from conexao import criar_conexao
+from python.pdf_export import (
+    consultar_registros,
+    enviar_relatorio_pdf,
+    formatar_data,
+    formatar_moeda,
+)
 from python.seguranca import criar_hash_senha, verificar_senha
 
 admins = Blueprint(
@@ -200,6 +206,46 @@ def usuarios():
     )
 
 
+@admins.route("/usuarios/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_usuarios_pdf():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    busca = request.args.get("busca", "").strip()
+    linhas = consultar_registros(
+        """
+        SELECT id, nome, email, telefone, ativo, data_cadastro
+        FROM usuarios
+        WHERE (%s = '' OR nome ILIKE %s)
+        ORDER BY nome, id
+        """,
+        (busca, f"%{busca}%"),
+        "Falha ao exportar a lista administrativa de usuários.",
+    )
+    registros = [
+        (
+            f"Usuário #{linha[0]} - {linha[1]}",
+            (
+                ("E-mail", linha[2]),
+                ("Telefone", linha[3]),
+                ("Status", "Ativa" if linha[4] else "Inativa"),
+                ("Data de cadastro", formatar_data(linha[5])),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Relatório de usuários",
+        registros,
+        "relatorio-usuarios.pdf",
+        (
+            f"Contas encontradas: {len(registros)}",
+            f"Pesquisa por nome: {busca or 'Todas'}",
+        ),
+    )
+
+
 @admins.route("/usuarios/<int:usuario_id>/status", methods=["POST"])
 @login_required
 def atualizar_status_usuario(usuario_id):
@@ -294,6 +340,46 @@ def motoristas():
         "admins/motoristas.html",
         motoristas=motoristas_cadastrados,
         busca=busca,
+    )
+
+
+@admins.route("/motoristas/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_motoristas_pdf():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    busca = request.args.get("busca", "").strip()
+    linhas = consultar_registros(
+        """
+        SELECT id, nome, cpf, telefone, status, disponivel
+        FROM motoristas
+        WHERE (%s = '' OR nome ILIKE %s)
+        ORDER BY nome, id
+        """,
+        (busca, f"%{busca}%"),
+        "Falha ao exportar a lista administrativa de motoristas.",
+    )
+    registros = [
+        (
+            f"Motorista #{linha[0]} - {linha[1]}",
+            (
+                ("CPF", linha[2]),
+                ("Telefone", linha[3]),
+                ("Status da conta", linha[4]),
+                ("Disponibilidade", "Disponível" if linha[5] else "Indisponível"),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Relatório de motoristas",
+        registros,
+        "relatorio-motoristas.pdf",
+        (
+            f"Contas encontradas: {len(registros)}",
+            f"Pesquisa por nome: {busca or 'Todas'}",
+        ),
     )
 
 
@@ -494,6 +580,94 @@ def corridas():
     )
 
 
+@admins.route("/corridas/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_corridas_pdf():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    status_filtro = request.args.get("status", "").strip()
+    status_validos = {
+        "Solicitada",
+        "Aceita",
+        "Em andamento",
+        "Finalizada",
+        "Cancelada",
+    }
+    if status_filtro and status_filtro not in status_validos:
+        abort(400)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            c.id,
+            c.origem,
+            c.destino,
+            c.data_hora,
+            c.status,
+            c.distancia_km,
+            c.valor,
+            u.nome,
+            m.nome,
+            p.forma_pagamento,
+            p.status,
+            p.valor,
+            a.nota,
+            a.comentario
+        FROM corridas AS c
+        JOIN usuarios AS u ON u.id = c.id_usuario
+        LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+        LEFT JOIN pagamentos AS p ON p.id_corrida = c.id
+        LEFT JOIN avaliacoes AS a ON a.id_corrida = c.id
+        WHERE (%s = '' OR c.status::text = %s)
+        ORDER BY c.data_hora DESC, c.id DESC
+        """,
+        (status_filtro, status_filtro),
+        "Falha ao exportar o histórico administrativo de corridas.",
+    )
+    registros = [
+        (
+            f"Corrida #{linha[0]}",
+            (
+                ("Origem", linha[1]),
+                ("Destino", linha[2]),
+                ("Data", formatar_data(linha[3])),
+                ("Status", linha[4]),
+                ("Passageiro", linha[7]),
+                ("Motorista", linha[8] or "Não atribuído"),
+                ("Distância", f"{linha[5]} km" if linha[5] is not None else "Não informada"),
+                ("Valor", formatar_moeda(linha[6])),
+                (
+                    "Pagamento",
+                    (
+                        f"{linha[9]} - {linha[10]} ({formatar_moeda(linha[11])})"
+                        if linha[9]
+                        else "Não registrado"
+                    ),
+                ),
+                (
+                    "Avaliação",
+                    (
+                        f"{linha[12]} de 5 - {linha[13] or 'Sem comentário'}"
+                        if linha[12] is not None
+                        else "Não avaliada"
+                    ),
+                ),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Relatório administrativo de corridas",
+        registros,
+        "relatorio-corridas.pdf",
+        (
+            f"Corridas encontradas: {len(registros)}",
+            f"Filtro de status: {status_filtro or 'Todos'}",
+        ),
+    )
+
+
 @admins.route("/pagamentos", methods=["GET"])
 @login_required
 def pagamentos():
@@ -593,6 +767,73 @@ def pagamentos():
     )
 
 
+@admins.route("/pagamentos/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_pagamentos_pdf():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    status_filtro = request.args.get("status", "").strip()
+    forma_filtro = request.args.get("forma", "").strip()
+    if status_filtro and status_filtro not in ("Pendente", "Pago", "Cancelado"):
+        abort(400)
+    if forma_filtro and forma_filtro not in ("Pix", "Dinheiro", "Cartão"):
+        abort(400)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            p.id,
+            p.id_corrida,
+            p.forma_pagamento,
+            p.valor,
+            p.status,
+            p.data_pagamento,
+            c.origem,
+            c.destino,
+            c.status,
+            u.nome,
+            m.nome
+        FROM pagamentos AS p
+        JOIN corridas AS c ON c.id = p.id_corrida
+        JOIN usuarios AS u ON u.id = c.id_usuario
+        LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+        WHERE (%s = '' OR p.status::text = %s)
+          AND (%s = '' OR p.forma_pagamento::text = %s)
+        ORDER BY p.data_pagamento DESC, p.id DESC
+        """,
+        (status_filtro, status_filtro, forma_filtro, forma_filtro),
+        "Falha ao exportar o painel administrativo de pagamentos.",
+    )
+    registros = [
+        (
+            f"Pagamento #{linha[0]} - Corrida #{linha[1]}",
+            (
+                ("Passageiro", linha[9]),
+                ("Motorista", linha[10] or "Não atribuído"),
+                ("Origem", linha[6]),
+                ("Destino", linha[7]),
+                ("Forma", linha[2]),
+                ("Valor", formatar_moeda(linha[3])),
+                ("Status do pagamento", linha[4]),
+                ("Status da corrida", linha[8]),
+                ("Data do registro", formatar_data(linha[5])),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Relatório administrativo de pagamentos",
+        registros,
+        "relatorio-pagamentos.pdf",
+        (
+            f"Registros encontrados: {len(registros)}",
+            f"Filtro de status: {status_filtro or 'Todos'}",
+            f"Filtro de forma: {forma_filtro or 'Todas'}",
+        ),
+    )
+
+
 @admins.route("/avaliacoes", methods=["GET"])
 @login_required
 def avaliacoes():
@@ -669,6 +910,69 @@ def avaliacoes():
         media_avaliacoes=resumo[1],
         nota_filtro=nota_texto,
         notas_validas=range(1, 6),
+    )
+
+
+@admins.route("/avaliacoes/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_avaliacoes_pdf():
+    if current_user.tipo != "admin":
+        abort(403)
+
+    nota_texto = request.args.get("nota", "").strip()
+    if nota_texto and nota_texto not in {"1", "2", "3", "4", "5"}:
+        abort(400)
+    nota_filtro = int(nota_texto) if nota_texto else None
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            a.id,
+            a.id_corrida,
+            a.nota,
+            a.comentario,
+            a.data_avaliacao,
+            u.nome,
+            m.nome,
+            c.origem,
+            c.destino
+        FROM avaliacoes AS a
+        JOIN corridas AS c ON c.id = a.id_corrida
+        JOIN usuarios AS u ON u.id = c.id_usuario
+        LEFT JOIN motoristas AS m ON m.id = c.id_motorista
+        WHERE (%s IS NULL OR a.nota = %s)
+        ORDER BY a.data_avaliacao DESC, a.id DESC
+        """,
+        (nota_filtro, nota_filtro),
+        "Falha ao exportar as avaliações administrativas.",
+    )
+    registros = [
+        (
+            f"Avaliação #{linha[0]} - Corrida #{linha[1]}",
+            (
+                ("Nota", f"{linha[2]} de 5"),
+                ("Passageiro", linha[5]),
+                ("Motorista", linha[6] or "Não atribuído"),
+                ("Origem", linha[7]),
+                ("Destino", linha[8]),
+                ("Data", formatar_data(linha[4])),
+                ("Comentário", linha[3] or "Sem comentário"),
+            ),
+        )
+        for linha in linhas
+    ]
+    media = sum(linha[2] for linha in linhas) / len(linhas) if linhas else None
+    return enviar_relatorio_pdf(
+        "Relatório administrativo de avaliações",
+        registros,
+        "relatorio-avaliacoes.pdf",
+        (
+            f"Avaliações encontradas: {len(registros)}",
+            f"Nota média neste relatório: {media:.2f}".replace(".", ",")
+            if media is not None
+            else "Nota média neste relatório: sem avaliações",
+            f"Filtro de nota: {nota_texto or 'Todas'}",
+        ),
     )
 
 

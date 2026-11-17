@@ -16,6 +16,9 @@
                 <h1 id="payments-title">Pagamentos</h1>
                 <p>Confira o valor das corridas finalizadas e registre a forma de pagamento. Tarifa de teste: R$ 2,50 por km.</p>
             </div>
+            <a class="secondary-action" href="{{ url_for('usuarios.exportar_pagamentos_pdf') }}">
+                Baixar extrato PDF
+            </a>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}

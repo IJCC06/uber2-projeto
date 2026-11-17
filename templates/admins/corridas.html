@@ -21,7 +21,13 @@
         <section class="panel admin-rides-panel" aria-labelledby="rides-list-title">
             <div class="panel-header">
                 <h2 id="rides-list-title">Histórico de corridas</h2>
-                <span class="ride-count">{{ corridas|length }}</span>
+                <div class="panel-actions">
+                    <span class="ride-count">{{ corridas|length }}</span>
+                    <a class="secondary-action"
+                       href="{{ url_for('admins.exportar_corridas_pdf', status=status_filtro) }}">
+                        Exportar PDF
+                    </a>
+                </div>
             </div>
 
             <form class="admin-ride-filter" action="{{ url_for('admins.corridas') }}" method="get">

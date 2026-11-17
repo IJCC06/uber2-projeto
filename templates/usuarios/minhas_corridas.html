@@ -16,9 +16,14 @@
                 <h1 id="rides-title">Minhas corridas</h1>
                 <p>Acompanhe o status e os detalhes das suas solicitações.</p>
             </div>
-            <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
-                Solicitar corrida
-            </a>
+            <div class="welcome-actions">
+                <a class="secondary-action" href="{{ url_for('usuarios.exportar_corridas_pdf') }}">
+                    Baixar histórico PDF
+                </a>
+                <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
+                    Solicitar corrida
+                </a>
+            </div>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}

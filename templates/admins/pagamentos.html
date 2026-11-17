@@ -43,7 +43,13 @@
         <section class="panel admin-rides-panel" aria-labelledby="payments-list-title">
             <div class="panel-header">
                 <h2 id="payments-list-title">Registros de pagamento</h2>
-                <span class="ride-count">{{ pagamentos|length }}</span>
+                <div class="panel-actions">
+                    <span class="ride-count">{{ pagamentos|length }}</span>
+                    <a class="secondary-action"
+                       href="{{ url_for('admins.exportar_pagamentos_pdf', status=status_filtro, forma=forma_filtro) }}">
+                        Exportar PDF
+                    </a>
+                </div>
             </div>
 
             <form class="admin-ride-filter" action="{{ url_for('admins.pagamentos') }}" method="get">

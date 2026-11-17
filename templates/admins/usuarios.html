@@ -30,7 +30,13 @@
         <section class="panel admin-users-panel" aria-labelledby="users-list-title">
             <div class="panel-header">
                 <h2 id="users-list-title">Contas cadastradas</h2>
-                <span class="ride-count">{{ usuarios|length }}</span>
+                <div class="panel-actions">
+                    <span class="ride-count">{{ usuarios|length }}</span>
+                    <a class="secondary-action"
+                       href="{{ url_for('admins.exportar_usuarios_pdf', busca=busca) }}">
+                        Exportar PDF
+                    </a>
+                </div>
             </div>
 
             <form class="admin-ride-filter" action="{{ url_for('admins.usuarios') }}" method="get">
