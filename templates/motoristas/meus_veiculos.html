@@ -57,7 +57,12 @@
         <section class="panel vehicle-list-panel" aria-labelledby="vehicle-list-title">
             <div class="panel-header">
                 <h2 id="vehicle-list-title">Veículos cadastrados</h2>
-                <span class="ride-count">{{ veiculos|length }}</span>
+                <div class="panel-actions">
+                    <span class="ride-count">{{ veiculos|length }}</span>
+                    <a class="secondary-action" href="{{ url_for('motoristas.exportar_veiculos_pdf') }}">
+                        Baixar lista PDF
+                    </a>
+                </div>
             </div>
             {% if veiculos %}
                 <div class="vehicle-list">

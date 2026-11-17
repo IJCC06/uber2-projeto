@@ -16,6 +16,9 @@
                 <h1 id="history-title">Histórico de corridas</h1>
                 <p>Consulte suas corridas finalizadas e canceladas.</p>
             </div>
+            <a class="secondary-action" href="{{ url_for('motoristas.exportar_historico_pdf') }}">
+                Baixar histórico PDF
+            </a>
         </section>
 
         <section class="driver-history-summary" aria-label="Resumo das corridas">

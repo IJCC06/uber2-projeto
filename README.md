@@ -20,6 +20,7 @@ Na versão 2.0.0, a aplicação web usa Flask e PostgreSQL para oferecer o fluxo
 - **Flask** — servidor web e rotas
 - **PostgreSQL** — banco de dados
 - **psycopg2-binary** — driver de conexão com PostgreSQL
+- **fpdf2** — geração dos relatórios PDF por perfil
 - **python-dotenv** — carregamento das configurações locais
 - **Flask-Login** — autenticação e gerenciamento de sessões
 - **HTML, CSS e JavaScript** — frontend
@@ -51,6 +52,9 @@ Até o momento, o repositório contém:
 - histórico administrativo completo de corridas, com filtro por status, pagamentos, avaliações e linha do tempo;
 - consulta administrativa de pagamentos, com filtros por status e forma e resumo dos valores registrados;
 - consulta administrativa de avaliações, com nota média, filtro por nota e comentários;
+- exportação de históricos de corridas e extratos de pagamento dos usuários em PDF;
+- exportação do histórico de corridas, veículos e avaliações recebidas do motorista em PDF;
+- exportação das consultas administrativas de usuários, motoristas, corridas, pagamentos e avaliações em PDF;
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes;
@@ -91,8 +95,11 @@ uber2-projeto/
 │   ├── insert-date.sql
 │   └── query.sql
 ├── python/
-│   └── logins.py
+│   ├── logins.py
+│   └── pdf_export.py
 ├── tests/
+│   ├── test_conexao.py
+│   ├── test_pdf_export.py
 │   └── test_postgres_acceptance.py
 └── templates/
     ├── admins/
@@ -186,9 +193,19 @@ O projeto continua aceitando as quatro variáveis `DB_*` do `.env` local. Na Ver
 
 O esquema inicial não cria uma conta administrativa. Não execute `sql/gerar_dados_ficticios.py` em produção: ele insere registros de teste e usa uma senha fixa de desenvolvimento. Provisione a conta administrativa com uma senha hash segura antes de testar o painel de administração.
 
+## Exportação de relatórios PDF
+
+Os relatórios são gerados no servidor com `fpdf2` e baixados pelas páginas correspondentes:
+
+- Usuários: histórico das próprias corridas e extrato de pagamentos das próprias corridas finalizadas.
+- Motoristas: histórico das corridas finalizadas/canceladas, lista dos próprios veículos e avaliações recebidas.
+- Administradores: relatórios de usuários, motoristas, corridas, pagamentos e avaliações. Os filtros de busca/status/forma/nota da página são mantidos na exportação.
+
+As rotas exigem autenticação e validam o perfil antes de consultar o banco. Os relatórios de usuários e motoristas incluem apenas seus dados próprios; relatórios administrativos são restritos ao perfil de administrador. Senhas e hashes de senha nunca são incluídos nos PDFs.
+
 ## Verificação do protótipo
 
-Execute a descoberta dos testes. O teste de aceitação é ignorado, a menos que seja habilitado explicitamente:
+Execute a descoberta dos testes. Os testes unitários também verificam a geração e a paginação dos PDFs. O teste de aceitação PostgreSQL é ignorado, a menos que seja habilitado explicitamente:
 
 ```powershell
 python -m unittest discover -s tests -v

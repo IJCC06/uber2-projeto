@@ -39,7 +39,13 @@
         <section class="panel admin-rides-panel" aria-labelledby="ratings-list-title">
             <div class="panel-header">
                 <h2 id="ratings-list-title">Avaliações recebidas</h2>
-                <span class="ride-count">{{ avaliacoes|length }}</span>
+                <div class="panel-actions">
+                    <span class="ride-count">{{ avaliacoes|length }}</span>
+                    <a class="secondary-action"
+                       href="{{ url_for('admins.exportar_avaliacoes_pdf', nota=nota_filtro) }}">
+                        Exportar PDF
+                    </a>
+                </div>
             </div>
 
             <form class="admin-ride-filter" action="{{ url_for('admins.avaliacoes') }}" method="get">

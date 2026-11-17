@@ -13,6 +13,12 @@ from flask import (
 )
 from flask_login import login_required, current_user
 from conexao import criar_conexao
+from python.pdf_export import (
+    consultar_registros,
+    enviar_relatorio_pdf,
+    formatar_data,
+    formatar_moeda,
+)
 from python.seguranca import criar_hash_senha, verificar_senha
 
 motoristas = Blueprint(
@@ -418,6 +424,64 @@ def historico_corridas():
     )
 
 
+@motoristas.route("/historico/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_historico_pdf():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            c.id,
+            c.origem,
+            c.destino,
+            c.data_hora,
+            c.status,
+            c.distancia_km,
+            c.valor,
+            u.nome
+        FROM corridas AS c
+        JOIN usuarios AS u ON u.id = c.id_usuario
+        WHERE c.id_motorista = %s
+          AND c.status IN ('Finalizada', 'Cancelada')
+        ORDER BY c.data_hora DESC, c.id DESC
+        """,
+        (current_user.id,),
+        "Falha ao exportar o histórico do motorista.",
+    )
+    registros = [
+        (
+            f"Corrida #{linha[0]}",
+            (
+                ("Passageiro", linha[7]),
+                ("Origem", linha[1]),
+                ("Destino", linha[2]),
+                ("Data", formatar_data(linha[3])),
+                ("Status", linha[4]),
+                ("Distância", f"{linha[5]} km" if linha[5] is not None else "Não informada"),
+                ("Valor bruto", formatar_moeda(linha[6])),
+            ),
+        )
+        for linha in linhas
+    ]
+    finalizadas = sum(linha[4] == "Finalizada" for linha in linhas)
+    total_bruto = sum(
+        (linha[6] or 0 for linha in linhas if linha[4] == "Finalizada"),
+        start=0,
+    )
+    return enviar_relatorio_pdf(
+        "Histórico de corridas do motorista",
+        registros,
+        "historico-corridas-motorista.pdf",
+        (
+            f"Motorista: {current_user.nome}",
+            f"Corridas finalizadas: {finalizadas}",
+            f"Total bruto: {formatar_moeda(total_bruto)}",
+        ),
+    )
+
+
 @motoristas.route("/disponibilidade", methods=["POST"])
 @login_required
 def atualizar_disponibilidade():
@@ -559,6 +623,97 @@ def meus_veiculos():
             conexao.close()
 
     return render_template("motoristas/meus_veiculos.html", veiculos=veiculos)
+
+
+@motoristas.route("/veiculos/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_veiculos_pdf():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    linhas = consultar_registros(
+        """
+        SELECT marca, modelo, placa, ano, cor
+        FROM veiculos
+        WHERE id_motorista = %s
+        ORDER BY marca, modelo, id
+        """,
+        (current_user.id,),
+        "Falha ao exportar os veículos do motorista.",
+    )
+    registros = [
+        (
+            f"{linha[1]} {linha[0]}",
+            (
+                ("Placa", linha[2]),
+                ("Ano", linha[3]),
+                ("Cor", linha[4] or "Não informada"),
+            ),
+        )
+        for linha in linhas
+    ]
+    return enviar_relatorio_pdf(
+        "Veículos cadastrados",
+        registros,
+        "veiculos-motorista.pdf",
+        (f"Motorista: {current_user.nome}", f"Veículos: {len(registros)}"),
+    )
+
+
+@motoristas.route("/avaliacoes/exportar.pdf", methods=["GET"])
+@login_required
+def exportar_avaliacoes_pdf():
+    if current_user.tipo != "motorista":
+        abort(403)
+
+    linhas = consultar_registros(
+        """
+        SELECT
+            a.nota,
+            a.comentario,
+            a.data_avaliacao,
+            c.id,
+            u.nome
+        FROM avaliacoes AS a
+        JOIN corridas AS c ON c.id = a.id_corrida
+        JOIN usuarios AS u ON u.id = c.id_usuario
+        WHERE c.id_motorista = %s
+        ORDER BY a.data_avaliacao DESC, a.id DESC
+        """,
+        (current_user.id,),
+        "Falha ao exportar as avaliações do motorista.",
+    )
+    registros = [
+        (
+            f"Avaliação da corrida #{linha[3]}",
+            (
+                ("Nota", f"{linha[0]} de 5"),
+                ("Passageiro", linha[4]),
+                ("Data", formatar_data(linha[2])),
+                ("Comentário", linha[1] or "Sem comentário"),
+            ),
+        )
+        for linha in linhas
+    ]
+    media = (
+        sum(linha[0] for linha in linhas) / len(linhas)
+        if linhas
+        else None
+    )
+    return enviar_relatorio_pdf(
+        "Avaliações recebidas",
+        registros,
+        "avaliacoes-motorista.pdf",
+        (
+            f"Motorista: {current_user.nome}",
+            f"Quantidade: {len(registros)}",
+            (
+                f"Nota média: {media:.2f}".replace(".", ",")
+                if media is not None
+                else "Nota média: sem avaliações"
+            ),
+        ),
+    )
 
 
 @motoristas.route("/veiculos/<int:veiculo_id>/editar", methods=["POST"])

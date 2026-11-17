@@ -12,6 +12,7 @@ A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenv
 - Flask — aplicação web e rotas HTTP
 - PostgreSQL — banco de dados relacional
 - psycopg2-binary — conexão entre Python e PostgreSQL
+- fpdf2 — geração de relatórios PDF por perfil
 - python-dotenv — leitura das configurações locais em .env
 - HTML, CSS e JavaScript — interface
 - Flask-Login — autenticação web e gerenciamento de sessões
@@ -43,17 +44,21 @@ uber2-projeto/
 │   ├── insert-date.sql
 │   └── query.sql
 ├── python/
-│   └── logins.py
+│   ├── logins.py
+│   └── pdf_export.py
 ├── tests/
+│   ├── test_conexao.py
+│   ├── test_pdf_export.py
 │   └── test_postgres_acceptance.py
 ├── templates/
 │   ├── admins/
 │   ├── logins/
 │   ├── motoristas/
 │   └── usuarios/
-└── static/
-    ├── css/
-    └── js/
+└── public/
+    └── static/
+        ├── css/
+        └── js/
 ```
 
 A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O módulo python/logins.py é utilizado atualmente por app.py; os demais módulos antigos ainda precisam ser avaliados antes de uma reorganização. A estrutura poderá ser simplificada conforme as funcionalidades web forem implementadas.
@@ -64,9 +69,10 @@ A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O 
 - blueprints/: separa autenticação, operações de usuários, motoristas e administração.
 - conexao.py: centraliza a criação de conexões com o PostgreSQL usando Psycopg2.
 - python/logins.py: contém as funções de validação de login chamadas atualmente pelas rotas.
-- tests/: contém o teste de aceitação com banco PostgreSQL isolado.
+- python/pdf_export.py: centraliza a formatação, paginação e resposta HTTP dos relatórios PDF.
+- tests/: contém testes unitários dos PDFs e teste de aceitação com banco PostgreSQL isolado.
 - templates/: reúne os arquivos HTML renderizados pelo Flask.
-- static/: reúne os arquivos estáticos, como CSS e JavaScript.
+- public/static/: reúne os arquivos estáticos publicados pela Vercel, como CSS e JavaScript.
 - sql/: contém os scripts SQL e utilitários de dados de teste versionados.
 
 ## Configuração do banco de dados
@@ -114,6 +120,8 @@ A suíte usa `unittest` da biblioteca padrão e pode ser executada com `python -
 O fluxo web principal está implementado: cadastro e autenticação por perfil, aprovação e disponibilidade de motoristas, gestão de veículos, solicitação e ciclo de vida de corridas, pagamentos registrados como pendentes, avaliações, históricos, gerenciamento de contas e consultas administrativas. As listagens administrativas de usuários e motoristas permitem pesquisar por nome. Erros HTTP comuns usam páginas personalizadas mantendo o status original da resposta. O teste de aceitação executa o fluxo completo em PostgreSQL isolado e verifica também entradas inválidas, transições recusadas, duplicatas, autorização por perfil e páginas de erro.
 
 O projeto continua sendo um protótipo acadêmico. Integração com gateway de pagamento, mapas/geolocalização e implantação de produção estão fora do escopo atual; a aplicação não deve ser tratada como pronta para uso comercial.
+
+As exportações PDF são oferecidas nos históricos e pagamentos do usuário, nos históricos, veículos e avaliações recebidas pelo motorista e nas consultas administrativas. Cada rota de exportação exige login, confere o perfil e restringe os dados pessoais às próprias contas; os relatórios administrativos preservam os filtros da consulta. A biblioteca fpdf2 gera os arquivos em memória, sem gravá-los no servidor.
 
 ## Regras de negócio implementadas
 

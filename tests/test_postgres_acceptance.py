@@ -172,6 +172,173 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertTrue(response.headers["Location"].endswith("/admin/home"))
         return client
 
+    def test_pdf_exports_are_scoped_by_profile_and_keep_admin_filters(self):
+        connection = self.database_connection()
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO usuarios (nome, email, telefone, senha, ativo)
+                    VALUES (%s, %s, %s, %s, TRUE)
+                    RETURNING id
+                    """,
+                    (
+                        "Passageiro PDF",
+                        "passageiro-pdf@example.test",
+                        "11999990002",
+                        generate_password_hash("senha-pdf-usuario"),
+                    ),
+                )
+                usuario_id = cursor.fetchone()[0]
+
+                cursor.execute(
+                    """
+                    INSERT INTO motoristas
+                        (nome, cpf, telefone, cnh, senha, status, disponivel)
+                    VALUES (%s, %s, %s, %s, %s, 'Ativo', TRUE)
+                    RETURNING id
+                    """,
+                    (
+                        "Motorista PDF",
+                        "123.456.789-10",
+                        "11999990003",
+                        "12345678910",
+                        generate_password_hash("senha-pdf-motorista"),
+                    ),
+                )
+                motorista_id = cursor.fetchone()[0]
+
+                cursor.execute(
+                    """
+                    INSERT INTO veiculos
+                        (id_motorista, modelo, marca, placa, ano, cor)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                    """,
+                    (motorista_id, "Corolla", "Toyota", "PDF-1234", 2024, "Prata"),
+                )
+
+                cursor.execute(
+                    """
+                    INSERT INTO corridas
+                        (
+                            id_usuario,
+                            id_motorista,
+                            origem,
+                            destino,
+                            distancia_km,
+                            valor,
+                            status
+                        )
+                    VALUES (%s, %s, %s, %s, %s, %s, 'Finalizada')
+                    RETURNING id
+                    """,
+                    (
+                        usuario_id,
+                        motorista_id,
+                        "Rua São João, 10",
+                        "Avenida Brasil, 20",
+                        Decimal("4.00"),
+                        Decimal("10.00"),
+                    ),
+                )
+                corrida_id = cursor.fetchone()[0]
+
+                cursor.execute(
+                    """
+                    INSERT INTO pagamentos
+                        (id_corrida, forma_pagamento, valor, status)
+                    VALUES (%s, 'Pix', %s, 'Pendente')
+                    """,
+                    (corrida_id, Decimal("10.00")),
+                )
+                cursor.execute(
+                    """
+                    INSERT INTO avaliacoes (id_corrida, nota, comentario)
+                    VALUES (%s, 5, %s)
+                    """,
+                    (corrida_id, "Ótimo motorista"),
+                )
+            connection.commit()
+        finally:
+            connection.close()
+
+        usuario_client = self.app.test_client()
+        response = usuario_client.post(
+            "/login/usuario",
+            data={
+                "email": "passageiro-pdf@example.test",
+                "password": "senha-pdf-usuario",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        motorista_client = self.app.test_client()
+        response = motorista_client.post(
+            "/login/motorista",
+            data={
+                "cpf": "123.456.789-10",
+                "password": "senha-pdf-motorista",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+
+        admin_client = self.login_admin()
+        exports = (
+            (usuario_client, "/usuario/corridas/exportar.pdf"),
+            (usuario_client, "/usuario/pagamentos/exportar.pdf"),
+            (motorista_client, "/motorista/historico/exportar.pdf"),
+            (motorista_client, "/motorista/veiculos/exportar.pdf"),
+            (motorista_client, "/motorista/avaliacoes/exportar.pdf"),
+            (admin_client, "/admin/usuarios/exportar.pdf?busca=Passageiro"),
+            (admin_client, "/admin/motoristas/exportar.pdf?busca=Motorista"),
+            (admin_client, "/admin/corridas/exportar.pdf?status=Finalizada"),
+            (
+                admin_client,
+                "/admin/pagamentos/exportar.pdf?status=Pendente&forma=Pix",
+            ),
+            (admin_client, "/admin/avaliacoes/exportar.pdf?nota=5"),
+        )
+        for client, path in exports:
+            with self.subTest(pdf_export=path):
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.mimetype, "application/pdf")
+                self.assertTrue(response.data.startswith(b"%PDF-"))
+                self.assertIn("attachment;", response.headers["Content-Disposition"])
+
+        page_requests = (
+            (usuario_client, "/usuario/corridas"),
+            (usuario_client, "/usuario/pagamentos"),
+            (motorista_client, "/motorista/home"),
+            (motorista_client, "/motorista/historico"),
+            (motorista_client, "/motorista/veiculos"),
+            (admin_client, "/admin/usuarios"),
+            (admin_client, "/admin/motoristas"),
+            (admin_client, "/admin/corridas"),
+            (admin_client, "/admin/pagamentos"),
+            (admin_client, "/admin/avaliacoes"),
+        )
+        for client, path in page_requests:
+            with self.subTest(report_page=path):
+                self.assertEqual(client.get(path).status_code, 200)
+
+        self.assertEqual(
+            usuario_client.get("/admin/usuarios/exportar.pdf").status_code,
+            403,
+        )
+        self.assertEqual(
+            motorista_client.get("/usuario/corridas/exportar.pdf").status_code,
+            403,
+        )
+        self.assertEqual(
+            admin_client.get("/motorista/veiculos/exportar.pdf").status_code,
+            403,
+        )
+        self.assertEqual(
+            admin_client.get("/admin/corridas/exportar.pdf?status=Inválida").status_code,
+            400,
+        )
+
     def test_complete_registration_and_ride_acceptance_flow(self):
         user_client = self.app.test_client()
         response = user_client.post(
