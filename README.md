@@ -109,6 +109,7 @@ uber2-projeto/
 │   ├── test_login_templates.py
 │   ├── test_pdf_export.py
 │   ├── test_postgres_acceptance.py
+│   ├── test_user_dashboard.py
 │   └── test_user_driver_navigation.py
 └── templates/
     ├── admins/
@@ -214,7 +215,7 @@ As rotas exigem autenticação e validam o perfil antes de consultar o banco. Os
 
 ## Interface com Bootstrap
 
-A adoção do Bootstrap é gradual. O painel e as navegações dos três perfis usam os componentes locais do Bootstrap 5.3.9; o painel administrativo também usa grid, cards, badges e tabela responsiva, enquanto as telas de login usam grid, cards e controles de formulário. Os arquivos estão versionados em `public/static/vendor/bootstrap/` para não depender de CDN. O conteúdo das demais páginas e os formulários de cadastro serão migrados em etapas posteriores.
+A adoção do Bootstrap é gradual. Os painéis administrativo e do usuário e as navegações dos três perfis usam os componentes locais do Bootstrap 5.3.9; o painel administrativo também usa grid, cards, badges e tabela responsiva, enquanto o painel do usuário organiza resumos, corridas e ações rápidas em cards responsivos. As telas de login usam grid, cards e controles de formulário. Os arquivos estão versionados em `public/static/vendor/bootstrap/` para não depender de CDN. As demais páginas e os formulários de cadastro serão migrados em etapas posteriores.
 
 ## Verificação do protótipo
 
