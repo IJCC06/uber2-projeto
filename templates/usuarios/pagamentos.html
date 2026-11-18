@@ -10,101 +10,108 @@
 <body>
     {% include "includes/header_usuario.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="payments-title">
+    <main class="container-xl py-5">
+        <section class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"
+                 aria-labelledby="payments-title">
             <div>
-                <p class="eyebrow">Área do usuário</p>
-                <h1 id="payments-title">Pagamentos</h1>
-                <p>Confira o valor das corridas finalizadas e registre a forma de pagamento. Tarifa de teste: R$ 2,50 por km.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Área do usuário</p>
+                <h1 class="display-6 fw-semibold mb-2" id="payments-title">Pagamentos</h1>
+                <p class="text-body-secondary mb-0">Confira o valor das corridas finalizadas e registre a forma de pagamento. Tarifa de teste: R$ 2,50 por km.</p>
             </div>
-            <a class="secondary-action" href="{{ url_for('usuarios.exportar_pagamentos_pdf') }}">
+            <a class="btn btn-outline-dark" href="{{ url_for('usuarios.exportar_pagamentos_pdf') }}">
                 Baixar extrato PDF
             </a>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
-                <p class="payment-message {{ categoria }}-message"
-                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                <div class="alert {{ 'alert-success' if categoria == 'success' else 'alert-danger' }}"
+                     role="{{ 'status' if categoria == 'success' else 'alert' }}">
                     {{ mensagem }}
-                </p>
+                </div>
             {% endfor %}
         {% endwith %}
 
         {% if corridas %}
-            <section class="payment-list" aria-label="Corridas finalizadas">
+            <section class="vstack gap-3" aria-label="Corridas finalizadas">
                 {% for corrida in corridas %}
-                    <article class="payment-card">
-                        <div class="payment-card-header">
-                            <div>
-                                <p class="eyebrow">Corrida #{{ corrida.id }}</p>
-                                <h2>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h2>
-                            </div>
-                            {% if corrida.status_pagamento %}
-                                <span class="payment-status">{{ corrida.status_pagamento }}</span>
+                    <article class="card shadow-sm">
+                        <div class="card-body p-4">
+                            <header class="d-flex flex-column flex-sm-row align-items-sm-start justify-content-between gap-3 mb-3">
+                                <div>
+                                    <p class="small text-body-secondary mb-1">Corrida #{{ corrida.id }}</p>
+                                    <h2 class="h5 mb-0">{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h2>
+                                </div>
+                                {% if corrida.status_pagamento %}
+                                    <span class="badge rounded-pill text-bg-dark">{{ corrida.status_pagamento }}</span>
+                                {% else %}
+                                    <span class="badge rounded-pill text-bg-warning">Sem pagamento registrado</span>
+                                {% endif %}
+                            </header>
+
+                            <dl class="row g-3 mb-3">
+                                <div class="col-12 col-sm-4">
+                                    <dt class="small text-body-secondary mb-1">Distância</dt>
+                                    <dd class="mb-0 fw-semibold">
+                                        {% if corrida.distancia_km is not none %}
+                                            {{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km
+                                        {% else %}
+                                            Não informada
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                <div class="col-12 col-sm-4">
+                                    <dt class="small text-body-secondary mb-1">Valor</dt>
+                                    <dd class="mb-0 fw-semibold">
+                                        {% if corrida.valor is not none %}
+                                            R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                        {% else %}
+                                            A definir
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                                {% if corrida.forma_pagamento %}
+                                    <div class="col-12 col-sm-4">
+                                        <dt class="small text-body-secondary mb-1">Forma escolhida</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.forma_pagamento }}</dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+
+                            {% if not corrida.status_pagamento and corrida.valor is not none %}
+                                <form class="row g-3 align-items-end pt-3 border-top" action="{{ url_for('usuarios.pagamentos') }}" method="post">
+                                    <input type="hidden" name="corrida_id" value="{{ corrida.id }}">
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <label class="form-label" for="forma-{{ corrida.id }}">Forma de pagamento</label>
+                                        <select class="form-select" id="forma-{{ corrida.id }}" name="forma_pagamento" required>
+                                            <option value="">Selecione</option>
+                                            <option value="Pix">Pix</option>
+                                            <option value="Dinheiro">Dinheiro</option>
+                                            <option value="Cartão">Cartão</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-auto">
+                                        <button class="btn btn-dark" type="submit">Registrar pagamento</button>
+                                    </div>
+                                </form>
+                            {% elif not corrida.status_pagamento %}
+                                <p class="text-body-secondary mb-0 pt-3 border-top">Não é possível registrar o pagamento sem um valor definido.</p>
                             {% else %}
-                                <span class="payment-status unpaid">Sem pagamento registrado</span>
+                                <p class="text-body-secondary mb-0 pt-3 border-top">
+                                    O status é {{ corrida.status_pagamento|lower }}. Esta versão não processa cobranças.
+                                </p>
                             {% endif %}
                         </div>
-
-                        <dl class="payment-details">
-                            <div>
-                                <dt>Distância</dt>
-                                <dd>
-                                    {% if corrida.distancia_km is not none %}
-                                        {{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km
-                                    {% else %}
-                                        Não informada
-                                    {% endif %}
-                                </dd>
-                            </div>
-                            <div>
-                                <dt>Valor</dt>
-                                <dd>
-                                    {% if corrida.valor is not none %}
-                                        R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
-                                    {% else %}
-                                        A definir
-                                    {% endif %}
-                                </dd>
-                            </div>
-                            {% if corrida.forma_pagamento %}
-                                <div>
-                                    <dt>Forma escolhida</dt>
-                                    <dd>{{ corrida.forma_pagamento }}</dd>
-                                </div>
-                            {% endif %}
-                        </dl>
-
-                        {% if not corrida.status_pagamento and corrida.valor is not none %}
-                            <form class="payment-form" action="{{ url_for('usuarios.pagamentos') }}" method="post">
-                                <input type="hidden" name="corrida_id" value="{{ corrida.id }}">
-                                <div class="payment-field">
-                                    <label for="forma-{{ corrida.id }}">Forma de pagamento</label>
-                                    <select id="forma-{{ corrida.id }}" name="forma_pagamento" required>
-                                        <option value="">Selecione</option>
-                                        <option value="Pix">Pix</option>
-                                        <option value="Dinheiro">Dinheiro</option>
-                                        <option value="Cartão">Cartão</option>
-                                    </select>
-                                </div>
-                                <button class="primary-action" type="submit">Registrar pagamento</button>
-                            </form>
-                        {% elif not corrida.status_pagamento %}
-                            <p class="payment-note">Não é possível registrar o pagamento sem um valor definido.</p>
-                        {% else %}
-                            <p class="payment-note">
-                                O status é {{ corrida.status_pagamento|lower }}. Esta versão não processa cobranças.
-                            </p>
-                        {% endif %}
                     </article>
                 {% endfor %}
             </section>
         {% else %}
-            <section class="panel empty-state">
-                <h2>Nenhuma corrida finalizada</h2>
-                <p>Os pagamentos estarão disponíveis aqui após a conclusão de uma corrida.</p>
-                <a class="secondary-action" href="{{ url_for('usuarios.home') }}">Voltar ao início</a>
+            <section class="card shadow-sm text-center">
+                <div class="card-body py-5">
+                    <h2 class="h5">Nenhuma corrida finalizada</h2>
+                    <p class="text-body-secondary">Os pagamentos estarão disponíveis aqui após a conclusão de uma corrida.</p>
+                    <a class="btn btn-outline-dark" href="{{ url_for('usuarios.home') }}">Voltar ao início</a>
+                </div>
             </section>
         {% endif %}
     </main>

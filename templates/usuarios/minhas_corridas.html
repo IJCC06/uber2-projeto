@@ -10,18 +10,19 @@
 <body>
     {% include "includes/header_usuario.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="rides-title">
+    <main class="container-xl py-5">
+        <section class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"
+                 aria-labelledby="rides-title">
             <div>
-                <p class="eyebrow">Área do usuário</p>
-                <h1 id="rides-title">Minhas corridas</h1>
-                <p>Acompanhe o status e os detalhes das suas solicitações.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Área do usuário</p>
+                <h1 class="display-6 fw-semibold mb-2" id="rides-title">Minhas corridas</h1>
+                <p class="text-body-secondary mb-0">Acompanhe o status e os detalhes das suas solicitações.</p>
             </div>
-            <div class="welcome-actions">
-                <a class="secondary-action" href="{{ url_for('usuarios.exportar_corridas_pdf') }}">
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <a class="btn btn-outline-dark" href="{{ url_for('usuarios.exportar_corridas_pdf') }}">
                     Baixar histórico PDF
                 </a>
-                <a class="primary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
+                <a class="btn btn-dark" href="{{ url_for('usuarios.solicitar_corrida') }}">
                     Solicitar corrida
                 </a>
             </div>
@@ -29,45 +30,53 @@
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
-                <p class="payment-message {{ categoria }}-message"
-                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                <div class="alert {{ 'alert-success' if categoria == 'success' else 'alert-danger' }}"
+                     role="{{ 'status' if categoria == 'success' else 'alert' }}">
                     {{ mensagem }}
-                </p>
+                </div>
             {% endfor %}
         {% endwith %}
 
         {% if corridas %}
-            <section class="ride-history" aria-label="Histórico de corridas">
+            <section class="vstack gap-3" aria-label="Histórico de corridas">
                 {% for corrida in corridas %}
-                    <article class="ride-history-card">
-                        <header class="ride-history-header">
+                    {% set cores_status = {
+                        "Solicitada": "text-bg-primary",
+                        "Aceita": "text-bg-info",
+                        "Em andamento": "text-bg-warning",
+                        "Finalizada": "text-bg-success",
+                        "Cancelada": "text-bg-danger"
+                    } %}
+                    <article class="card shadow-sm">
+                        <div class="card-body p-4">
+                        <header class="d-flex flex-column flex-sm-row align-items-sm-start justify-content-between gap-3 mb-3">
                             <div>
-                                <p class="eyebrow">Corrida #{{ corrida.id }}</p>
-                                <h2>{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h2>
+                                <p class="small text-body-secondary mb-1">Corrida #{{ corrida.id }}</p>
+                                <h2 class="h5 mb-0">{{ corrida.origem }} <span aria-hidden="true">&rarr;</span> {{ corrida.destino }}</h2>
                             </div>
-                            <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
+                            <span class="badge rounded-pill {{ cores_status.get(corrida.status, 'text-bg-secondary') }}">
                                 {{ corrida.status }}
                             </span>
                         </header>
 
-                        <dl class="ride-history-details">
-                            <div>
-                                <dt>Solicitada em</dt>
-                                <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                        <dl class="row g-3 mb-0">
+                            <div class="col-12 col-md-4">
+                                <dt class="small text-body-secondary mb-1">Solicitada em</dt>
+                                <dd class="mb-0 fw-semibold">{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
                             </div>
-                            <div>
-                                <dt>Motorista</dt>
-                                <dd>{{ corrida.motorista or "Aguardando motorista" }}</dd>
+                            <div class="col-12 col-md-4">
+                                <dt class="small text-body-secondary mb-1">Motorista</dt>
+                                <dd class="mb-0 fw-semibold">{{ corrida.motorista or "Aguardando motorista" }}</dd>
                             </div>
                             {% if corrida.distancia_km is not none %}
-                                <div>
-                                    <dt>Distância</dt>
-                                    <dd>{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                                <div class="col-12 col-md-4">
+                                    <dt class="small text-body-secondary mb-1">Distância</dt>
+                                    <dd class="mb-0 fw-semibold">{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
                                 </div>
                             {% endif %}
-                            <div>
-                                <dt>Valor</dt>
-                                <dd>
+                            <div class="col-12 col-md-4">
+                                <dt class="small text-body-secondary mb-1">Valor</dt>
+                                <dd class="mb-0 fw-semibold">
                                     {% if corrida.valor is not none %}
                                         R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
                                     {% else %}
@@ -79,28 +88,28 @@
 
                         {% if corrida.status == "Solicitada" %}
                             <form
-                                class="cancel-ride-form"
+                                class="d-flex justify-content-end mt-3"
                                 action="{{ url_for('usuarios.cancelar_corrida', corrida_id=corrida.id) }}"
                                 method="post"
                                 onsubmit="return confirm('Deseja cancelar esta solicitação de corrida?');"
                             >
-                                <button class="cancel-action" type="submit">Cancelar solicitação</button>
+                                <button class="btn btn-outline-danger" type="submit">Cancelar solicitação</button>
                             </form>
                         {% endif %}
 
                         {% if corrida.status == "Finalizada" %}
-                            <a class="history-link" href="{{ url_for('usuarios.pagamentos') }}">
+                            <a class="d-inline-block mt-3 link-dark fw-semibold" href="{{ url_for('usuarios.pagamentos') }}">
                                 Ver pagamento
                             </a>
                             {% if corrida.nota is none and corrida.motorista %}
                                 <form
-                                    class="rating-form"
+                                    class="row g-3 mt-2 pt-3 border-top"
                                     action="{{ url_for('usuarios.avaliar_corrida', corrida_id=corrida.id) }}"
                                     method="post"
                                 >
-                                    <div class="rating-field">
-                                        <label for="nota-{{ corrida.id }}">Avalie o motorista</label>
-                                        <select id="nota-{{ corrida.id }}" name="nota" required>
+                                    <div class="col-12 col-md-4">
+                                        <label class="form-label" for="nota-{{ corrida.id }}">Avalie o motorista</label>
+                                        <select class="form-select" id="nota-{{ corrida.id }}" name="nota" required>
                                             <option value="">Selecione uma nota</option>
                                             <option value="5">5 — Excelente</option>
                                             <option value="4">4 — Muito bom</option>
@@ -109,33 +118,39 @@
                                             <option value="1">1 — Ruim</option>
                                         </select>
                                     </div>
-                                    <div class="rating-field">
-                                        <label for="comentario-{{ corrida.id }}">Comentário (opcional)</label>
+                                    <div class="col-12 col-md-6">
+                                        <label class="form-label" for="comentario-{{ corrida.id }}">Comentário (opcional)</label>
                                         <textarea
+                                            class="form-control"
                                             id="comentario-{{ corrida.id }}"
                                             name="comentario"
                                             rows="3"
                                         ></textarea>
                                     </div>
-                                    <button class="primary-action" type="submit">Enviar avaliação</button>
+                                    <div class="col-12 col-md-2 d-grid align-self-end">
+                                        <button class="btn btn-dark" type="submit">Enviar avaliação</button>
+                                    </div>
                                 </form>
                             {% else %}
-                                <p class="rating-note">
+                                <p class="text-body-secondary mt-3 mb-0">
                                     Sua avaliação: {{ corrida.nota }} de 5
                                     {% if corrida.comentario %}— {{ corrida.comentario }}{% endif %}
                                 </p>
                             {% endif %}
                         {% endif %}
+                        </div>
                     </article>
                 {% endfor %}
             </section>
         {% else %}
-            <section class="panel empty-state">
-                <h2>Você ainda não tem corridas</h2>
-                <p>Quando solicitar uma corrida, ela aparecerá nesta página.</p>
-                <a class="secondary-action" href="{{ url_for('usuarios.solicitar_corrida') }}">
+            <section class="card shadow-sm text-center">
+                <div class="card-body py-5">
+                <h2 class="h5">Você ainda não tem corridas</h2>
+                <p class="text-body-secondary">Quando solicitar uma corrida, ela aparecerá nesta página.</p>
+                <a class="btn btn-outline-dark" href="{{ url_for('usuarios.solicitar_corrida') }}">
                     Solicitar sua primeira corrida
                 </a>
+                </div>
             </section>
         {% endif %}
     </main>
