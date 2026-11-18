@@ -10,107 +10,102 @@
 <body>
     {% include "includes/header_admin.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="drivers-title">
+    <main class="container-xl py-5">
+        <section class="mb-4" aria-labelledby="drivers-title">
             <div>
-                <p class="eyebrow">Administração</p>
-                <h1 id="drivers-title">Motoristas</h1>
-                <p>Consulte as contas e gerencie a situação dos motoristas.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Administração</p>
+                <h1 class="display-6 fw-semibold mb-2" id="drivers-title">Motoristas</h1>
+                <p class="text-body-secondary mb-0">Consulte as contas e gerencie a situação dos motoristas.</p>
             </div>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
-                <p class="payment-message {{ categoria }}-message"
-                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                <div class="alert {{ 'alert-success' if categoria == 'success' else 'alert-danger' }}"
+                     role="{{ 'status' if categoria == 'success' else 'alert' }}">
                     {{ mensagem }}
-                </p>
+                </div>
             {% endfor %}
         {% endwith %}
 
-        <section class="panel admin-users-panel" aria-labelledby="drivers-list-title">
-            <div class="panel-header">
-                <h2 id="drivers-list-title">Contas cadastradas</h2>
-                <div class="panel-actions">
-                    <span class="ride-count">{{ motoristas|length }}</span>
-                    <a class="secondary-action"
+        <section class="card shadow-sm" aria-labelledby="drivers-list-title">
+            <div class="card-header bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 py-3">
+                <h2 id="drivers-list-title" class="h5 mb-0">Contas cadastradas</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill text-bg-dark">{{ motoristas|length }}</span>
+                    <a class="btn btn-outline-dark btn-sm"
                        href="{{ url_for('admins.exportar_motoristas_pdf', busca=busca) }}">
                         Exportar PDF
                     </a>
                 </div>
             </div>
 
-            <form class="admin-ride-filter" action="{{ url_for('admins.motoristas') }}" method="get">
-                <label for="busca-motorista">
-                    Pesquisar por nome
-                    <input
-                        id="busca-motorista"
-                        name="busca"
-                        type="search"
-                        value="{{ busca }}"
-                        placeholder="Digite o nome do motorista"
-                    >
-                </label>
-                <button class="primary-action" type="submit">Pesquisar</button>
-                {% if busca %}
-                    <a class="admin-filter-reset" href="{{ url_for('admins.motoristas') }}">Limpar busca</a>
-                {% endif %}
-            </form>
+            <div class="card-body border-bottom">
+                <form class="row g-2 align-items-end" action="{{ url_for('admins.motoristas') }}" method="get">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="busca-motorista">Pesquisar por nome</label>
+                        <input class="form-control" id="busca-motorista" name="busca" type="search"
+                               value="{{ busca }}" placeholder="Digite o nome do motorista">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-dark" type="submit">Pesquisar</button>
+                    </div>
+                    {% if busca %}
+                        <div class="col-auto">
+                            <a class="btn btn-link link-dark" href="{{ url_for('admins.motoristas') }}">Limpar busca</a>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
 
             {% if motoristas %}
-                <div class="admin-user-list">
+                <div class="list-group list-group-flush">
                     {% for motorista in motoristas %}
-                        <article class="admin-user-card">
-                            <div class="admin-user-info">
-                                <h3>{{ motorista.nome }}</h3>
-                                <dl>
-                                    <div>
-                                        <dt>CPF (login)</dt>
-                                        <dd>{{ motorista.cpf }}</dd>
-                                    </div>
-                                    <div>
-                                        <dt>Telefone</dt>
-                                        <dd>{{ motorista.telefone }}</dd>
-                                    </div>
-                                    <div>
-                                        <dt>CNH</dt>
-                                        <dd>{{ motorista.cnh }}</dd>
-                                    </div>
-                                    <div>
-                                        <dt>Disponibilidade</dt>
-                                        <dd>{{ "Disponível" if motorista.disponivel else "Indisponível" }}</dd>
-                                    </div>
-                                </dl>
-                            </div>
-                            <div class="admin-user-actions">
-                                <span class="account-status {{ 'account-active' if motorista.ativo else 'account-inactive' }}">
-                                    {{ "Ativa" if motorista.ativo else "Inativa" }}
-                                </span>
-                                <form
-                                    action="{{ url_for('admins.atualizar_status_motorista', motorista_id=motorista.id) }}"
-                                    method="post"
-                                >
-                                    <input type="hidden" name="busca" value="{{ busca }}">
-                                    <input
-                                        type="hidden"
-                                        name="status"
-                                        value="{{ 'Inativo' if motorista.ativo else 'Ativo' }}"
-                                    >
-                                    <button
-                                        class="{{ 'danger-action' if motorista.ativo else 'primary-action' }}"
-                                        type="submit"
-                                    >
-                                        {{ "Desativar conta" if motorista.ativo else "Ativar conta" }}
-                                    </button>
-                                </form>
+                        <article class="list-group-item p-4">
+                            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3">
+                                <div>
+                                    <h3 class="h5 mb-3">{{ motorista.nome }}</h3>
+                                    <dl class="row g-3 mb-0">
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <dt class="small text-body-secondary mb-1">CPF (login)</dt>
+                                            <dd class="mb-0 fw-semibold">{{ motorista.cpf }}</dd>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <dt class="small text-body-secondary mb-1">Telefone</dt>
+                                            <dd class="mb-0 fw-semibold">{{ motorista.telefone }}</dd>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <dt class="small text-body-secondary mb-1">CNH</dt>
+                                            <dd class="mb-0 fw-semibold">{{ motorista.cnh }}</dd>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-lg-3">
+                                            <dt class="small text-body-secondary mb-1">Disponibilidade</dt>
+                                            <dd class="mb-0 fw-semibold">{{ "Disponível" if motorista.disponivel else "Indisponível" }}</dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                                <div class="d-flex flex-column align-items-md-end gap-2">
+                                    <span class="badge rounded-pill {{ 'text-bg-success' if motorista.ativo else 'text-bg-danger' }}">
+                                        {{ "Ativa" if motorista.ativo else "Inativa" }}
+                                    </span>
+                                    <form action="{{ url_for('admins.atualizar_status_motorista', motorista_id=motorista.id) }}" method="post">
+                                        <input type="hidden" name="busca" value="{{ busca }}">
+                                        <input type="hidden" name="status"
+                                               value="{{ 'Inativo' if motorista.ativo else 'Ativo' }}">
+                                        <button class="btn {{ 'btn-outline-danger' if motorista.ativo else 'btn-dark' }}"
+                                                type="submit">
+                                            {{ "Desativar conta" if motorista.ativo else "Ativar conta" }}
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </article>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <h3>{{ "Nenhum motorista encontrado" if busca else "Nenhum motorista cadastrado" }}</h3>
-                    <p>{{ "Tente pesquisar por outro nome." if busca else "As contas de motoristas aparecerão nesta lista." }}</p>
+                <div class="card-body text-center py-5">
+                    <h3 class="h6">{{ "Nenhum motorista encontrado" if busca else "Nenhum motorista cadastrado" }}</h3>
+                    <p class="text-body-secondary mb-0">{{ "Tente pesquisar por outro nome." if busca else "As contas de motoristas aparecerão nesta lista." }}</p>
                 </div>
             {% endif %}
         </section>
