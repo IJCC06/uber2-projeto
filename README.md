@@ -21,6 +21,7 @@ Na versão 2.0.0, a aplicação web usa Flask e PostgreSQL para oferecer o fluxo
 - **PostgreSQL** — banco de dados
 - **psycopg2-binary** — driver de conexão com PostgreSQL
 - **fpdf2** — geração dos relatórios PDF por perfil
+- **Bootstrap 5.3.9** — grid e componentes do painel administrativo inicial
 - **python-dotenv** — carregamento das configurações locais
 - **Flask-Login** — autenticação e gerenciamento de sessões
 - **HTML, CSS e JavaScript** — frontend
@@ -58,6 +59,7 @@ Até o momento, o repositório contém:
 - exibição da média e das avaliações recentes recebidas pelo motorista;
 - histórico de corridas finalizadas e canceladas do motorista, com resumo de valores brutos;
 - painel administrativo com indicadores de usuários, motoristas, corridas e pagamentos, além das corridas recentes;
+- painel administrativo inicial adaptado ao grid, cards, badges e tabela responsiva do Bootstrap 5.3.9, servido localmente;
 - páginas personalizadas para erros HTTP comuns, com opção para voltar ao início.
 
 Motoristas podem cancelar uma corrida atribuída a eles enquanto estiver nos estados “Aceita” ou “Em andamento”. A transição fica registrada no histórico.
@@ -87,7 +89,11 @@ uber2-projeto/
 ├── public/
 │   └── static/
 │       ├── css/
-│       └── js/
+│       ├── js/
+│       └── vendor/
+│           └── bootstrap/
+│               ├── bootstrap.min.css
+│               └── LICENSE
 ├── sql/
 │   ├── create-table.sql
 │   ├── adicionar-distancia-corridas.sql
@@ -202,6 +208,10 @@ Os relatórios são gerados no servidor com `fpdf2` e baixados pelas páginas co
 - Administradores: relatórios de usuários, motoristas, corridas, pagamentos e avaliações. Os filtros de busca/status/forma/nota da página são mantidos na exportação.
 
 As rotas exigem autenticação e validam o perfil antes de consultar o banco. Os relatórios de usuários e motoristas incluem apenas seus dados próprios; relatórios administrativos são restritos ao perfil de administrador. Senhas e hashes de senha nunca são incluídos nos PDFs.
+
+## Interface com Bootstrap
+
+A adoção do Bootstrap é gradual. O painel inicial do administrador usa o grid e componentes de cards, badges e tabela responsiva do Bootstrap 5.3.9; os arquivos estão versionados em `public/static/vendor/bootstrap/` para não depender de CDN. O CSS próprio continua responsável pela identidade visual e pela navegação existente. Outras páginas serão migradas em etapas.
 
 ## Verificação do protótipo
 

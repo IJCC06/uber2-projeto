@@ -312,6 +312,7 @@ class PostgresAcceptanceTests(unittest.TestCase):
             (motorista_client, "/motorista/home"),
             (motorista_client, "/motorista/historico"),
             (motorista_client, "/motorista/veiculos"),
+            (admin_client, "/admin/home"),
             (admin_client, "/admin/usuarios"),
             (admin_client, "/admin/motoristas"),
             (admin_client, "/admin/corridas"),
@@ -320,7 +321,19 @@ class PostgresAcceptanceTests(unittest.TestCase):
         )
         for client, path in page_requests:
             with self.subTest(report_page=path):
-                self.assertEqual(client.get(path).status_code, 200)
+                response = client.get(path)
+                self.assertEqual(response.status_code, 200)
+                if path == "/admin/home":
+                    self.assertIn(b'class="container-xl py-5"', response.data)
+                    self.assertIn(b"table-responsive", response.data)
+
+        bootstrap_response = admin_client.get(
+            "/static/vendor/bootstrap/bootstrap.min.css"
+        )
+        self.assertEqual(bootstrap_response.status_code, 200)
+        self.assertTrue(bootstrap_response.mimetype.startswith("text/css"))
+        self.assertIn(b".container-xl", bootstrap_response.data)
+        bootstrap_response.close()
 
         self.assertEqual(
             usuario_client.get("/admin/usuarios/exportar.pdf").status_code,

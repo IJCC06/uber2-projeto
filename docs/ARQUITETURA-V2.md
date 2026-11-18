@@ -13,6 +13,7 @@ A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenv
 - PostgreSQL — banco de dados relacional
 - psycopg2-binary — conexão entre Python e PostgreSQL
 - fpdf2 — geração de relatórios PDF por perfil
+- Bootstrap 5.3.9 — grid e componentes utilizados inicialmente no painel administrativo
 - python-dotenv — leitura das configurações locais em .env
 - HTML, CSS e JavaScript — interface
 - Flask-Login — autenticação web e gerenciamento de sessões
@@ -58,7 +59,11 @@ uber2-projeto/
 └── public/
     └── static/
         ├── css/
-        └── js/
+        ├── js/
+        └── vendor/
+            └── bootstrap/
+                ├── bootstrap.min.css
+                └── LICENSE
 ```
 
 A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O módulo python/logins.py é utilizado atualmente por app.py; os demais módulos antigos ainda precisam ser avaliados antes de uma reorganização. A estrutura poderá ser simplificada conforme as funcionalidades web forem implementadas.
@@ -73,6 +78,7 @@ A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O 
 - tests/: contém testes unitários dos PDFs e teste de aceitação com banco PostgreSQL isolado.
 - templates/: reúne os arquivos HTML renderizados pelo Flask.
 - public/static/: reúne os arquivos estáticos publicados pela Vercel, como CSS e JavaScript.
+- public/static/vendor/bootstrap/: contém a folha de estilos local e a licença MIT do Bootstrap 5.3.9.
 - sql/: contém os scripts SQL e utilitários de dados de teste versionados.
 
 ## Configuração do banco de dados
@@ -122,6 +128,8 @@ O fluxo web principal está implementado: cadastro e autenticação por perfil, 
 O projeto continua sendo um protótipo acadêmico. Integração com gateway de pagamento, mapas/geolocalização e implantação de produção estão fora do escopo atual; a aplicação não deve ser tratada como pronta para uso comercial.
 
 As exportações PDF são oferecidas nos históricos e pagamentos do usuário, nos históricos, veículos e avaliações recebidas pelo motorista e nas consultas administrativas. Cada rota de exportação exige login, confere o perfil e restringe os dados pessoais às próprias contas; os relatórios administrativos preservam os filtros da consulta. A biblioteca fpdf2 gera os arquivos em memória, sem gravá-los no servidor.
+
+A migração visual para Bootstrap é incremental. O painel inicial do administrador utiliza localmente o Bootstrap 5.3.9 para grid responsivo, cards, badges e tabela de corridas; o CSS personalizado permanece carregado para a identidade existente e será reduzido conforme as demais telas forem migradas.
 
 ## Regras de negócio implementadas
 
