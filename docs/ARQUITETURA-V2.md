@@ -50,6 +50,7 @@ uber2-projeto/
 ├── tests/
 │   ├── test_admin_navigation.py
 │   ├── test_conexao.py
+│   ├── test_driver_dashboard.py
 │   ├── test_login_templates.py
 │   ├── test_pdf_export.py
 │   ├── test_postgres_acceptance.py
@@ -133,7 +134,7 @@ O projeto continua sendo um protótipo acadêmico. Integração com gateway de p
 
 As exportações PDF são oferecidas nos históricos e pagamentos do usuário, nos históricos, veículos e avaliações recebidas pelo motorista e nas consultas administrativas. Cada rota de exportação exige login, confere o perfil e restringe os dados pessoais às próprias contas; os relatórios administrativos preservam os filtros da consulta. A biblioteca fpdf2 gera os arquivos em memória, sem gravá-los no servidor.
 
-A migração visual para Bootstrap é incremental. As navegações dos três perfis utilizam localmente os componentes do Bootstrap 5.3.9. Os painéis administrativo e do usuário usam grid responsivo e cards; o administrativo também inclui badges e tabela de corridas, e o do usuário apresenta corridas recentes e ações rápidas. As telas de login usam grid, cards e controles de formulário. O conteúdo das demais páginas e os cadastros permanecem com o CSS personalizado até etapas posteriores.
+A migração visual para Bootstrap é incremental. As navegações dos três perfis utilizam localmente os componentes do Bootstrap 5.3.9. Os painéis administrativo, do usuário e do motorista usam grid responsivo e cards para indicadores e conteúdo; o painel administrativo inclui badges e tabela de corridas, e o painel do motorista apresenta disponibilidade, corridas e avaliações. As telas de login usam grid, cards e controles de formulário. O conteúdo das demais páginas e os cadastros permanecem com o CSS personalizado até etapas posteriores.
 
 ## Regras de negócio implementadas
 
