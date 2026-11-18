@@ -10,85 +10,102 @@
 <body>
     {% include "includes/header_motorista.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="history-title">
+    <main class="container-xl py-5">
+        <section class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"
+                 aria-labelledby="history-title">
             <div>
-                <p class="eyebrow">Área do motorista</p>
-                <h1 id="history-title">Histórico de corridas</h1>
-                <p>Consulte suas corridas finalizadas e canceladas.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Área do motorista</p>
+                <h1 class="display-6 fw-semibold mb-2" id="history-title">Histórico de corridas</h1>
+                <p class="text-body-secondary mb-0">Consulte suas corridas finalizadas e canceladas.</p>
             </div>
-            <a class="secondary-action" href="{{ url_for('motoristas.exportar_historico_pdf') }}">
+            <a class="btn btn-outline-dark" href="{{ url_for('motoristas.exportar_historico_pdf') }}">
                 Baixar histórico PDF
             </a>
         </section>
 
-        <section class="driver-history-summary" aria-label="Resumo das corridas">
-            <article class="summary-card">
-                <span class="summary-label">Corridas finalizadas</span>
-                <strong>{{ corridas_finalizadas }}</strong>
-            </article>
-            <article class="summary-card">
-                <span class="summary-label">Total bruto das corridas</span>
-                <strong>R$ {{ "%.2f"|format(total_recebido)|replace(".", ",") }}</strong>
-                <span class="history-note">Soma dos valores das corridas finalizadas; não representa repasse líquido.</span>
-            </article>
+        <section class="row g-3 mb-4" aria-label="Resumo das corridas">
+            <div class="col-12 col-md-6">
+                <article class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="text-body-secondary">Corridas finalizadas</span>
+                        <strong class="d-block mt-2 fs-2">{{ corridas_finalizadas }}</strong>
+                    </div>
+                </article>
+            </div>
+            <div class="col-12 col-md-6">
+                <article class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <span class="text-body-secondary">Total bruto das corridas</span>
+                        <strong class="d-block mt-2 fs-2">R$ {{ "%.2f"|format(total_recebido)|replace(".", ",") }}</strong>
+                        <small class="text-body-secondary">Soma dos valores das corridas finalizadas; não representa repasse líquido.</small>
+                    </div>
+                </article>
+            </div>
         </section>
 
         {% if corridas %}
-            <section class="driver-history-list" aria-label="Corridas anteriores">
+            <section class="vstack gap-3" aria-label="Corridas anteriores">
                 {% for corrida in corridas %}
-                    <article class="ride-card">
-                        <div class="ride-card-header">
-                            <h2>Corrida #{{ corrida.id }}</h2>
-                            <span class="ride-status status-{{ corrida.status|lower|replace(' ', '-') }}">
-                                {{ corrida.status }}
-                            </span>
-                        </div>
+                    {% set cores_status = {
+                        "Finalizada": "text-bg-success",
+                        "Cancelada": "text-bg-danger"
+                    } %}
+                    <article class="card shadow-sm">
+                        <div class="card-body">
+                            <header class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+                                <h2 class="h5 mb-0">Corrida #{{ corrida.id }}</h2>
+                                <span class="badge rounded-pill {{ cores_status.get(corrida.status, 'text-bg-secondary') }}">
+                                    {{ corrida.status }}
+                                </span>
+                            </header>
 
-                        <dl class="ride-details">
-                            <div>
-                                <dt>Passageiro</dt>
-                                <dd>{{ corrida.usuario }}</dd>
-                            </div>
-                            <div>
-                                <dt>Origem</dt>
-                                <dd>{{ corrida.origem }}</dd>
-                            </div>
-                            <div>
-                                <dt>Destino</dt>
-                                <dd>{{ corrida.destino }}</dd>
-                            </div>
-                            <div>
-                                <dt>Data</dt>
-                                <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
-                            </div>
-                            {% if corrida.distancia_km is not none %}
-                                <div>
-                                    <dt>Distância</dt>
-                                    <dd>{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                            <dl class="row g-3 mb-0">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Passageiro</dt>
+                                    <dd class="mb-0 fw-semibold">{{ corrida.usuario }}</dd>
                                 </div>
-                            {% endif %}
-                            <div>
-                                <dt>Valor</dt>
-                                <dd>
-                                    {% if corrida.valor is not none %}
-                                        R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
-                                    {% else %}
-                                        Não definido
-                                    {% endif %}
-                                </dd>
-                            </div>
-                        </dl>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Origem</dt>
+                                    <dd class="mb-0 fw-semibold">{{ corrida.origem }}</dd>
+                                </div>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Destino</dt>
+                                    <dd class="mb-0 fw-semibold">{{ corrida.destino }}</dd>
+                                </div>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Data</dt>
+                                    <dd class="mb-0 fw-semibold">{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                </div>
+                                {% if corrida.distancia_km is not none %}
+                                    <div class="col-12 col-sm-6 col-lg-4">
+                                        <dt class="small text-body-secondary mb-1">Distância</dt>
+                                        <dd class="mb-0 fw-semibold">{{ "%.2f"|format(corrida.distancia_km)|replace(".", ",") }} km</dd>
+                                    </div>
+                                {% endif %}
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Valor</dt>
+                                    <dd class="mb-0 fw-semibold">
+                                        {% if corrida.valor is not none %}
+                                            R$ {{ "%.2f"|format(corrida.valor)|replace(".", ",") }}
+                                        {% else %}
+                                            Não definido
+                                        {% endif %}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
                     </article>
                 {% endfor %}
             </section>
         {% else %}
-            <section class="panel empty-state">
-                <h2>Nenhuma corrida anterior</h2>
-                <p>As corridas finalizadas ou canceladas aparecerão aqui.</p>
-                <a class="secondary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
-                    Consultar corridas disponíveis
-                </a>
+            <section class="card shadow-sm" aria-labelledby="no-history-title">
+                <div class="card-body text-center py-5">
+                    <h2 id="no-history-title" class="h5">Nenhuma corrida anterior</h2>
+                    <p class="text-body-secondary">As corridas finalizadas ou canceladas aparecerão aqui.</p>
+                    <a class="btn btn-outline-dark" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+                        Consultar corridas disponíveis
+                    </a>
+                </div>
             </section>
         {% endif %}
     </main>
