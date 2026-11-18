@@ -113,6 +113,7 @@ uber2-projeto/
 │   ├── test_login_templates.py
 │   ├── test_pdf_export.py
 │   ├── test_postgres_acceptance.py
+│   ├── test_registration_error_templates.py
 │   ├── test_user_dashboard.py
 │   ├── test_user_profile_pages.py
 │   └── test_user_driver_navigation.py
@@ -220,7 +221,7 @@ As rotas exigem autenticação e validam o perfil antes de consultar o banco. Os
 
 ## Interface com Bootstrap
 
-A adoção do Bootstrap está aplicada às telas dos perfis usuário, motorista e administrador, incluindo suas navegações e conteúdos principais. O Bootstrap 5.3.9 é servido localmente em `public/static/vendor/bootstrap/`; grids, cards, badges, tabelas, formulários e estados vazios mantêm a identidade visual existente. Os cadastros públicos permanecem com o CSS próprio até uma etapa posterior.
+A migração para o Bootstrap está concluída em todas as páginas da aplicação. O Bootstrap 5.3.9 é servido localmente em `public/static/vendor/bootstrap/`; páginas públicas, dashboards, históricos, pagamentos, cadastros, conta e mensagens de erro usam componentes responsivos. Os estilos locais restantes complementam a identidade visual e não substituem o framework nas telas já migradas.
 
 ## Verificação do protótipo
 
