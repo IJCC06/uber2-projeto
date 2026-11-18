@@ -70,6 +70,11 @@ nav .active,
     color: var(--black);
 }
 
+.topbar .nav-pills .nav-link.active {
+    background: var(--black);
+    color: var(--white);
+}
+
 .logout {
     cursor: pointer;
 }
