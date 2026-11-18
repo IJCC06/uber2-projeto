@@ -27,6 +27,11 @@ body {
     padding: 24px;
 }
 
+.login-bootstrap-card {
+    width: min(100%, 820px);
+    border-radius: 16px;
+}
+
 .login-card {
     width: min(100%, 820px);
     padding: 36px;
@@ -69,30 +74,6 @@ body {
 .login-footer {
     margin: 0;
     color: var(--gray-600);
-    line-height: 1.5;
-}
-
-.login-options {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
-}
-
-.login-option {
-    padding: 20px;
-    border: 1px solid var(--gray-200);
-    border-radius: 12px;
-}
-
-.login-option h2 {
-    margin: 0 0 6px;
-    font-size: 1.1rem;
-}
-
-.login-option > p {
-    margin: 0 0 16px;
-    color: var(--gray-600);
-    font-size: 0.9rem;
     line-height: 1.5;
 }
 
@@ -188,7 +169,4 @@ button:focus-visible {
         padding: 28px 22px;
     }
 
-    .login-options {
-        grid-template-columns: 1fr;
-    }
 }

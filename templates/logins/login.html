@@ -4,72 +4,83 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Entrar | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <main class="login-page">
-        <section class="login-card" aria-labelledby="login-title">
-            <div class="brand">
-                <span class="brand-mark" aria-hidden="true">U2</span>
-                <span>Uber 2</span>
-            </div>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <section class="login-bootstrap-card card border-0 shadow-sm" aria-labelledby="login-title">
+            <div class="card-body p-4 p-md-5">
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">U2</span>
+                    <span>Uber 2</span>
+                </div>
 
-            <header class="login-header">
-                <h1 id="login-title">Acesse o Uber 2</h1>
-                <p>Escolha abaixo o tipo de acesso.</p>
-            </header>
+                <header class="login-header">
+                    <h1 id="login-title">Acesse o Uber 2</h1>
+                    <p>Escolha abaixo o tipo de acesso.</p>
+                </header>
 
-            {% if erro %}
-                <p class="form-message error-message" role="alert">
-                    {{ erro }}
+                {% if erro %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ erro }}
+                    </div>
+                {% endif %}
+
+                <div class="row g-3">
+                    <section class="col-12 col-md-6" aria-labelledby="user-login-title">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h2 id="user-login-title" class="h5 fw-semibold">Sou usuário</h2>
+                                <p class="text-body-secondary">Entre com seu e-mail e sua senha.</p>
+
+                                <form class="vstack gap-3 mt-auto" action="{{ url_for('auth.login_usuario') }}" method="post">
+                                    <div>
+                                        <label class="form-label" for="email">E-mail</label>
+                                        <input id="email" class="form-control" name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label" for="user-password">Senha</label>
+                                        <input id="user-password" class="form-control" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                                    </div>
+
+                                    <button class="btn btn-dark w-100" type="submit">Entrar como usuário</button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="col-12 col-md-6" aria-labelledby="driver-login-title">
+                        <div class="card h-100">
+                            <div class="card-body d-flex flex-column">
+                                <h2 id="driver-login-title" class="h5 fw-semibold">Sou motorista</h2>
+                                <p class="text-body-secondary">Entre com o CPF cadastrado. Sua conta precisa estar ativa.</p>
+
+                                <form class="vstack gap-3 mt-auto" action="{{ url_for('auth.login_motorista') }}" method="post">
+                                    <div>
+                                        <label class="form-label" for="cpf">CPF</label>
+                                        <input id="cpf" class="form-control" name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
+                                    </div>
+
+                                    <div>
+                                        <label class="form-label" for="driver-password">Senha</label>
+                                        <input id="driver-password" class="form-control" type="password" name="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                                    </div>
+
+                                    <button class="btn btn-dark w-100" type="submit">Entrar como motorista</button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <p class="login-footer">
+                    Ainda não tem uma conta?
+                    <a href="{{ url_for('auth.cadastro') }}">Cadastre-se como usuário</a>
+                    ou <a href="{{ url_for('auth.cadastro_motorista') }}">como motorista</a>.
                 </p>
-            {% endif %}
-
-            <div class="login-options">
-                <section class="login-option" aria-labelledby="user-login-title">
-                    <h2 id="user-login-title">Sou usuário</h2>
-                    <p>Entre com seu e-mail e sua senha.</p>
-
-                    <form class="login-form" action="{{ url_for('auth.login_usuario') }}" method="post">
-                        <div class="form-field">
-                            <label for="email">E-mail</label>
-                            <input name="email" type="email" autocomplete="email" placeholder="voce@exemplo.com" required>
-                        </div>
-
-                        <div class="form-field">
-                            <label for="password">Senha</label>
-                            <input name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
-                        </div>
-
-                        <button type="submit">Entrar como usuário</button>
-                    </form>
-                </section>
-
-                <section class="login-option" aria-labelledby="driver-login-title">
-                    <h2 id="driver-login-title">Sou motorista</h2>
-                    <p>Entre com o CPF cadastrado. Sua conta precisa estar ativa.</p>
-
-                    <form class="login-form" action="{{ url_for('auth.login_motorista') }}" method="post">
-                        <div class="form-field">
-                            <label for="cpf">CPF</label>
-                            <input name="cpf" type="text" inputmode="numeric" autocomplete="username" placeholder="000.000.000-00" required>
-                        </div>
-
-                        <div class="form-field">
-                            <label for="senha">Senha</label>
-                            <input type="password" name="password" placeholder="Digite sua senha" required>
-                        </div>
-
-                        <button type="submit">Entrar como motorista</button>
-                    </form>
-                </section>
             </div>
-
-            <p class="login-footer">
-                Ainda não tem uma conta?
-                <a href="{{ url_for('auth.cadastro') }}">Cadastre-se como usuário</a>
-                ou <a href="{{ url_for('auth.cadastro_motorista') }}">como motorista</a>.
-            </p>
         </section>
     </main>
 </body>
