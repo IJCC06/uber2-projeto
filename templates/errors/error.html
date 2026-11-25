@@ -4,16 +4,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ status_code }} | {{ titulo }} | Uber 2</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/errors.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
 </head>
 <body>
-    <main class="error-page" aria-labelledby="error-title">
-        <section class="error-card">
-            <a class="brand" href="{{ url_for('auth.login') }}">Uber 2</a>
-            <p class="error-code">Erro {{ status_code }}</p>
-            <h1 id="error-title">{{ titulo }}</h1>
-            <p class="error-message">{{ mensagem }}</p>
-            <a class="home-link" href="{{ url_for('auth.login') }}">Voltar ao início</a>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <section class="card border-0 shadow-sm text-center" style="max-width: 560px;" aria-labelledby="error-title">
+            <div class="card-body p-4 p-md-5">
+                <a class="link-dark fw-bold text-decoration-none d-inline-block mb-4" href="{{ url_for('auth.login') }}">Uber 2</a>
+                <p class="text-body-secondary text-uppercase fw-semibold mb-2">Erro {{ status_code }}</p>
+                <h1 class="h2 mb-3" id="error-title">{{ titulo }}</h1>
+                <p class="text-body-secondary">{{ mensagem }}</p>
+                <a class="btn btn-dark" href="{{ url_for('auth.login') }}">Voltar ao início</a>
+            </div>
         </section>
     </main>
 </body>

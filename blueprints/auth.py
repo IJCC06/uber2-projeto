@@ -1,3 +1,8 @@
+import json
+from urllib.error import URLError
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
+
 from flask import (
     Blueprint,
     current_app,
@@ -19,11 +24,84 @@ from python.logins import (
 
 auth = Blueprint("auth", __name__)
 
+_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
+_RECAPTCHA_ERROR = (
+    "Não foi possível validar o CAPTCHA. Tente novamente."
+)
+
+
+def _captcha_configurado():
+    return bool(
+        current_app.config.get("RECAPTCHA_SITE_KEY")
+        and current_app.config.get("RECAPTCHA_SECRET_KEY")
+    )
+
+
+def _renderizar_login(template, **contexto):
+    configurado = _captcha_configurado()
+    return render_template(
+        template,
+        recaptcha_configurado=configurado,
+        recaptcha_site_key=(
+            current_app.config.get("RECAPTCHA_SITE_KEY") if configurado else None
+        ),
+        **contexto,
+    )
+
+
+def _verificar_recaptcha():
+    token = request.form.get("g-recaptcha-response", "").strip()
+    if not token:
+        return False
+
+    secret_key = current_app.config.get("RECAPTCHA_SECRET_KEY")
+    if not secret_key or not current_app.config.get("RECAPTCHA_SITE_KEY"):
+        current_app.logger.error(
+            "As chaves do Google reCAPTCHA não estão configuradas."
+        )
+        return False
+
+    payload = urlencode(
+        {"secret": secret_key, "response": token}
+    ).encode("ascii")
+    requisicao = Request(
+        _RECAPTCHA_VERIFY_URL,
+        data=payload,
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+        method="POST",
+    )
+
+    try:
+        with urlopen(requisicao, timeout=5) as resposta:
+            resultado = json.loads(resposta.read(65536).decode("utf-8"))
+    except (
+        URLError,
+        TimeoutError,
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ):
+        current_app.logger.exception("Falha ao consultar o Google reCAPTCHA.")
+        return False
+
+    if not isinstance(resultado, dict):
+        current_app.logger.error("Resposta inválida do Google reCAPTCHA.")
+        return False
+
+    if resultado.get("success") is not True:
+        current_app.logger.warning(
+            "Google reCAPTCHA rejeitou a tentativa de login: %s",
+            resultado.get("error-codes", []),
+        )
+        return False
+
+    return True
+
 
 #Tela de Login
 @auth.route("/", methods=["GET"])
 def login():
-    return render_template("logins/login.html")
+    return _renderizar_login("logins/login.html")
 
 
 # Cadastro de Usuários
@@ -195,6 +273,9 @@ def cadastro_motorista():
 # Login de Usuário
 @auth.route("/login/usuario", methods=["POST"])
 def login_usuario():
+    if not _verificar_recaptcha():
+        return _renderizar_login("logins/login.html", erro=_RECAPTCHA_ERROR)
+
     email = request.form["email"]
     senha = request.form["password"]
 
@@ -204,7 +285,7 @@ def login_usuario():
         login_user(usuario)
         return redirect(url_for("usuarios.home"))
 
-    return render_template(
+    return _renderizar_login(
         "logins/login.html",
         erro="E-mail ou senha incorretos."
     )
@@ -213,6 +294,9 @@ def login_usuario():
 # Login de Motorista
 @auth.route("/login/motorista", methods=["POST"])
 def login_motorista():
+    if not _verificar_recaptcha():
+        return _renderizar_login("logins/login.html", erro=_RECAPTCHA_ERROR)
+
     cpf = request.form["cpf"]
     senha = request.form["password"]
 
@@ -222,7 +306,7 @@ def login_motorista():
         login_user(motorista)
         return redirect(url_for("motoristas.home"))
 
-    return render_template(
+    return _renderizar_login(
         "logins/login.html",
         erro="CPF ou senha inválidos."
     )
@@ -232,6 +316,12 @@ def login_motorista():
 @auth.route("/login/admin", methods=["GET", "POST"])
 def login_admin():
     if request.method == "POST":
+        if not _verificar_recaptcha():
+            return _renderizar_login(
+                "logins/login_admin.html",
+                erro=_RECAPTCHA_ERROR,
+            )
+
         email = request.form["email"]
         senha = request.form["password"]
 
@@ -241,12 +331,12 @@ def login_admin():
             login_user(admin)
             return redirect(url_for("admins.home"))
 
-        return render_template(
+        return _renderizar_login(
             "logins/login_admin.html",
             erro="E-mail ou senha incorretos."
         )
 
-    return render_template("logins/login_admin.html")
+    return _renderizar_login("logins/login_admin.html")
 
 
 # Logout

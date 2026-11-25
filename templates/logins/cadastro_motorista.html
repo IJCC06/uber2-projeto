@@ -4,115 +4,68 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Cadastro de motorista | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
 <body>
-    <main class="login-page">
-        <section class="login-card" aria-labelledby="cadastro-title">
-            <div class="brand">
-                <span class="brand-mark" aria-hidden="true">U2</span>
-                <span>Uber 2</span>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <section class="card border-0 shadow-sm login-bootstrap-card" style="max-width: 760px;" aria-labelledby="cadastro-title">
+            <div class="card-body p-4 p-md-5">
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">U2</span>
+                    <span>Uber 2</span>
+                </div>
+                <header class="login-header">
+                    <h1 id="cadastro-title">Cadastre-se como motorista</h1>
+                    <p>Após o cadastro, um administrador precisará ativar sua conta.</p>
+                </header>
+                {% if erro %}
+                    <div class="alert alert-danger" role="alert">{{ erro }}</div>
+                {% endif %}
+                {% if sucesso %}
+                    <div class="alert alert-success" role="status">{{ sucesso }}</div>
+                {% endif %}
+                <form class="vstack gap-3" action="{{ url_for('auth.cadastro_motorista') }}" method="post">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="nome">Nome completo</label>
+                            <input class="form-control" id="nome" name="nome" type="text" maxlength="100"
+                                   autocomplete="name" value="{{ request.form.get('nome', '') }}" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="cpf">CPF (usado para entrar)</label>
+                            <input class="form-control" id="cpf" name="cpf" type="text" maxlength="14"
+                                   inputmode="numeric" autocomplete="username" placeholder="000.000.000-00"
+                                   value="{{ request.form.get('cpf', '') }}" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="telefone">Telefone</label>
+                            <input class="form-control" id="telefone" name="telefone" type="tel" maxlength="20"
+                                   autocomplete="tel" value="{{ request.form.get('telefone', '') }}" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="cnh">CNH</label>
+                            <input class="form-control" id="cnh" name="cnh" type="text" maxlength="20"
+                                   autocomplete="off" value="{{ request.form.get('cnh', '') }}" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="senha">Senha</label>
+                            <input class="form-control" id="senha" name="senha" type="password" minlength="8"
+                                   autocomplete="new-password" required>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="confirmar_senha">Confirmar senha</label>
+                            <input class="form-control" id="confirmar_senha" name="confirmar_senha" type="password"
+                                   minlength="8" autocomplete="new-password" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-dark" type="submit">Enviar cadastro</button>
+                </form>
+                <p class="login-footer mt-3 mb-0 text-center">
+                    Já possui cadastro?
+                    <a href="{{ url_for('auth.login') }}">Voltar ao login</a>
+                </p>
             </div>
-
-            <header class="login-header">
-                <h1 id="cadastro-title">Cadastre-se como motorista</h1>
-                <p>Após o cadastro, um administrador precisará ativar sua conta.</p>
-            </header>
-
-            {% if erro %}
-                <p class="form-message error-message" role="alert">{{ erro }}</p>
-            {% endif %}
-
-            {% if sucesso %}
-                <p class="form-message sucess-message" role="status">{{ sucesso }}</p>
-            {% endif %}
-
-            <form class="login-form" action="{{ url_for('auth.cadastro_motorista') }}" method="post">
-                <div class="form-field">
-                    <label for="nome">Nome completo</label>
-                    <input
-                        id="nome"
-                        name="nome"
-                        type="text"
-                        maxlength="100"
-                        autocomplete="name"
-                        value="{{ request.form.get('nome', '') }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-field">
-                    <label for="cpf">CPF (usado para entrar)</label>
-                    <input
-                        id="cpf"
-                        name="cpf"
-                        type="text"
-                        maxlength="14"
-                        inputmode="numeric"
-                        autocomplete="username"
-                        placeholder="000.000.000-00"
-                        value="{{ request.form.get('cpf', '') }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-field">
-                    <label for="telefone">Telefone</label>
-                    <input
-                        id="telefone"
-                        name="telefone"
-                        type="tel"
-                        maxlength="20"
-                        autocomplete="tel"
-                        value="{{ request.form.get('telefone', '') }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-field">
-                    <label for="cnh">CNH</label>
-                    <input
-                        id="cnh"
-                        name="cnh"
-                        type="text"
-                        maxlength="20"
-                        autocomplete="off"
-                        value="{{ request.form.get('cnh', '') }}"
-                        required
-                    >
-                </div>
-
-                <div class="form-field">
-                    <label for="senha">Senha</label>
-                    <input
-                        id="senha"
-                        name="senha"
-                        type="password"
-                        minlength="8"
-                        autocomplete="new-password"
-                        required
-                    >
-                </div>
-
-                <div class="form-field">
-                    <label for="confirmar_senha">Confirmar senha</label>
-                    <input
-                        id="confirmar_senha"
-                        name="confirmar_senha"
-                        type="password"
-                        minlength="8"
-                        autocomplete="new-password"
-                        required
-                    >
-                </div>
-
-                <button type="submit">Enviar cadastro</button>
-            </form>
-
-            <p class="login-footer">
-                Já possui cadastro?
-                <a href="{{ url_for('auth.login') }}">Voltar ao login</a>
-            </p>
         </section>
     </main>
 </body>

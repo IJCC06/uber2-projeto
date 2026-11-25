@@ -4,117 +4,118 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Avaliações | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
 </head>
 <body>
     {% include "includes/header_admin.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="ratings-title">
+    <main class="container-xl py-5">
+        <section class="mb-4" aria-labelledby="ratings-title">
             <div>
-                <p class="eyebrow">Administração</p>
-                <h1 id="ratings-title">Avaliações</h1>
-                <p>Consulte as notas e os comentários enviados pelos usuários.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Administração</p>
+                <h1 class="display-6 fw-semibold mb-2" id="ratings-title">Avaliações</h1>
+                <p class="text-body-secondary mb-0">Consulte as notas e os comentários enviados pelos usuários.</p>
             </div>
         </section>
 
-        <section class="admin-payment-summary" aria-label="Resumo das avaliações">
-            <article class="summary-card">
-                <span class="summary-label">Avaliações registradas</span>
-                <strong>{{ total_avaliacoes }}</strong>
-            </article>
-            <article class="summary-card">
-                <span class="summary-label">Nota média</span>
-                <strong>
-                    {% if media_avaliacoes is not none %}
-                        {{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}
-                    {% else %}
-                        —
-                    {% endif %}
-                </strong>
-                <span class="admin-card-detail">Escala de 1 a 5</span>
-            </article>
+        <section class="row g-3 mb-4" aria-label="Resumo das avaliações">
+            <div class="col-12 col-md-6">
+                <article class="card h-100 shadow-sm"><div class="card-body">
+                    <span class="text-body-secondary">Avaliações registradas</span>
+                    <strong class="d-block mt-2 fs-2">{{ total_avaliacoes }}</strong>
+                </div></article>
+            </div>
+            <div class="col-12 col-md-6">
+                <article class="card h-100 shadow-sm"><div class="card-body">
+                    <span class="text-body-secondary">Nota média</span>
+                    <strong class="d-block mt-2 fs-2">
+                        {% if media_avaliacoes is not none %}{{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}{% else %}—{% endif %}
+                    </strong>
+                    <small class="text-body-secondary">Escala de 1 a 5</small>
+                </div></article>
+            </div>
         </section>
 
-        <section class="panel admin-rides-panel" aria-labelledby="ratings-list-title">
-            <div class="panel-header">
-                <h2 id="ratings-list-title">Avaliações recebidas</h2>
-                <div class="panel-actions">
-                    <span class="ride-count">{{ avaliacoes|length }}</span>
-                    <a class="secondary-action"
+        <section class="card shadow-sm" aria-labelledby="ratings-list-title">
+            <div class="card-header bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 py-3">
+                <h2 id="ratings-list-title" class="h5 mb-0">Avaliações recebidas</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill text-bg-dark">{{ avaliacoes|length }}</span>
+                    <a class="btn btn-outline-dark btn-sm"
                        href="{{ url_for('admins.exportar_avaliacoes_pdf', nota=nota_filtro) }}">
                         Exportar PDF
                     </a>
                 </div>
             </div>
 
-            <form class="admin-ride-filter" action="{{ url_for('admins.avaliacoes') }}" method="get">
-                <label for="nota">
-                    Filtrar por nota
-                    <select id="nota" name="nota">
+            <div class="card-body border-bottom">
+            <form class="row g-2 align-items-end" action="{{ url_for('admins.avaliacoes') }}" method="get">
+                <div class="col-12 col-md-6">
+                    <label class="form-label" for="nota">Filtrar por nota</label>
+                    <select class="form-select" id="nota" name="nota">
                         <option value="" {% if not nota_filtro %}selected{% endif %}>Todas as notas</option>
                         {% for nota in notas_validas %}
-                            <option value="{{ nota }}" {% if nota_filtro == nota|string %}selected{% endif %}>
-                                {{ nota }} de 5
-                            </option>
+                            <option value="{{ nota }}" {% if nota_filtro == nota|string %}selected{% endif %}>{{ nota }} de 5</option>
                         {% endfor %}
                     </select>
-                </label>
-                <button class="primary-action" type="submit">Filtrar</button>
+                </div>
+                <div class="col-auto"><button class="btn btn-dark" type="submit">Filtrar</button></div>
                 {% if nota_filtro %}
-                    <a class="admin-filter-reset" href="{{ url_for('admins.avaliacoes') }}">Limpar filtro</a>
+                    <div class="col-auto"><a class="btn btn-link link-dark" href="{{ url_for('admins.avaliacoes') }}">Limpar filtro</a></div>
                 {% endif %}
             </form>
+            </div>
 
             {% if avaliacoes %}
-                <div class="admin-ride-list">
+                <div class="list-group list-group-flush">
                     {% for avaliacao in avaliacoes %}
-                        <article class="ride-history-card admin-payment-card">
-                            <header class="ride-history-header">
+                        <article class="list-group-item p-4">
+                            <header class="d-flex flex-column flex-sm-row align-items-sm-start justify-content-between gap-3 mb-3">
                                 <div>
-                                    <p class="eyebrow">
+                                    <p class="small text-body-secondary mb-1">
                                         Avaliação #{{ avaliacao.id }} · Corrida #{{ avaliacao.corrida_id }}
                                     </p>
-                                    <h3>{{ avaliacao.origem }} <span aria-hidden="true">&rarr;</span> {{ avaliacao.destino }}</h3>
+                                    <h3 class="h5 mb-0">{{ avaliacao.origem }} <span aria-hidden="true">&rarr;</span> {{ avaliacao.destino }}</h3>
                                 </div>
-                                <span class="rating-score" aria-label="Nota {{ avaliacao.nota }} de 5">
+                                <span class="badge rounded-pill text-bg-dark fs-6" aria-label="Nota {{ avaliacao.nota }} de 5">
                                     {{ avaliacao.nota }} / 5
                                 </span>
                             </header>
 
-                            <dl class="ride-history-details">
-                                <div>
-                                    <dt>Usuário</dt>
-                                    <dd>{{ avaliacao.usuario }}</dd>
+                            <dl class="row g-3 mb-0">
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <dt class="small text-body-secondary mb-1">Usuário</dt>
+                                    <dd class="mb-0 fw-semibold">{{ avaliacao.usuario }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Motorista avaliado</dt>
-                                    <dd>{{ avaliacao.motorista or "Não atribuído" }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <dt class="small text-body-secondary mb-1">Motorista avaliado</dt>
+                                    <dd class="mb-0 fw-semibold">{{ avaliacao.motorista or "Não atribuído" }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Status da corrida</dt>
-                                    <dd>{{ avaliacao.status_corrida }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <dt class="small text-body-secondary mb-1">Status da corrida</dt>
+                                    <dd class="mb-0 fw-semibold">{{ avaliacao.status_corrida }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Data da avaliação</dt>
-                                    <dd>{{ avaliacao.data_avaliacao.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-3">
+                                    <dt class="small text-body-secondary mb-1">Data da avaliação</dt>
+                                    <dd class="mb-0 fw-semibold">{{ avaliacao.data_avaliacao.strftime("%d/%m/%Y às %H:%M") }}</dd>
                                 </div>
                             </dl>
 
                             {% if avaliacao.comentario %}
-                                <blockquote class="admin-rating-comment">
+                                <blockquote class="mt-3 mb-0 p-3 bg-light border-start border-3">
                                     {{ avaliacao.comentario }}
                                 </blockquote>
                             {% else %}
-                                <p class="payment-note">Avaliação sem comentário.</p>
+                                <p class="text-body-secondary mt-3 mb-0">Avaliação sem comentário.</p>
                             {% endif %}
                         </article>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <h3>Nenhuma avaliação encontrada</h3>
-                    <p>
+                <div class="card-body text-center py-5">
+                    <h3 class="h6">Nenhuma avaliação encontrada</h3>
+                    <p class="text-body-secondary mb-0">
                         {% if nota_filtro %}
                             Não há avaliações com a nota selecionada.
                         {% else %}

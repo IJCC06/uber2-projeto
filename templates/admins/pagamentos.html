@@ -4,132 +4,133 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pagamentos | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_usuarios.css') }}">
 </head>
 <body>
     {% include "includes/header_admin.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="payments-title">
+    <main class="container-xl py-5">
+        <section class="mb-4" aria-labelledby="payments-title">
             <div>
-                <p class="eyebrow">Administração</p>
-                <h1 id="payments-title">Pagamentos</h1>
-                <p>Consulte os pagamentos registrados. Esta versão não processa nem confirma cobranças.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Administração</p>
+                <h1 class="display-6 fw-semibold mb-2" id="payments-title">Pagamentos</h1>
+                <p class="text-body-secondary mb-0">Consulte os pagamentos registrados. Esta versão não processa nem confirma cobranças.</p>
             </div>
         </section>
 
-        <section class="admin-payment-summary" aria-label="Resumo de pagamentos">
-            <article class="summary-card">
-                <span class="summary-label">Pagamentos pendentes</span>
-                <strong>{{ total_pendentes }}</strong>
-                <span class="admin-card-detail">
-                    R$ {{ "%.2f"|format(valor_pendente)|replace(".", ",") }} registrados
-                </span>
-            </article>
-            <article class="summary-card">
-                <span class="summary-label">Pagamentos marcados como pagos</span>
-                <strong>{{ total_pagos }}</strong>
-                <span class="admin-card-detail">
-                    R$ {{ "%.2f"|format(valor_pago)|replace(".", ",") }} registrados
-                </span>
-            </article>
-            <article class="summary-card">
-                <span class="summary-label">Total de registros</span>
-                <strong>{{ total_pagamentos }}</strong>
-                <span class="admin-card-detail">Registros de forma de pagamento</span>
-            </article>
+        <section class="row g-3 mb-4" aria-label="Resumo de pagamentos">
+            <div class="col-12 col-md-4">
+                <article class="card h-100 shadow-sm"><div class="card-body">
+                    <span class="text-body-secondary">Pagamentos pendentes</span>
+                    <strong class="d-block mt-2 fs-2">{{ total_pendentes }}</strong>
+                    <small class="text-body-secondary">R$ {{ "%.2f"|format(valor_pendente)|replace(".", ",") }} registrados</small>
+                </div></article>
+            </div>
+            <div class="col-12 col-md-4">
+                <article class="card h-100 shadow-sm"><div class="card-body">
+                    <span class="text-body-secondary">Pagamentos marcados como pagos</span>
+                    <strong class="d-block mt-2 fs-2">{{ total_pagos }}</strong>
+                    <small class="text-body-secondary">R$ {{ "%.2f"|format(valor_pago)|replace(".", ",") }} registrados</small>
+                </div></article>
+            </div>
+            <div class="col-12 col-md-4">
+                <article class="card h-100 shadow-sm"><div class="card-body">
+                    <span class="text-body-secondary">Total de registros</span>
+                    <strong class="d-block mt-2 fs-2">{{ total_pagamentos }}</strong>
+                    <small class="text-body-secondary">Registros de forma de pagamento</small>
+                </div></article>
+            </div>
         </section>
 
-        <section class="panel admin-rides-panel" aria-labelledby="payments-list-title">
-            <div class="panel-header">
-                <h2 id="payments-list-title">Registros de pagamento</h2>
-                <div class="panel-actions">
-                    <span class="ride-count">{{ pagamentos|length }}</span>
-                    <a class="secondary-action"
+        <section class="card shadow-sm" aria-labelledby="payments-list-title">
+            <div class="card-header bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 py-3">
+                <h2 id="payments-list-title" class="h5 mb-0">Registros de pagamento</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill text-bg-dark">{{ pagamentos|length }}</span>
+                    <a class="btn btn-outline-dark btn-sm"
                        href="{{ url_for('admins.exportar_pagamentos_pdf', status=status_filtro, forma=forma_filtro) }}">
                         Exportar PDF
                     </a>
                 </div>
             </div>
 
-            <form class="admin-ride-filter" action="{{ url_for('admins.pagamentos') }}" method="get">
-                <label for="status">
-                    Status
-                    <select id="status" name="status">
+            <div class="card-body border-bottom">
+            <form class="row g-2 align-items-end" action="{{ url_for('admins.pagamentos') }}" method="get">
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="status">Status</label>
+                    <select class="form-select" id="status" name="status">
                         <option value="" {% if not status_filtro %}selected{% endif %}>Todos</option>
                         {% for status in status_validos %}
-                            <option value="{{ status }}" {% if status_filtro == status %}selected{% endif %}>
-                                {{ status }}
-                            </option>
+                            <option value="{{ status }}" {% if status_filtro == status %}selected{% endif %}>{{ status }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <label for="forma">
-                    Forma
-                    <select id="forma" name="forma">
+                </div>
+                <div class="col-12 col-md-4">
+                    <label class="form-label" for="forma">Forma</label>
+                    <select class="form-select" id="forma" name="forma">
                         <option value="" {% if not forma_filtro %}selected{% endif %}>Todas</option>
                         {% for forma in formas_validas %}
-                            <option value="{{ forma }}" {% if forma_filtro == forma %}selected{% endif %}>
-                                {{ forma }}
-                            </option>
+                            <option value="{{ forma }}" {% if forma_filtro == forma %}selected{% endif %}>{{ forma }}</option>
                         {% endfor %}
                     </select>
-                </label>
-                <button class="primary-action" type="submit">Filtrar</button>
+                </div>
+                <div class="col-auto"><button class="btn btn-dark" type="submit">Filtrar</button></div>
                 {% if status_filtro or forma_filtro %}
-                    <a class="admin-filter-reset" href="{{ url_for('admins.pagamentos') }}">Limpar filtros</a>
+                    <div class="col-auto"><a class="btn btn-link link-dark" href="{{ url_for('admins.pagamentos') }}">Limpar filtros</a></div>
                 {% endif %}
             </form>
+            </div>
 
             {% if pagamentos %}
-                <div class="admin-ride-list">
+                <div class="list-group list-group-flush">
                     {% for pagamento in pagamentos %}
-                        <article class="ride-history-card admin-payment-card">
-                            <header class="ride-history-header">
+                        <article class="list-group-item p-4">
+                            <header class="d-flex flex-column flex-sm-row align-items-sm-start justify-content-between gap-3 mb-3">
                                 <div>
-                                    <p class="eyebrow">
+                                    <p class="small text-body-secondary mb-1">
                                         Pagamento #{{ pagamento.id }} · Corrida #{{ pagamento.corrida_id }}
                                     </p>
-                                    <h3>{{ pagamento.origem }} <span aria-hidden="true">&rarr;</span> {{ pagamento.destino }}</h3>
+                                    <h3 class="h5 mb-0">{{ pagamento.origem }} <span aria-hidden="true">&rarr;</span> {{ pagamento.destino }}</h3>
                                 </div>
-                                <span class="payment-status {{ 'unpaid' if pagamento.status == 'Pendente' else '' }}">
+                                <span class="badge rounded-pill {{ 'text-bg-warning' if pagamento.status == 'Pendente' else 'text-bg-dark' }}">
                                     {{ pagamento.status }}
                                 </span>
                             </header>
 
-                            <dl class="ride-history-details">
-                                <div>
-                                    <dt>Usuário</dt>
-                                    <dd>{{ pagamento.usuario }}</dd>
+                            <dl class="row g-3 mb-0">
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Usuário</dt>
+                                    <dd class="mb-0 fw-semibold">{{ pagamento.usuario }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Motorista</dt>
-                                    <dd>{{ pagamento.motorista or "Não atribuído" }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Motorista</dt>
+                                    <dd class="mb-0 fw-semibold">{{ pagamento.motorista or "Não atribuído" }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Forma registrada</dt>
-                                    <dd>{{ pagamento.forma }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Forma registrada</dt>
+                                    <dd class="mb-0 fw-semibold">{{ pagamento.forma }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Valor registrado</dt>
-                                    <dd>R$ {{ "%.2f"|format(pagamento.valor)|replace(".", ",") }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Valor registrado</dt>
+                                    <dd class="mb-0 fw-semibold">R$ {{ "%.2f"|format(pagamento.valor)|replace(".", ",") }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Status da corrida</dt>
-                                    <dd>{{ pagamento.status_corrida }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Status da corrida</dt>
+                                    <dd class="mb-0 fw-semibold">{{ pagamento.status_corrida }}</dd>
                                 </div>
-                                <div>
-                                    <dt>Registro criado em</dt>
-                                    <dd>{{ pagamento.data_registro.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                <div class="col-12 col-sm-6 col-lg-4">
+                                    <dt class="small text-body-secondary mb-1">Registro criado em</dt>
+                                    <dd class="mb-0 fw-semibold">{{ pagamento.data_registro.strftime("%d/%m/%Y às %H:%M") }}</dd>
                                 </div>
                             </dl>
                         </article>
                     {% endfor %}
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <h3>Nenhum pagamento encontrado</h3>
-                    <p>Os pagamentos registrados aparecerão nesta lista.</p>
+                <div class="card-body text-center py-5">
+                    <h3 class="h6">Nenhum pagamento encontrado</h3>
+                    <p class="text-body-secondary mb-0">Os pagamentos registrados aparecerão nesta lista.</p>
                 </div>
             {% endif %}
         </section>

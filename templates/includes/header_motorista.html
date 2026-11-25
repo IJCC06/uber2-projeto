@@ -3,30 +3,35 @@
         U2 <span>Uber 2</span>
     </a>
 
-    <nav aria-label="Navegação principal">
-        <a href="{{ url_for('motoristas.home') }}"
-           {% if request.endpoint == 'motoristas.home' %}class="active" aria-current="page"{% endif %}>
+    <nav class="nav nav-pills flex-wrap" aria-label="Navegação principal">
+        <a class="nav-link{% if request.endpoint == 'motoristas.home' %} active{% endif %}"
+           href="{{ url_for('motoristas.home') }}"
+           {% if request.endpoint == 'motoristas.home' %}aria-current="page"{% endif %}>
             Início
         </a>
-        <a href="{{ url_for('motoristas.corridas_disponiveis') }}"
-           {% if request.endpoint == 'motoristas.corridas_disponiveis' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'motoristas.corridas_disponiveis' %} active{% endif %}"
+           href="{{ url_for('motoristas.corridas_disponiveis') }}"
+           {% if request.endpoint == 'motoristas.corridas_disponiveis' %}aria-current="page"{% endif %}>
             Corridas disponíveis
         </a>
-        <a href="{{ url_for('motoristas.historico_corridas') }}"
-           {% if request.endpoint == 'motoristas.historico_corridas' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'motoristas.historico_corridas' %} active{% endif %}"
+           href="{{ url_for('motoristas.historico_corridas') }}"
+           {% if request.endpoint == 'motoristas.historico_corridas' %}aria-current="page"{% endif %}>
             Histórico
         </a>
-        <a href="{{ url_for('motoristas.meus_veiculos') }}"
-           {% if request.endpoint == 'motoristas.meus_veiculos' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'motoristas.meus_veiculos' %} active{% endif %}"
+           href="{{ url_for('motoristas.meus_veiculos') }}"
+           {% if request.endpoint == 'motoristas.meus_veiculos' %}aria-current="page"{% endif %}>
             Meus veículos
         </a>
-        <a href="{{ url_for('motoristas.conta') }}"
-           {% if request.endpoint == 'motoristas.conta' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'motoristas.conta' %} active{% endif %}"
+           href="{{ url_for('motoristas.conta') }}"
+           {% if request.endpoint == 'motoristas.conta' %}aria-current="page"{% endif %}>
             Minha conta
         </a>
     </nav>
 
-    <form action="{{ url_for('auth.logout') }}" method="POST">
-        <button class="logout" type="submit">Sair</button>
+    <form class="d-flex" action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="btn btn-outline-dark btn-sm" type="submit">Sair</button>
     </form>
 </header>

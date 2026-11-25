@@ -4,45 +4,59 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Acesso administrativo | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login_admin.css') }}">
+    {% if recaptcha_configurado %}
+        <script src="https://www.google.com/recaptcha/api.js?hl=pt-BR" async defer></script>
+    {% endif %}
 </head>
 <body>
-    <main class="admin-login-page">
-        <section class="admin-login-card" aria-labelledby="admin-login-title">
-            <a class="back-link" href="{{ url_for('auth.login') }}">← Voltar para os acessos</a>
+    <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
+        <section class="admin-login-card card border-0 shadow-sm" aria-labelledby="admin-login-title">
+            <div class="card-body p-4 p-md-5">
+                <a class="back-link" href="{{ url_for('auth.login') }}">← Voltar para os acessos</a>
 
-            <div class="brand">
-                <span class="brand-mark" aria-hidden="true">U2</span>
-                <span>Uber 2</span>
+                <div class="brand">
+                    <span class="brand-mark" aria-hidden="true">U2</span>
+                    <span>Uber 2</span>
+                </div>
+
+                <header class="admin-login-header">
+                    <p class="eyebrow">Área restrita</p>
+                    <h1 id="admin-login-title">Acesso administrativo</h1>
+                    <p>Entre com as credenciais da sua conta de administrador.</p>
+                </header>
+
+                {% if erro %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ erro }}
+                    </div>
+                {% endif %}
+                {% if not recaptcha_configurado %}
+                    <div class="alert alert-warning" role="alert">
+                        O CAPTCHA não está configurado. O login está temporariamente indisponível.
+                    </div>
+                {% endif %}
+
+                <form class="vstack gap-3" action="{{ url_for('auth.login_admin') }}" method="post">
+                    <div>
+                        <label class="form-label" for="admin-email">E-mail</label>
+                        <input id="admin-email" class="form-control" name="email" type="email" autocomplete="email" placeholder="admin@exemplo.com" required>
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="admin-password">Senha</label>
+                        <input id="admin-password" class="form-control" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+                    </div>
+
+                    {% if recaptcha_configurado %}
+                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                    {% endif %}
+                    <button class="btn btn-dark w-100" type="submit" {% if not recaptcha_configurado %}disabled{% endif %}>Entrar na área administrativa</button>
+                </form>
+
+                <p class="security-note alert alert-warning">Use uma conta de administrador autorizada para continuar.</p>
             </div>
-
-            <header class="admin-login-header">
-                <p class="eyebrow">Área restrita</p>
-                <h1 id="admin-login-title">Acesso administrativo</h1>
-                <p>Entre com as credenciais da sua conta de administrador.</p>
-            </header>
-
-            {% if erro %}
-                <p class="form-message error-message" role="alert">
-                    {{ erro }}
-                </p>
-            {% endif %}
-
-            <form class="admin-login-form" action="{{ url_for('auth.login_admin') }}" method="post">
-                <div class="form-field">
-                    <label for="admin-email">E-mail</label>
-                    <input name="email" type="email" autocomplete="email" placeholder="admin@exemplo.com" required>
-                </div>
-
-                <div class="form-field">
-                    <label for="admin-password">Senha</label>
-                    <input name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
-                </div>
-
-                <button type="submit">Entrar na área administrativa</button>
-            </form>
-
-            <p class="security-note">Use uma conta de administrador autorizada para continuar.</p>
         </section>
     </main>
 </body>

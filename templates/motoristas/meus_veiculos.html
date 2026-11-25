@@ -4,131 +4,148 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Meus veículos | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
 </head>
 <body>
     {% include "includes/header_motorista.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="vehicles-title">
+    <main class="container-xl py-5">
+        <section class="mb-4" aria-labelledby="vehicles-title">
             <div>
-                <p class="eyebrow">Área do motorista</p>
-                <h1 id="vehicles-title">Meus veículos</h1>
-                <p>Cadastre e consulte os veículos vinculados à sua conta.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Área do motorista</p>
+                <h1 class="display-6 fw-semibold mb-2" id="vehicles-title">Meus veículos</h1>
+                <p class="text-body-secondary mb-0">Cadastre e consulte os veículos vinculados à sua conta.</p>
             </div>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
-                <p class="form-message {{ categoria }}-message"
-                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                <div class="alert {{ 'alert-success' if categoria == 'success' else 'alert-danger' }}"
+                     role="{{ 'status' if categoria == 'success' else 'alert' }}">
                     {{ mensagem }}
-                </p>
+                </div>
             {% endfor %}
         {% endwith %}
 
-        <section class="panel vehicle-form-panel" aria-labelledby="vehicle-form-title">
-            <h2 id="vehicle-form-title">Cadastrar veículo</h2>
-            <form class="vehicle-form" action="{{ url_for('motoristas.meus_veiculos') }}" method="post">
-                <div class="vehicle-field">
-                    <label for="marca">Marca</label>
-                    <input id="marca" name="marca" maxlength="50" autocomplete="organization" required>
-                </div>
-                <div class="vehicle-field">
-                    <label for="modelo">Modelo</label>
-                    <input id="modelo" name="modelo" maxlength="50" required>
-                </div>
-                <div class="vehicle-field">
-                    <label for="placa">Placa</label>
-                    <input id="placa" name="placa" maxlength="10" autocomplete="off" required>
-                </div>
-                <div class="vehicle-field">
-                    <label for="ano">Ano</label>
-                    <input id="ano" name="ano" type="number" min="1" step="1" required>
-                </div>
-                <div class="vehicle-field">
-                    <label for="cor">Cor (opcional)</label>
-                    <input id="cor" name="cor" maxlength="30">
-                </div>
-                <button class="primary-action" type="submit">Cadastrar veículo</button>
-            </form>
+        <section class="card shadow-sm mb-4" aria-labelledby="vehicle-form-title">
+            <div class="card-body">
+                <h2 id="vehicle-form-title" class="h5 mb-3">Cadastrar veículo</h2>
+                <form class="row g-3" action="{{ url_for('motoristas.meus_veiculos') }}" method="post">
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="marca">Marca</label>
+                        <input class="form-control" id="marca" name="marca" maxlength="50" autocomplete="organization" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="modelo">Modelo</label>
+                        <input class="form-control" id="modelo" name="modelo" maxlength="50" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="placa">Placa</label>
+                        <input class="form-control" id="placa" name="placa" maxlength="10" autocomplete="off" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="ano">Ano</label>
+                        <input class="form-control" id="ano" name="ano" type="number" min="1" step="1" required>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label class="form-label" for="cor">Cor (opcional)</label>
+                        <input class="form-control" id="cor" name="cor" maxlength="30">
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-dark" type="submit">Cadastrar veículo</button>
+                    </div>
+                </form>
+            </div>
         </section>
 
-        <section class="panel vehicle-list-panel" aria-labelledby="vehicle-list-title">
-            <div class="panel-header">
-                <h2 id="vehicle-list-title">Veículos cadastrados</h2>
-                <div class="panel-actions">
-                    <span class="ride-count">{{ veiculos|length }}</span>
-                    <a class="secondary-action" href="{{ url_for('motoristas.exportar_veiculos_pdf') }}">
+        <section class="card shadow-sm" aria-labelledby="vehicle-list-title">
+            <div class="card-header bg-white d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 py-3">
+                <h2 id="vehicle-list-title" class="h5 mb-0">Veículos cadastrados</h2>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge rounded-pill text-bg-dark">{{ veiculos|length }}</span>
+                    <a class="btn btn-outline-dark btn-sm" href="{{ url_for('motoristas.exportar_veiculos_pdf') }}">
                         Baixar lista PDF
                     </a>
                 </div>
             </div>
             {% if veiculos %}
-                <div class="vehicle-list">
-                    {% for veiculo in veiculos %}
-                        <article class="vehicle-card">
-                            <div>
-                                <p class="eyebrow">{{ veiculo.marca }} {{ veiculo.modelo }}</p>
-                                <h3>{{ veiculo.placa }}</h3>
-                                <details class="vehicle-edit">
-                                    <summary>Editar dados</summary>
-                                    <form
-                                        class="vehicle-form vehicle-edit-form"
-                                        action="{{ url_for('motoristas.editar_veiculo', veiculo_id=veiculo.id) }}"
-                                        method="post"
-                                    >
-                                        <div class="vehicle-field">
-                                            <label for="marca-{{ veiculo.id }}">Marca</label>
-                                            <input id="marca-{{ veiculo.id }}" name="marca" maxlength="50" value="{{ veiculo.marca }}" required>
+                <div class="card-body">
+                    <div class="vstack gap-3">
+                        {% for veiculo in veiculos %}
+                            <article class="card">
+                                <div class="card-body">
+                                    <div class="row g-3 align-items-start">
+                                        <div class="col-12 col-md-6">
+                                            <p class="small text-body-secondary text-uppercase fw-semibold mb-1">
+                                                {{ veiculo.marca }} {{ veiculo.modelo }}
+                                            </p>
+                                            <h3 class="h5 mb-0">{{ veiculo.placa }}</h3>
                                         </div>
-                                        <div class="vehicle-field">
-                                            <label for="modelo-{{ veiculo.id }}">Modelo</label>
-                                            <input id="modelo-{{ veiculo.id }}" name="modelo" maxlength="50" value="{{ veiculo.modelo }}" required>
+                                        <dl class="col-12 col-md-4 row g-2 mb-0">
+                                            <div class="col-6">
+                                                <dt class="small text-body-secondary mb-1">Ano</dt>
+                                                <dd class="mb-0 fw-semibold">{{ veiculo.ano }}</dd>
+                                            </div>
+                                            {% if veiculo.cor %}
+                                                <div class="col-6">
+                                                    <dt class="small text-body-secondary mb-1">Cor</dt>
+                                                    <dd class="mb-0 fw-semibold">{{ veiculo.cor }}</dd>
+                                                </div>
+                                            {% endif %}
+                                        </dl>
+                                        <div class="col-12 col-md-2 d-grid">
+                                            <form
+                                                action="{{ url_for('motoristas.excluir_veiculo', veiculo_id=veiculo.id) }}"
+                                                method="post"
+                                                onsubmit="return confirm('Deseja excluir este veículo?');"
+                                            >
+                                                <button class="btn btn-outline-danger w-100" type="submit">Excluir</button>
+                                            </form>
                                         </div>
-                                        <div class="vehicle-field">
-                                            <label for="placa-{{ veiculo.id }}">Placa</label>
-                                            <input id="placa-{{ veiculo.id }}" name="placa" maxlength="10" value="{{ veiculo.placa }}" required>
-                                        </div>
-                                        <div class="vehicle-field">
-                                            <label for="ano-{{ veiculo.id }}">Ano</label>
-                                            <input id="ano-{{ veiculo.id }}" name="ano" type="number" min="1" step="1" value="{{ veiculo.ano }}" required>
-                                        </div>
-                                        <div class="vehicle-field">
-                                            <label for="cor-{{ veiculo.id }}">Cor (opcional)</label>
-                                            <input id="cor-{{ veiculo.id }}" name="cor" maxlength="30" value="{{ veiculo.cor or '' }}">
-                                        </div>
-                                        <button class="primary-action" type="submit">Salvar alterações</button>
-                                    </form>
-                                </details>
-                            </div>
-                            <dl class="vehicle-details">
-                                <div>
-                                    <dt>Ano</dt>
-                                    <dd>{{ veiculo.ano }}</dd>
-                                </div>
-                                {% if veiculo.cor %}
-                                    <div>
-                                        <dt>Cor</dt>
-                                        <dd>{{ veiculo.cor }}</dd>
                                     </div>
-                                {% endif %}
-                            </dl>
-                            <form
-                                class="vehicle-delete-form"
-                                action="{{ url_for('motoristas.excluir_veiculo', veiculo_id=veiculo.id) }}"
-                                method="post"
-                                onsubmit="return confirm('Deseja excluir este veículo?');"
-                            >
-                                <button class="vehicle-delete-action" type="submit">Excluir</button>
-                            </form>
-                        </article>
-                    {% endfor %}
+
+                                    <details class="mt-3">
+                                        <summary class="link-dark fw-semibold">Editar dados</summary>
+                                        <form
+                                            class="row g-3 mt-1"
+                                            action="{{ url_for('motoristas.editar_veiculo', veiculo_id=veiculo.id) }}"
+                                            method="post"
+                                        >
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label" for="marca-{{ veiculo.id }}">Marca</label>
+                                                <input class="form-control" id="marca-{{ veiculo.id }}" name="marca" maxlength="50" value="{{ veiculo.marca }}" required>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label" for="modelo-{{ veiculo.id }}">Modelo</label>
+                                                <input class="form-control" id="modelo-{{ veiculo.id }}" name="modelo" maxlength="50" value="{{ veiculo.modelo }}" required>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label" for="placa-{{ veiculo.id }}">Placa</label>
+                                                <input class="form-control" id="placa-{{ veiculo.id }}" name="placa" maxlength="10" value="{{ veiculo.placa }}" required>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label" for="ano-{{ veiculo.id }}">Ano</label>
+                                                <input class="form-control" id="ano-{{ veiculo.id }}" name="ano" type="number" min="1" step="1" value="{{ veiculo.ano }}" required>
+                                            </div>
+                                            <div class="col-12 col-md-6">
+                                                <label class="form-label" for="cor-{{ veiculo.id }}">Cor (opcional)</label>
+                                                <input class="form-control" id="cor-{{ veiculo.id }}" name="cor" maxlength="30" value="{{ veiculo.cor or '' }}">
+                                            </div>
+                                            <div class="col-12">
+                                                <button class="btn btn-dark" type="submit">Salvar alterações</button>
+                                            </div>
+                                        </form>
+                                    </details>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    </div>
                 </div>
             {% else %}
-                <div class="empty-state">
-                    <h3>Nenhum veículo cadastrado</h3>
-                    <p>Use o formulário acima para cadastrar seu primeiro veículo.</p>
+                <div class="card-body text-center py-5">
+                    <h3 class="h6">Nenhum veículo cadastrado</h3>
+                    <p class="text-body-secondary mb-0">Use o formulário acima para cadastrar seu primeiro veículo.</p>
                 </div>
             {% endif %}
         </section>

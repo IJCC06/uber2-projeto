@@ -3,30 +3,35 @@
         U2 <span>Uber 2</span>
     </a>
 
-    <nav aria-label="Navegação principal">
-        <a href="{{ url_for('usuarios.home') }}"
-           {% if request.endpoint == 'usuarios.home' %}class="active" aria-current="page"{% endif %}>
+    <nav class="nav nav-pills flex-wrap" aria-label="Navegação principal">
+        <a class="nav-link{% if request.endpoint == 'usuarios.home' %} active{% endif %}"
+           href="{{ url_for('usuarios.home') }}"
+           {% if request.endpoint == 'usuarios.home' %}aria-current="page"{% endif %}>
             Início
         </a>
-        <a href="{{ url_for('usuarios.solicitar_corrida') }}"
-           {% if request.endpoint == 'usuarios.solicitar_corrida' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'usuarios.solicitar_corrida' %} active{% endif %}"
+           href="{{ url_for('usuarios.solicitar_corrida') }}"
+           {% if request.endpoint == 'usuarios.solicitar_corrida' %}aria-current="page"{% endif %}>
             Solicitar corrida
         </a>
-        <a href="{{ url_for('usuarios.minhas_corridas') }}"
-           {% if request.endpoint == 'usuarios.minhas_corridas' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'usuarios.minhas_corridas' %} active{% endif %}"
+           href="{{ url_for('usuarios.minhas_corridas') }}"
+           {% if request.endpoint == 'usuarios.minhas_corridas' %}aria-current="page"{% endif %}>
             Minhas corridas
         </a>
-        <a href="{{ url_for('usuarios.pagamentos') }}"
-           {% if request.endpoint == 'usuarios.pagamentos' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'usuarios.pagamentos' %} active{% endif %}"
+           href="{{ url_for('usuarios.pagamentos') }}"
+           {% if request.endpoint == 'usuarios.pagamentos' %}aria-current="page"{% endif %}>
             Pagamentos
         </a>
-        <a href="{{ url_for('usuarios.conta') }}"
-           {% if request.endpoint == 'usuarios.conta' %}class="active" aria-current="page"{% endif %}>
+        <a class="nav-link{% if request.endpoint == 'usuarios.conta' %} active{% endif %}"
+           href="{{ url_for('usuarios.conta') }}"
+           {% if request.endpoint == 'usuarios.conta' %}aria-current="page"{% endif %}>
             Minha conta
         </a>
     </nav>
 
-    <form action="{{ url_for('auth.logout') }}" method="POST">
-        <button class="logout" type="submit">Sair</button>
+    <form class="d-flex" action="{{ url_for('auth.logout') }}" method="POST">
+        <button class="btn btn-outline-dark btn-sm" type="submit">Sair</button>
     </form>
 </header>

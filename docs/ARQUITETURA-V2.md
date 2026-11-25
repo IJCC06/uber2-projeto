@@ -13,6 +13,8 @@ A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenv
 - PostgreSQL — banco de dados relacional
 - psycopg2-binary — conexão entre Python e PostgreSQL
 - fpdf2 — geração de relatórios PDF por perfil
+- Bootstrap 5.3.9 — grid e componentes utilizados inicialmente no painel administrativo
+- Google reCAPTCHA v2 — validação anti-bot server-side nos formulários de login
 - python-dotenv — leitura das configurações locais em .env
 - HTML, CSS e JavaScript — interface
 - Flask-Login — autenticação web e gerenciamento de sessões
@@ -47,9 +49,19 @@ uber2-projeto/
 │   ├── logins.py
 │   └── pdf_export.py
 ├── tests/
+│   ├── test_admin_navigation.py
+│   ├── test_admin_pages.py
 │   ├── test_conexao.py
+│   ├── test_driver_dashboard.py
+│   ├── test_driver_history.py
+│   ├── test_driver_profile_pages.py
+│   ├── test_login_templates.py
 │   ├── test_pdf_export.py
-│   └── test_postgres_acceptance.py
+│   ├── test_postgres_acceptance.py
+│   ├── test_registration_error_templates.py
+│   ├── test_user_dashboard.py
+│   ├── test_user_profile_pages.py
+│   └── test_user_driver_navigation.py
 ├── templates/
 │   ├── admins/
 │   ├── logins/
@@ -58,7 +70,11 @@ uber2-projeto/
 └── public/
     └── static/
         ├── css/
-        └── js/
+        ├── js/
+        └── vendor/
+            └── bootstrap/
+                ├── bootstrap.min.css
+                └── LICENSE
 ```
 
 A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O módulo python/logins.py é utilizado atualmente por app.py; os demais módulos antigos ainda precisam ser avaliados antes de uma reorganização. A estrutura poderá ser simplificada conforme as funcionalidades web forem implementadas.
@@ -73,6 +89,7 @@ A pasta python ainda contém módulos herdados da versão de terminal/SQLite. O 
 - tests/: contém testes unitários dos PDFs e teste de aceitação com banco PostgreSQL isolado.
 - templates/: reúne os arquivos HTML renderizados pelo Flask.
 - public/static/: reúne os arquivos estáticos publicados pela Vercel, como CSS e JavaScript.
+- public/static/vendor/bootstrap/: contém a folha de estilos local e a licença MIT do Bootstrap 5.3.9.
 - sql/: contém os scripts SQL e utilitários de dados de teste versionados.
 
 ## Configuração do banco de dados
@@ -87,11 +104,15 @@ DB_NAME=uber2_v2
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 SECRET_KEY=chave_forte_gerada_localmente
+RECAPTCHA_SITE_KEY=chave_publica_do_recaptcha
+RECAPTCHA_SECRET_KEY=chave_secreta_do_recaptcha
 ```
 
 A função `criar_conexao()`, em `conexao.py`, utiliza as quatro variáveis do banco para abrir a conexão com PostgreSQL por meio de psycopg2. `app.py` carrega `SECRET_KEY` do mesmo `.env`; a chave deve ser forte, privada e estável para manter a validade das sessões entre reinicializações. Gere-a localmente com `python -c "import secrets; print(secrets.token_hex(32))"`.
 
 O arquivo `.env` está no `.gitignore` e não deve ser compartilhado nem enviado ao Git.
+
+Os logins de usuário, motorista e administrador usam Google reCAPTCHA v2 do tipo caixa de seleção. Configure as chaves pública e secreta no console do Google para cada domínio usado. O servidor envia o token ao endpoint de verificação do Google com timeout; token ausente, rejeitado, indisponibilidade do serviço ou chaves não configuradas bloqueiam a autenticação. A chave secreta deve ser mantida fora do código e do Git.
 
 O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em sql/ e devem ser revisados antes da execução. Em especial, insert-date.sql contém comandos de limpeza e não deve ser executado em um banco com dados que precisem ser preservados. Para bancos já criados, adicionar-distancia-corridas.sql inclui a coluna de distância sem remover os registros existentes.
 
@@ -100,7 +121,7 @@ O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scrip
 1. Instale Python 3 e PostgreSQL.
 2. Crie e ative um ambiente virtual na pasta do projeto.
 3. Instale as dependências listadas em requirements.txt.
-4. Configure DB_HOST, DB_NAME, DB_USER, DB_PASSWORD e SECRET_KEY em um arquivo local `.env`. Gere `SECRET_KEY` localmente com o comando Python documentado acima.
+4. Configure DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, SECRET_KEY, RECAPTCHA_SITE_KEY e RECAPTCHA_SECRET_KEY em um arquivo local `.env`. Gere `SECRET_KEY` localmente com o comando Python documentado acima.
 5. Crie o banco configurado no PostgreSQL.
 6. Execute os scripts SQL necessários, após revisar seu conteúdo.
 7. Inicie a aplicação:
@@ -122,6 +143,8 @@ O fluxo web principal está implementado: cadastro e autenticação por perfil, 
 O projeto continua sendo um protótipo acadêmico. Integração com gateway de pagamento, mapas/geolocalização e implantação de produção estão fora do escopo atual; a aplicação não deve ser tratada como pronta para uso comercial.
 
 As exportações PDF são oferecidas nos históricos e pagamentos do usuário, nos históricos, veículos e avaliações recebidas pelo motorista e nas consultas administrativas. Cada rota de exportação exige login, confere o perfil e restringe os dados pessoais às próprias contas; os relatórios administrativos preservam os filtros da consulta. A biblioteca fpdf2 gera os arquivos em memória, sem gravá-los no servidor.
+
+A migração visual para Bootstrap está concluída em toda a aplicação. Os perfis usuário, motorista e administrador, login, cadastros e páginas de erro usam o Bootstrap 5.3.9 local. Painéis, históricos, solicitações, pagamentos, veículos, contas, usuários, motoristas, corridas e avaliações usam grid, cards, badges, tabelas e formulários responsivos. Os estilos locais restantes complementam identidade visual e elementos específicos das telas.
 
 ## Regras de negócio implementadas
 

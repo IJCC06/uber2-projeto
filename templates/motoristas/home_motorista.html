@@ -4,191 +4,189 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Área do motorista | Uber 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/home_motorista.css') }}">
 </head>
 <body>
     {% include "includes/header_motorista.html" %}
 
-    <main class="page-content">
-        <section class="welcome" aria-labelledby="welcome-title">
+    <main class="container-xl py-5">
+        <section class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4"
+                 aria-labelledby="welcome-title">
             <div>
-                <p class="eyebrow">Área do motorista</p>
-                <h1 id="welcome-title">Olá, {{ current_user.nome }}!</h1>
-                <p>Consulte as corridas disponíveis para você.</p>
+                <p class="small text-body-secondary text-uppercase fw-semibold mb-2">Área do motorista</p>
+                <h1 class="display-6 fw-semibold mb-2" id="welcome-title">Olá, {{ current_user.nome }}!</h1>
+                <p class="text-body-secondary mb-0">Consulte as corridas disponíveis para você.</p>
             </div>
-            <a class="primary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+            <a class="btn btn-dark" href="{{ url_for('motoristas.corridas_disponiveis') }}">
                 Ver corridas disponíveis
             </a>
         </section>
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
             {% for categoria, mensagem in mensagens %}
-                <p class="form-message {{ categoria }}-message"
-                   role="{{ 'status' if categoria == 'success' else 'alert' }}">
+                <div class="alert {{ 'alert-success' if categoria == 'success' else 'alert-danger' }}"
+                     role="{{ 'status' if categoria == 'success' else 'alert' }}">
                     {{ mensagem }}
-                </p>
+                </div>
             {% endfor %}
         {% endwith %}
 
         {% if pode_receber is defined %}
-            <section class="availability-card" aria-live="polite">
-                {% if pode_receber %}
-                    <span class="availability-indicator available" aria-hidden="true"></span>
-                    <div>
-                        <h2>Você está disponível</h2>
-                        <p>As corridas solicitadas aparecem abaixo.</p>
-                    </div>
-                {% else %}
-                    <span class="availability-indicator unavailable" aria-hidden="true"></span>
-                    <div>
-                        {% if not motorista_ativo %}
-                            <h2>Sua conta está inativa</h2>
-                            <p>Entre em contato com a administração para voltar a receber corridas.</p>
+            <section class="card shadow-sm mb-4" aria-live="polite">
+                <div class="card-body d-flex flex-column flex-md-row align-items-md-center gap-3">
+                    <div class="flex-grow-1">
+                        {% if pode_receber %}
+                            <span class="badge rounded-pill text-bg-success mb-2">Disponível</span>
+                            <h2 class="h5 mb-1">Você está disponível</h2>
+                            <p class="text-body-secondary mb-0">As corridas solicitadas aparecem abaixo.</p>
+                        {% elif not motorista_ativo %}
+                            <span class="badge rounded-pill text-bg-danger mb-2">Conta inativa</span>
+                            <h2 class="h5 mb-1">Sua conta está inativa</h2>
+                            <p class="text-body-secondary mb-0">Entre em contato com a administração para voltar a receber corridas.</p>
                         {% else %}
-                            <h2>Você não está disponível para receber corridas</h2>
-                            <p>Ative sua disponibilidade quando quiser receber novas solicitações.</p>
+                            <span class="badge rounded-pill text-bg-secondary mb-2">Indisponível</span>
+                            <h2 class="h5 mb-1">Você não está disponível para receber corridas</h2>
+                            <p class="text-body-secondary mb-0">Ative sua disponibilidade quando quiser receber novas solicitações.</p>
                         {% endif %}
                     </div>
-                {% endif %}
 
-                {% if disponivel or motorista_ativo %}
-                    <form
-                        class="availability-actions"
-                        action="{{ url_for('motoristas.atualizar_disponibilidade') }}"
-                        method="post"
-                    >
-                        <input
-                            type="hidden"
-                            name="disponivel"
-                            value="{{ '0' if disponivel else '1' }}"
-                        >
-                        {% if disponivel %}
-                            <button class="secondary-action" type="submit">Ficar indisponível</button>
-                        {% else %}
-                            <button class="primary-action" type="submit">Ficar disponível</button>
-                        {% endif %}
-                    </form>
-                {% endif %}
+                    {% if disponivel or motorista_ativo %}
+                        <form class="d-flex" action="{{ url_for('motoristas.atualizar_disponibilidade') }}" method="post">
+                            <input type="hidden" name="disponivel" value="{{ '0' if disponivel else '1' }}">
+                            {% if disponivel %}
+                                <button class="btn btn-outline-dark" type="submit">Ficar indisponível</button>
+                            {% else %}
+                                <button class="btn btn-dark" type="submit">Ficar disponível</button>
+                            {% endif %}
+                        </form>
+                    {% endif %}
+                </div>
             </section>
         {% endif %}
 
         {% if avaliacoes_recentes is defined %}
-            <section class="panel ratings-panel" aria-labelledby="ratings-title">
-                <div class="panel-header">
+            <section class="card shadow-sm mb-4" aria-labelledby="ratings-title">
+                <div class="card-header bg-white d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 py-3">
                     <div>
-                        <p class="eyebrow">Opinião dos passageiros</p>
-                        <h2 id="ratings-title">Suas avaliações</h2>
+                        <p class="small text-body-secondary text-uppercase fw-semibold mb-1">Opinião dos passageiros</p>
+                        <h2 id="ratings-title" class="h5 mb-0">Suas avaliações</h2>
                     </div>
-                    <div class="panel-actions">
-                        <span class="ride-count">{{ quantidade_avaliacoes }}</span>
-                        <a class="secondary-action" href="{{ url_for('motoristas.exportar_avaliacoes_pdf') }}">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge rounded-pill text-bg-dark">{{ quantidade_avaliacoes }}</span>
+                        <a class="btn btn-outline-dark btn-sm" href="{{ url_for('motoristas.exportar_avaliacoes_pdf') }}">
                             Baixar avaliações PDF
                         </a>
                     </div>
                 </div>
 
-                <div class="ratings-summary">
-                    <strong>
+                <div class="card-body border-bottom">
+                    <strong class="fs-2">
                         {% if media_avaliacoes is not none %}
                             {{ "%.2f"|format(media_avaliacoes)|replace(".", ",") }}
                         {% else %}
                             —
                         {% endif %}
                     </strong>
-                    <span>Média das notas</span>
+                    <span class="d-block text-body-secondary">Média das notas</span>
                 </div>
 
                 {% if avaliacoes_recentes %}
-                    <div class="rating-list">
+                    <div class="list-group list-group-flush">
                         {% for avaliacao in avaliacoes_recentes %}
-                            <article class="rating-card">
-                                <div class="rating-card-header">
-                                    <h3>{{ avaliacao.nota }} de 5</h3>
-                                    <time datetime="{{ avaliacao.data.isoformat() }}">
+                            <article class="list-group-item p-4">
+                                <div class="d-flex align-items-center justify-content-between gap-3">
+                                    <h3 class="h6 mb-0">{{ avaliacao.nota }} de 5</h3>
+                                    <time class="small text-body-secondary" datetime="{{ avaliacao.data.isoformat() }}">
                                         {{ avaliacao.data.strftime("%d/%m/%Y") }}
                                     </time>
                                 </div>
-                                <p class="rating-author">
+                                <p class="small text-body-secondary mt-2 mb-1">
                                     {{ avaliacao.usuario }} · Corrida #{{ avaliacao.corrida_id }}
                                 </p>
-                                <p class="rating-comment">
+                                <p class="mb-0">
                                     {{ avaliacao.comentario or "O passageiro não deixou um comentário." }}
                                 </p>
                             </article>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="empty-state ratings-empty-state">
-                        <h3>Você ainda não recebeu avaliações</h3>
-                        <p>As avaliações aparecerão aqui após os passageiros concluírem suas corridas.</p>
+                    <div class="card-body text-center py-4">
+                        <h3 class="h6">Você ainda não recebeu avaliações</h3>
+                        <p class="text-body-secondary mb-0">As avaliações aparecerão aqui após os passageiros concluírem suas corridas.</p>
                     </div>
                 {% endif %}
             </section>
         {% endif %}
 
         {% if corridas_ativas is defined %}
-            <section class="panel rides-panel" aria-labelledby="active-rides-title">
-                <div class="panel-header">
+            <section class="card shadow-sm mb-4" aria-labelledby="active-rides-title">
+                <div class="card-header bg-white d-flex align-items-center justify-content-between gap-3 py-3">
                     <div>
-                        <p class="eyebrow">Suas viagens</p>
-                        <h2 id="active-rides-title">Corridas atribuídas a você</h2>
+                        <p class="small text-body-secondary text-uppercase fw-semibold mb-1">Suas viagens</p>
+                        <h2 id="active-rides-title" class="h5 mb-0">Corridas atribuídas a você</h2>
                     </div>
-                    <span class="ride-count">{{ corridas_ativas|length }}</span>
+                    <span class="badge rounded-pill text-bg-dark">{{ corridas_ativas|length }}</span>
                 </div>
 
                 {% if corridas_ativas %}
-                    <div class="ride-list">
+                    <div class="list-group list-group-flush">
                         {% for corrida in corridas_ativas %}
-                            <article class="ride-card">
-                                <div class="ride-card-header">
-                                    <h3>Corrida #{{ corrida.id }}</h3>
-                                    <span class="ride-status">{{ corrida.status }}</span>
-                                </div>
+                            <article class="list-group-item p-4">
+                                <header class="d-flex align-items-center justify-content-between gap-3 mb-3">
+                                    <h3 class="h6 mb-0">Corrida #{{ corrida.id }}</h3>
+                                    <span class="badge rounded-pill {{ 'text-bg-info' if corrida.status == 'Aceita' else 'text-bg-warning' }}">
+                                        {{ corrida.status }}
+                                    </span>
+                                </header>
 
-                                <dl class="ride-details">
-                                    <div>
-                                        <dt>Passageiro</dt>
-                                        <dd>{{ corrida.usuario }}</dd>
+                                <dl class="row g-3 mb-0">
+                                    <div class="col-12 col-md-6">
+                                        <dt class="small text-body-secondary mb-1">Passageiro</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.usuario }}</dd>
                                     </div>
-                                    <div>
-                                        <dt>Origem</dt>
-                                        <dd>{{ corrida.origem }}</dd>
+                                    <div class="col-12 col-md-6">
+                                        <dt class="small text-body-secondary mb-1">Origem</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.origem }}</dd>
                                     </div>
-                                    <div>
-                                        <dt>Destino</dt>
-                                        <dd>{{ corrida.destino }}</dd>
+                                    <div class="col-12 col-md-6">
+                                        <dt class="small text-body-secondary mb-1">Destino</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.destino }}</dd>
                                     </div>
-                                    <div>
-                                        <dt>Solicitada em</dt>
-                                        <dd>{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
+                                    <div class="col-12 col-md-6">
+                                        <dt class="small text-body-secondary mb-1">Solicitada em</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}</dd>
                                     </div>
                                 </dl>
 
                                 {% if corrida.status == "Aceita" %}
-                                    <form
-                                        class="ride-actions"
-                                        action="{{ url_for('motoristas.iniciar_corrida', corrida_id=corrida.id) }}"
-                                        method="post"
-                                    >
-                                        <button class="primary-action" type="submit">Iniciar corrida</button>
-                                    </form>
-                                    <form
-                                        class="ride-actions"
-                                        action="{{ url_for('motoristas.cancelar_corrida', corrida_id=corrida.id) }}"
-                                        method="post"
-                                        onsubmit="return confirm('Deseja cancelar esta corrida?');"
-                                    >
-                                        <button class="danger-action" type="submit">Cancelar corrida</button>
-                                    </form>
+                                    <div class="d-flex flex-wrap gap-2 mt-3">
+                                        <form
+                                            action="{{ url_for('motoristas.iniciar_corrida', corrida_id=corrida.id) }}"
+                                            method="post"
+                                        >
+                                            <button class="btn btn-dark" type="submit">Iniciar corrida</button>
+                                        </form>
+                                        <form
+                                            action="{{ url_for('motoristas.cancelar_corrida', corrida_id=corrida.id) }}"
+                                            method="post"
+                                            onsubmit="return confirm('Deseja cancelar esta corrida?');"
+                                        >
+                                            <button class="btn btn-outline-danger" type="submit">Cancelar corrida</button>
+                                        </form>
+                                    </div>
                                 {% elif corrida.status == "Em andamento" %}
                                     <form
-                                        class="ride-actions"
+                                        class="d-flex flex-column flex-md-row align-items-md-end gap-3 mt-3"
                                         action="{{ url_for('motoristas.finalizar_corrida', corrida_id=corrida.id) }}"
                                         method="post"
                                     >
-                                        <label class="distance-field" for="distancia-{{ corrida.id }}">
-                                            <span>Distância percorrida (km)</span>
+                                        <div class="flex-grow-1">
+                                            <label class="form-label" for="distancia-{{ corrida.id }}">
+                                                Distância percorrida (km)
+                                            </label>
                                             <input
+                                                class="form-control"
                                                 id="distancia-{{ corrida.id }}"
                                                 name="distancia_km"
                                                 type="number"
@@ -198,96 +196,99 @@
                                                 placeholder="Ex.: 8.5"
                                                 required
                                             >
-                                            <small>Tarifa de teste: R$ 2,50 por km.</small>
-                                        </label>
-                                        <button class="primary-action" type="submit">Finalizar corrida</button>
+                                            <div class="form-text">Tarifa de teste: R$ 2,50 por km.</div>
+                                        </div>
+                                        <button class="btn btn-dark" type="submit">Finalizar corrida</button>
                                     </form>
                                     <form
-                                        class="ride-actions"
+                                        class="mt-2"
                                         action="{{ url_for('motoristas.cancelar_corrida', corrida_id=corrida.id) }}"
                                         method="post"
                                         onsubmit="return confirm('Deseja cancelar esta corrida?');"
                                     >
-                                        <button class="danger-action" type="submit">Cancelar corrida</button>
+                                        <button class="btn btn-outline-danger" type="submit">Cancelar corrida</button>
                                     </form>
                                 {% endif %}
                             </article>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="empty-state">
-                        <h3>Nenhuma corrida atribuída</h3>
-                        <p>As corridas que você aceitar aparecerão aqui.</p>
+                    <div class="card-body text-center py-5">
+                        <h3 class="h6">Nenhuma corrida atribuída</h3>
+                        <p class="text-body-secondary mb-0">As corridas que você aceitar aparecerão aqui.</p>
                     </div>
                 {% endif %}
             </section>
         {% endif %}
 
         {% if corridas_disponiveis is defined %}
-            <section class="panel rides-panel" aria-labelledby="rides-title">
-                <div class="panel-header">
+            <section class="card shadow-sm mb-4" aria-labelledby="rides-title">
+                <div class="card-header bg-white d-flex align-items-center justify-content-between gap-3 py-3">
                     <div>
-                        <p class="eyebrow">Solicitações abertas</p>
-                        <h2 id="rides-title">Corridas disponíveis</h2>
+                        <p class="small text-body-secondary text-uppercase fw-semibold mb-1">Solicitações abertas</p>
+                        <h2 id="rides-title" class="h5 mb-0">Corridas disponíveis</h2>
                     </div>
-                    <span class="ride-count">{{ corridas_disponiveis|length }}</span>
+                    <span class="badge rounded-pill text-bg-dark">{{ corridas_disponiveis|length }}</span>
                 </div>
 
                 {% if not pode_receber %}
-                    <div class="empty-state">
-                        <h3>Disponibilidade desativada</h3>
-                        <p>Ative sua disponibilidade para consultar solicitações de corrida.</p>
+                    <div class="card-body">
+                        <div class="alert alert-warning mb-0" role="status">
+                            <h3 class="h6">Disponibilidade desativada</h3>
+                            <p class="mb-0">Ative sua disponibilidade para consultar solicitações de corrida.</p>
+                        </div>
                     </div>
                 {% elif corridas_disponiveis %}
-                    <div class="ride-list">
+                    <div class="list-group list-group-flush">
                         {% for corrida in corridas_disponiveis %}
-                            <article class="ride-card">
-                                <div class="ride-card-header">
-                                    <h3>Corrida #{{ corrida.id }}</h3>
-                                    <time datetime="{{ corrida.data_hora.isoformat() }}">
+                            <article class="list-group-item p-4">
+                                <header class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-3">
+                                    <h3 class="h6 mb-0">Corrida #{{ corrida.id }}</h3>
+                                    <time class="small text-body-secondary" datetime="{{ corrida.data_hora.isoformat() }}">
                                         {{ corrida.data_hora.strftime("%d/%m/%Y às %H:%M") }}
                                     </time>
-                                </div>
+                                </header>
 
-                                <dl class="ride-details">
-                                    <div>
-                                        <dt>Passageiro</dt>
-                                        <dd>{{ corrida.usuario }}</dd>
+                                <dl class="row g-3 mb-3">
+                                    <div class="col-12 col-md-4">
+                                        <dt class="small text-body-secondary mb-1">Passageiro</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.usuario }}</dd>
                                     </div>
-                                    <div>
-                                        <dt>Origem</dt>
-                                        <dd>{{ corrida.origem }}</dd>
+                                    <div class="col-12 col-md-4">
+                                        <dt class="small text-body-secondary mb-1">Origem</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.origem }}</dd>
                                     </div>
-                                    <div>
-                                        <dt>Destino</dt>
-                                        <dd>{{ corrida.destino }}</dd>
+                                    <div class="col-12 col-md-4">
+                                        <dt class="small text-body-secondary mb-1">Destino</dt>
+                                        <dd class="mb-0 fw-semibold">{{ corrida.destino }}</dd>
                                     </div>
                                 </dl>
 
                                 <form
-                                    class="ride-actions"
                                     action="{{ url_for('motoristas.aceitar_corrida', corrida_id=corrida.id) }}"
                                     method="post"
                                 >
-                                    <button class="primary-action" type="submit">Aceitar corrida</button>
+                                    <button class="btn btn-dark" type="submit">Aceitar corrida</button>
                                 </form>
                             </article>
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="empty-state">
-                        <h3>Nenhuma corrida disponível</h3>
-                        <p>Quando um passageiro solicitar uma corrida, ela aparecerá aqui.</p>
+                    <div class="card-body text-center py-5">
+                        <h3 class="h6">Nenhuma corrida disponível</h3>
+                        <p class="text-body-secondary mb-0">Quando um passageiro solicitar uma corrida, ela aparecerá aqui.</p>
                     </div>
                 {% endif %}
             </section>
         {% else %}
-            <section class="panel intro-panel" aria-labelledby="next-step-title">
-                <h2 id="next-step-title">Próximo passo</h2>
-                <p>Abra a lista de corridas para conferir as solicitações que aguardam motorista.</p>
-                <a class="secondary-action" href="{{ url_for('motoristas.corridas_disponiveis') }}">
-                    Consultar corridas
-                </a>
+            <section class="card shadow-sm" aria-labelledby="next-step-title">
+                <div class="card-body">
+                    <h2 id="next-step-title" class="h5">Próximo passo</h2>
+                    <p class="text-body-secondary">Abra a lista de corridas para conferir as solicitações que aguardam motorista.</p>
+                    <a class="btn btn-outline-dark" href="{{ url_for('motoristas.corridas_disponiveis') }}">
+                        Consultar corridas
+                    </a>
+                </div>
             </section>
         {% endif %}
     </main>
