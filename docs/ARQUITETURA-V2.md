@@ -14,6 +14,7 @@ A prioridade da v2 é manter uma estrutura simples, modular e adequada ao desenv
 - psycopg2-binary — conexão entre Python e PostgreSQL
 - fpdf2 — geração de relatórios PDF por perfil
 - Bootstrap 5.3.9 — grid e componentes utilizados inicialmente no painel administrativo
+- Google reCAPTCHA v2 — validação anti-bot server-side nos formulários de login
 - python-dotenv — leitura das configurações locais em .env
 - HTML, CSS e JavaScript — interface
 - Flask-Login — autenticação web e gerenciamento de sessões
@@ -103,11 +104,15 @@ DB_NAME=uber2_v2
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 SECRET_KEY=chave_forte_gerada_localmente
+RECAPTCHA_SITE_KEY=chave_publica_do_recaptcha
+RECAPTCHA_SECRET_KEY=chave_secreta_do_recaptcha
 ```
 
 A função `criar_conexao()`, em `conexao.py`, utiliza as quatro variáveis do banco para abrir a conexão com PostgreSQL por meio de psycopg2. `app.py` carrega `SECRET_KEY` do mesmo `.env`; a chave deve ser forte, privada e estável para manter a validade das sessões entre reinicializações. Gere-a localmente com `python -c "import secrets; print(secrets.token_hex(32))"`.
 
 O arquivo `.env` está no `.gitignore` e não deve ser compartilhado nem enviado ao Git.
+
+Os logins de usuário, motorista e administrador usam Google reCAPTCHA v2 do tipo caixa de seleção. Configure as chaves pública e secreta no console do Google para cada domínio usado. O servidor envia o token ao endpoint de verificação do Google com timeout; token ausente, rejeitado, indisponibilidade do serviço ou chaves não configuradas bloqueiam a autenticação. A chave secreta deve ser mantida fora do código e do Git.
 
 O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scripts disponíveis estão em sql/ e devem ser revisados antes da execução. Em especial, insert-date.sql contém comandos de limpeza e não deve ser executado em um banco com dados que precisem ser preservados. Para bancos já criados, adicionar-distancia-corridas.sql inclui a coluna de distância sem remover os registros existentes.
 
@@ -116,7 +121,7 @@ O banco deve ser criado no PostgreSQL antes de executar os scripts SQL. Os scrip
 1. Instale Python 3 e PostgreSQL.
 2. Crie e ative um ambiente virtual na pasta do projeto.
 3. Instale as dependências listadas em requirements.txt.
-4. Configure DB_HOST, DB_NAME, DB_USER, DB_PASSWORD e SECRET_KEY em um arquivo local `.env`. Gere `SECRET_KEY` localmente com o comando Python documentado acima.
+4. Configure DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, SECRET_KEY, RECAPTCHA_SITE_KEY e RECAPTCHA_SECRET_KEY em um arquivo local `.env`. Gere `SECRET_KEY` localmente com o comando Python documentado acima.
 5. Crie o banco configurado no PostgreSQL.
 6. Execute os scripts SQL necessários, após revisar seu conteúdo.
 7. Inicie a aplicação:

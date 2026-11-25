@@ -6,6 +6,9 @@
     <title>Entrar | Uber 2</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+    {% if recaptcha_configurado %}
+        <script src="https://www.google.com/recaptcha/api.js?hl=pt-BR" async defer></script>
+    {% endif %}
 </head>
 <body>
     <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
@@ -24,6 +27,11 @@
                 {% if erro %}
                     <div class="alert alert-danger" role="alert">
                         {{ erro }}
+                    </div>
+                {% endif %}
+                {% if not recaptcha_configurado %}
+                    <div class="alert alert-warning" role="alert">
+                        O CAPTCHA não está configurado. O login está temporariamente indisponível.
                     </div>
                 {% endif %}
 
@@ -45,7 +53,10 @@
                                         <input id="user-password" class="form-control" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
                                     </div>
 
-                                    <button class="btn btn-dark w-100" type="submit">Entrar como usuário</button>
+                                    {% if recaptcha_configurado %}
+                                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                                    {% endif %}
+                                    <button class="btn btn-dark w-100" type="submit" {% if not recaptcha_configurado %}disabled{% endif %}>Entrar como usuário</button>
                                 </form>
                             </div>
                         </div>
@@ -68,7 +79,10 @@
                                         <input id="driver-password" class="form-control" type="password" name="password" autocomplete="current-password" placeholder="Digite sua senha" required>
                                     </div>
 
-                                    <button class="btn btn-dark w-100" type="submit">Entrar como motorista</button>
+                                    {% if recaptcha_configurado %}
+                                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                                    {% endif %}
+                                    <button class="btn btn-dark w-100" type="submit" {% if not recaptcha_configurado %}disabled{% endif %}>Entrar como motorista</button>
                                 </form>
                             </div>
                         </div>

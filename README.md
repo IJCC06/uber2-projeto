@@ -22,6 +22,7 @@ Na versão 2.0.0, a aplicação web usa Flask e PostgreSQL para oferecer o fluxo
 - **psycopg2-binary** — driver de conexão com PostgreSQL
 - **fpdf2** — geração dos relatórios PDF por perfil
 - **Bootstrap 5.3.9** — grid e componentes do painel administrativo inicial
+- **Google reCAPTCHA v2** — proteção dos formulários de login de usuário, motorista e administrador
 - **python-dotenv** — carregamento das configurações locais
 - **Flask-Login** — autenticação e gerenciamento de sessões
 - **HTML, CSS e JavaScript** — frontend
@@ -35,6 +36,7 @@ Até o momento, o repositório contém:
 - leitura de configurações por variáveis de ambiente;
 - tela de login renderizada pelo Flask;
 - rotas para tentativa de login de usuário, motorista e administrador;
+- validação server-side do Google reCAPTCHA v2 nos logins de usuário, motorista e administrador;
 - cadastro público de motoristas, com contas inicialmente inativas até ativação administrativa;
 - rota para exibir a página inicial do usuário;
 - templates HTML e diretórios de arquivos estáticos;
@@ -137,6 +139,8 @@ DB_NAME=uber2_v2
 DB_USER=seu_usuario
 DB_PASSWORD=sua_senha
 SECRET_KEY=cole_aqui_a_chave_gerada
+RECAPTCHA_SITE_KEY=chave_publica_do_recaptcha
+RECAPTCHA_SECRET_KEY=chave_secreta_do_recaptcha
 ```
 
 Gere uma chave forte localmente, sem compartilhá-la:
@@ -148,6 +152,8 @@ python -c "import secrets; print(secrets.token_hex(32))"
 Copie o valor exibido para `SECRET_KEY`. A chave deve permanecer estável entre reinicializações para preservar as sessões existentes. **Não use uma chave de exemplo, não compartilhe nem envie o arquivo `.env` ao Git**; ele contém credenciais e um segredo de sessão. O `.env` já está listado no `.gitignore`.
 
 A conexão é criada em `conexao.py` com psycopg2. Localmente, ela lê `DB_HOST`, `DB_NAME`, `DB_USER` e `DB_PASSWORD`; se `DATABASE_URL` estiver definida, essa URL tem prioridade. `app.py` carrega o mesmo arquivo para ler `SECRET_KEY`.
+
+Configure `RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY` com as chaves de um reCAPTCHA v2 do tipo caixa de seleção, criado no console do Google reCAPTCHA para os domínios usados pela aplicação. A chave secreta deve permanecer privada e nunca deve ser enviada ao Git. Sem ambas as chaves, os formulários de login ficam indisponíveis; a validação do token é feita pelo servidor e falha de forma segura se o Google não responder.
 
 Os scripts de banco estão na pasta sql/:
 
@@ -201,7 +207,8 @@ A aplicação pode ser executada como uma função Flask na Vercel, mantendo o P
 3. Importe este repositório na Vercel e selecione a branch `main`. O runtime Python detecta o Flask a partir de `requirements.txt` e `app.py`.
 4. Em **Project Settings → Environment Variables**, configure:
    - `DATABASE_URL`: a URL pooled do Neon;
-   - `SECRET_KEY`: uma chave aleatória forte e estável, diferente da usada localmente.
+   - `SECRET_KEY`: uma chave aleatória forte e estável, diferente da usada localmente;
+   - `RECAPTCHA_SITE_KEY` e `RECAPTCHA_SECRET_KEY`: as chaves do reCAPTCHA cadastradas para o domínio de produção.
    Marque o ambiente **Production** (e **Preview** se também quiser testar previews). Não defina essas variáveis no código, no Git ou em mensagens.
 5. Faça o deploy e teste as páginas públicas e o acesso ao banco. Para gerar a chave localmente no Windows, use `.\.venv\Scripts\python.exe -c "import secrets; print(secrets.token_hex(32))"` e cole o resultado diretamente nas configurações da Vercel.
 

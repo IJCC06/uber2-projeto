@@ -6,6 +6,9 @@
     <title>Acesso administrativo | Uber 2</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/login_admin.css') }}">
+    {% if recaptcha_configurado %}
+        <script src="https://www.google.com/recaptcha/api.js?hl=pt-BR" async defer></script>
+    {% endif %}
 </head>
 <body>
     <main class="container min-vh-100 d-flex align-items-center justify-content-center py-4">
@@ -29,6 +32,11 @@
                         {{ erro }}
                     </div>
                 {% endif %}
+                {% if not recaptcha_configurado %}
+                    <div class="alert alert-warning" role="alert">
+                        O CAPTCHA não está configurado. O login está temporariamente indisponível.
+                    </div>
+                {% endif %}
 
                 <form class="vstack gap-3" action="{{ url_for('auth.login_admin') }}" method="post">
                     <div>
@@ -41,7 +49,10 @@
                         <input id="admin-password" class="form-control" name="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
                     </div>
 
-                    <button class="btn btn-dark w-100" type="submit">Entrar na área administrativa</button>
+                    {% if recaptcha_configurado %}
+                        <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                    {% endif %}
+                    <button class="btn btn-dark w-100" type="submit" {% if not recaptcha_configurado %}disabled{% endif %}>Entrar na área administrativa</button>
                 </form>
 
                 <p class="security-note alert alert-warning">Use uma conta de administrador autorizada para continuar.</p>

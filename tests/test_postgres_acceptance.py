@@ -164,13 +164,21 @@ class PostgresAcceptanceTests(unittest.TestCase):
 
     def login_admin(self):
         client = self.app.test_client()
-        response = client.post(
+        response = self.post_login(
+            client,
             "/login/admin",
             data={"email": "admin@example.test", "password": "senha-admin-teste"},
         )
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.headers["Location"].endswith("/admin/home"))
         return client
+
+    def post_login(self, client, path, data):
+        with patch.object(auth_module, "_verificar_recaptcha", return_value=True):
+            return client.post(
+                path,
+                data={**data, "g-recaptcha-response": "token-de-teste"},
+            )
 
     def test_pdf_exports_are_scoped_by_profile_and_keep_admin_filters(self):
         connection = self.database_connection()
@@ -263,7 +271,8 @@ class PostgresAcceptanceTests(unittest.TestCase):
             connection.close()
 
         usuario_client = self.app.test_client()
-        response = usuario_client.post(
+        response = self.post_login(
+            usuario_client,
             "/login/usuario",
             data={
                 "email": "passageiro-pdf@example.test",
@@ -273,7 +282,8 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
 
         motorista_client = self.app.test_client()
-        response = motorista_client.post(
+        response = self.post_login(
+            motorista_client,
             "/login/motorista",
             data={
                 "cpf": "123.456.789-10",
@@ -402,7 +412,8 @@ class PostgresAcceptanceTests(unittest.TestCase):
         finally:
             connection.close()
 
-        response = driver_registration_client.post(
+        response = self.post_login(
+            driver_registration_client,
             "/login/motorista",
             data={"cpf": "123.456.789-00", "password": "senha-motorista-teste"},
         )
@@ -449,14 +460,16 @@ class PostgresAcceptanceTests(unittest.TestCase):
         self.assertIn("busca=motorista+de", response.headers["Location"])
 
         driver_client = self.app.test_client()
-        response = driver_client.post(
+        response = self.post_login(
+            driver_client,
             "/login/motorista",
             data={"cpf": "123.456.789-00", "password": "senha-motorista-teste"},
         )
         self.assertEqual(response.status_code, 302)
         self.assertTrue(response.headers["Location"].endswith("/motorista/home"))
 
-        response = user_client.post(
+        response = self.post_login(
+            user_client,
             "/login/usuario",
             data={
                 "email": "usuario@example.test",
